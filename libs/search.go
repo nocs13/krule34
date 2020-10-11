@@ -303,10 +303,11 @@ wloop:
 						src = strings.Split(src, "?")[0]
 					}
 
+					src = strings.Replace(src, "ny.rule34.xxx", "rule34.xxx", 1)
+
 					tmp := src
 
 					//r.thumbs.PushBack(src)
-					src = strings.Replace(src, "ny.rule34.xxx", "rule34.xxx", 1)
 					src = strings.Replace(src, "thumbnail_", "sample_", 1)
 					src = strings.Replace(src, "thumbnails", "samples", 1)
 					LogDebug("Token image preview source: " + src)
