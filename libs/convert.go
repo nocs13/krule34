@@ -17,7 +17,6 @@ func ContentToXML(c *Content) string {
 	}
 
 	for e := c.images.Front(); e != nil; e = e.Next() {
-		Log("Adding image in resource list.")
 		res += "<image>" + fmt.Sprintf("%v", e.Value) + "</image>"
 	}
 

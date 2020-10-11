@@ -25,16 +25,16 @@ func IsToken(tok *html.Token, tag string, class string) bool {
 		return false
 	}
 
-	//Log("Is Token: tk is " + tok.Data)
+	//LogDebug("Is Token: tk is " + tok.Data)
 
 	if tok.Data != tag {
 		return false
 	}
 
-	//Log("Is Token: tag passed")
+	//LogDebug("Is Token: tag passed")
 
 	for _, a := range tok.Attr {
-		//Log("Is Token: Attr is " + a.Key + "/" + a.Val)
+		//LogDebug("Is Token: Attr is " + a.Key + "/" + a.Val)
 
 		if a.Key == "class" && a.Val == class {
 			return true
@@ -50,17 +50,17 @@ func IsTokenAttr(tok *html.Token, tag string, key string, val string) bool {
 		return false
 	}
 
-	//Log("IsTokenAttr: tk is " + tok.Data)
+	//LogDebug("IsTokenAttr: tk is " + tok.Data)
 
 	if tok.Data != tag {
 		return false
 	}
 
 	for _, a := range tok.Attr {
-		//Log("IsTokenArrt: Current attribute is " + a.Key + "/" + a.Val)
+		//LogDebug("IsTokenArrt: Current attribute is " + a.Key + "/" + a.Val)
 
 		if a.Key == key && a.Val == val {
-			//Log("IsTokenArrt: Found XXXXXX")
+			//LogDebug("IsTokenArrt: Found XXXXXX")
 			return true
 		}
 	}
@@ -89,7 +89,7 @@ func GetTokenAttr(tok *html.Token, tag string, key string) string {
 
 //IsImage ...
 func IsImage(uri string) bool {
-	Log("Checking uri is image " + uri)
+	LogDebug("Checking uri is image " + uri)
 
 	res, err := http.Head(uri)
 
@@ -97,17 +97,17 @@ func IsImage(uri string) bool {
 		return false
 	}
 
-	Log("Checking uri content length")
+	LogDebug("Checking uri content length")
 
 	if res.ContentLength < 1 {
 		return false
 	}
 
-	Log("Checking uri content type")
+	LogDebug("Checking uri content type")
 
 	contentType := res.Header.Get("Content-type")
 
-	Log("Checking uri content type is " + contentType)
+	LogDebug("Checking uri content type is " + contentType)
 
 	if contentType == "" || strings.Contains(contentType, "image") == false {
 		return false
@@ -118,7 +118,7 @@ func IsImage(uri string) bool {
 
 //IsVideo ...
 func IsVideo(uri string) bool {
-	Log("Checking uri is video " + uri)
+	LogDebug("Checking uri is video " + uri)
 
 	res, err := http.Head(uri)
 
@@ -126,17 +126,17 @@ func IsVideo(uri string) bool {
 		return false
 	}
 
-	Log("Checking uri content length")
+	LogDebug("Checking uri content length")
 
 	if res.ContentLength < 1 {
 		return false
 	}
 
-	Log("Checking uri content type")
+	LogDebug("Checking uri content type")
 
 	contentType := res.Header.Get("Content-type")
 
-	Log("Checking uri content type is " + contentType)
+	LogDebug("Checking uri content type is " + contentType)
 
 	if contentType == "" || strings.Contains(contentType, "video") == false {
 		return false
@@ -198,28 +198,28 @@ wloop:
 
 		switch {
 		case stat == html.ErrorToken:
-			Log("Tokenizer error.")
+			LogDebug("Tokenizer error.")
 			break wloop
 		case stat == html.StartTagToken:
 			tn := tok.Token()
 
 			if IsTokenAttr(&tn, "li", "class", "tag-type-metadata") || IsTokenAttr(&tn, "li", "class", "tag-type-general") {
-				Log("Token for tag.")
+				LogDebug("Token for tag.")
 				ttype = "tag"
 				acount = 0
 			} else if IsTokenAttr(&tn, "li", "class", "tag-type-artist") {
-				Log("Token for thumb.")
+				LogDebug("Token for thumb.")
 				ttype = "artist"
 			} else if IsToken(&tn, "span", "thumb") {
-				Log("Token for thumb.")
+				LogDebug("Token for thumb.")
 				ttype = "thumb"
 			} else if IsToken(&tn, "div", "pagination") {
-				Log("Token for pagination.")
+				LogDebug("Token for pagination.")
 				ttype = "pagination"
 			}
 
 			if tn.Data == "a" {
-				Log("Token for A.")
+				LogDebug("Token for A.")
 
 				if ttype == "tag" || ttype == "artist" {
 					alink = true
@@ -233,7 +233,7 @@ wloop:
 							mc := fmt.Sprintf("%v", re.FindString(href))
 							mc = strings.Replace(mc, "tags=", "", 1)
 
-							Log("Token tag is: " + mc)
+							LogDebug("Token tag is: " + mc)
 
 							if mc != "" && ttype == "tag" {
 								r.tags.PushBack(mc)
@@ -254,7 +254,7 @@ wloop:
 						mc := fmt.Sprintf("%v", re.FindString(href))
 						mc = strings.Replace(mc, "pid=", "", 1)
 
-						Log("Token page is: " + mc)
+						LogDebug("Token page is: " + mc)
 
 						if mc != "" {
 							r.pages.PushBack(mc)
@@ -269,31 +269,31 @@ wloop:
 				ttype = ""
 			}
 			if tn.Data == "a" {
-				Log("Token a closing.")
+				LogDebug("Token a closing.")
 				alink = false
 			}
 		case stat == html.SelfClosingTagToken:
 			tn := tok.Token()
 
-			Log("Token text is: " + tn.Data)
+			LogDebug("Token text is: " + tn.Data)
 			if IsToken(&tn, "img", "preview") && alink == true {
 				var anim bool
 
 				anim = false
 
-				Log("Token for image preview.")
+				LogDebug("Token for image preview.")
 				tit := GetTokenAttr(&tn, "img", "title")
 
 				if tit != "" && strings.Contains(tit, " animated ") {
 					anim = true
 
-					Log("Token image preview is aniated.")
+					LogDebug("Token image preview is aniated.")
 				}
 
 				src := GetTokenAttr(&tn, "img", "src")
 
 				if src != "" {
-					Log("Token image preview source: " + src)
+					LogDebug("Token image preview source: " + src)
 
 					if strings.Contains(src, "?") {
 						src = strings.Split(src, "?")[0]
@@ -304,7 +304,7 @@ wloop:
 					//r.thumbs.PushBack(src)
 					src = strings.Replace(src, "thumbnail_", "sample_", 1)
 					src = strings.Replace(src, "thumbnails", "samples", 1)
-					Log("Token image preview source: " + src)
+					LogDebug("Token image preview source: " + src)
 
 					//_, err := url.ParseRequestURI(src)
 
@@ -337,6 +337,8 @@ wloop:
 					if src != "" {
 						r.images.PushBack(src)
 						r.thumbs.PushBack(tmp)
+					} else {
+						LogInfo("thumb [" + tmp + "] not parsed correct.")
 					}
 				}
 			}
@@ -344,7 +346,7 @@ wloop:
 	}
 
 	if err != nil {
-		Log("Search document creator failed")
+		LogError("Search document creator failed")
 	}
 
 	return &r

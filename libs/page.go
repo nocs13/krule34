@@ -21,7 +21,7 @@ func (t *Page) Init(id string) {
 	content, err := ioutil.ReadFile("static/html/" + id)
 
 	if err != nil {
-		Log("Cannot read file " + id)
+		LogError("Cannot read file " + id)
 	}
 
 	txt := string(content)
@@ -33,7 +33,7 @@ func ReadFile(path string) string {
 	content, err := ioutil.ReadFile(path)
 
 	if err != nil {
-		Log("Cannot read file " + path)
+		LogError("Cannot read file " + path)
 
 		return ""
 	}

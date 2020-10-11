@@ -30,19 +30,19 @@ func (h *WebHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	h.mu.Lock()
 
-	libs.Log("Run web handler " + r.URL.Path)
+	libs.LogDebug("Run web handler " + r.URL.Path)
 
 	var url = r.URL.Path
 
 	if len(url) > 7 {
-		libs.Log("Run web  " + r.URL.Path[0:8])
+		libs.LogDebug("Run web  " + r.URL.Path[0:8])
 	}
 
 	if len(url) > len("/static/") && url[0:8] == "/static/" {
-		libs.Log("Handle static")
+		libs.LogDebug("Handle static")
 		handleStatic(w, r)
 	} else {
-		libs.Log("routes count " + strconv.Itoa(len(h.routes)))
+		libs.LogDebug("routes count " + strconv.Itoa(len(h.routes)))
 
 		for _, rt := range h.routes {
 			if rt.id == url {
@@ -68,7 +68,7 @@ func getValue(r *http.Request, key string) string {
 	keys, ok := r.URL.Query()[key]
 
 	if !ok || len(keys[0]) < 1 {
-		libs.Log("Url query key " + key + " is missing.")
+		libs.LogDebug("Url query key " + key + " is missing.")
 
 		return ""
 	}
@@ -83,7 +83,7 @@ func handleStatic(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleIndex(w http.ResponseWriter, r *http.Request) {
-	libs.Log("run handler hello " + r.URL.Path)
+	libs.LogDebug("run handler hello " + r.URL.Path)
 
 	t := libs.NewPage()
 
@@ -93,11 +93,11 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleSearch(w http.ResponseWriter, r *http.Request) {
-	libs.Log("run handler search " + r.URL.Path)
+	libs.LogDebug("run handler search " + r.URL.Path)
 
 	var key = getValue(r, "key")
 
-	libs.Log("run handler search " + key)
+	libs.LogDebug("run handler search " + key)
 
 	var content = libs.Search(key, "")
 
@@ -109,12 +109,12 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 }
 
 func handlePage(w http.ResponseWriter, r *http.Request) {
-	libs.Log("run handler page " + r.URL.Path)
+	libs.LogDebug("run handler page " + r.URL.Path)
 
 	var tag = getValue(r, "tag")
 	var pid = getValue(r, "pid")
 
-	libs.Log("run handler search " + tag + " " + pid)
+	libs.LogDebug("run handler search " + tag + " " + pid)
 
 	var content = libs.Search(tag, pid)
 
@@ -124,11 +124,11 @@ func handlePage(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleTag(w http.ResponseWriter, r *http.Request) {
-	libs.Log("run handler tag " + r.URL.Path)
+	libs.LogDebug("run handler tag " + r.URL.Path)
 
 	var tag = getValue(r, "tag")
 
-	libs.Log("run handler tag " + tag)
+	libs.LogDebug("run handler tag " + tag)
 
 	var content = libs.Search(tag, "")
 
@@ -144,7 +144,9 @@ func main() {
 		port = "5000"
 	}
 
-	libs.Log("Import port is " + port)
+	libs.SetLogLevel(2)
+
+	libs.LogDebug("Import port is " + port)
 
 	var h = new(WebHandler)
 
