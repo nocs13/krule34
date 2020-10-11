@@ -100,6 +100,8 @@ func IsImage(uri string) bool {
 	LogDebug("Checking uri content length")
 
 	if res.ContentLength < 1 {
+		LogInfo("URI [" + uri + "] content length i too small.")
+
 		return false
 	}
 
@@ -110,6 +112,8 @@ func IsImage(uri string) bool {
 	LogDebug("Checking uri content type is " + contentType)
 
 	if contentType == "" || strings.Contains(contentType, "image") == false {
+		LogInfo("URI [" + uri + "] is not image type it is [" + contentType + "] content type.")
+
 		return false
 	}
 
