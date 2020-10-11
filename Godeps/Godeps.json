@@ -1,0 +1,18 @@
+{
+	"ImportPath": "kRule34",
+	"GoVersion": "go1.13",
+	"GodepVersion": "v80",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "golang.org/x/net/html",
+			"Rev": "d3edc9973b7eb1fb302b0ff2c62357091cea9a30"
+		},
+		{
+			"ImportPath": "golang.org/x/net/html/atom",
+			"Rev": "d3edc9973b7eb1fb302b0ff2c62357091cea9a30"
+		}
+	]
+}

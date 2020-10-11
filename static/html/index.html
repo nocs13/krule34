@@ -1,0 +1,69 @@
+<html lang="en" dir="ltr">
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Poppins" rel="stylesheet" />
+    <link href="/static/css/slider.css" rel="stylesheet" />
+
+    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="/static/js/main.js"></script>
+</head>
+
+<body>
+  <div id="div_search">
+    <form>
+      <div class="input-field second-wrap">
+        <select id="tags"></select>
+        <input id="key" type="text" placeholder="Enter Keywords?" value='ass'/>
+        <button id="btn_search" class="btn-search" type="button" onclick="onSearch()">
+          Search
+        </button>
+      </div>
+      <div class="input-field third-wrap">
+        <select id="pages"></select>
+        <select id="artist"></select>
+      </div>
+
+      <button id="k_btn_left" class="btn-search prev" type="button">
+        <
+      </button>
+      <button id="k_btn_right" class="btn-search next" type="button">
+        >
+      </button>
+    </form>
+  </div>
+  <div id="div_main">
+  </div>
+  <div id="div_page">
+  </div>
+
+  <div id="busy">
+    <img src="/static/img/loading.gif" width="150px" height="150px"
+         style="left: 50%; top: 50%; position: fixed;">
+  </div>
+
+  <script>
+    $('#busy').hide();
+    $('#tags').on('change', function() {
+      onSelect(this.value);
+      $('#key').val(this.value);
+    });
+    $('#artist').on('change', function() {
+      onSelect(this.value);
+      $('#key').val(this.value);
+    });
+    $('#k_btn_left').on("click", function(){
+      onPageSide(-1, $('#key').val());
+    });
+    $('#k_btn_right').on("click", function(){
+      onPageSide(1, $('#key').val());
+    });
+    $('#pages').on('change', function() {
+      onPage(this.value, $('#key').val());
+    });
+    $(document).ready(function () {
+        window.scrollTo(0,0);
+    });
+  </script>
+</body>
+</html>
