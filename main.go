@@ -158,7 +158,7 @@ func main() {
 
 	libs.SetLogLevel(2)
 
-	libs.LogDebug("Import port is " + port)
+	libs.LogInfo("Using port: " + port)
 
 	var h = new(WebHandler)
 

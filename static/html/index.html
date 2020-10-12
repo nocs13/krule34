@@ -42,6 +42,12 @@
          style="left: 50%; top: 50%; position: fixed;">
   </div>
 
+  <div id="info">
+    Adult art and images. 3D and 2D xxx paint or modeling art.
+    Use rule34 xxx or rule34.xxx base to provide more comfortable
+    view.
+  </div>
+
   <script>
     $(document.body).off('keypress', "#key");
     $(document.body).off('keyup', "#key");
@@ -50,6 +56,7 @@
       console.log("form refresh");
     });
 
+    $('#info').hide();
     $('#busy').hide();
     $('#tags').on('change', function() {
       onSelect(this.value);
