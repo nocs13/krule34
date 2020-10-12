@@ -1,27 +1,55 @@
 <html lang="en" dir="ltr">
 <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <link href="https://fonts.googleapis.com/css?family=Poppins" rel="stylesheet" />
     <link href="/static/css/slider.css" rel="stylesheet" />
+
+    <title>kRule_34.</title>
+    <meta name="keywords" content="Rule34, xxx art, xxx 3D, xxx 2D, imageboard" />
+    <meta name="description" content="Rule 34 - If it exists, there is porn of it." />
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
     <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <script src="/static/js/main.js"></script>
 </head>
 
 <body>
-  <div id="div_search">
-    <!-- <form> -->
-      <div class="input-field second-wrap">
-        <select id="tags"></select>
+  <div class="jumbotron text-center"
+       style="height: 1px; padding-top: 5px; padding-bottom: 30px;">
+    <p>Rule 34 adult paint art collection.</p>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 pull-left" style="align: left;">
         <input id="key" type="text" placeholder="Enter Keywords?" value='ass'/>
         <button id="btn_search" class="btn-search" type="button" onclick="onSearch()">
           Search
         </button>
       </div>
-      <div class="input-field third-wrap">
+      <div class="col-sm-4">
+        <select id="tags"></select>
+      </div>
+      <div class="col-sm-4">
         <select id="pages"></select>
-        <select id="artist"></select>
+        <!-- <select id="artist"></select> -->
+      </div>
+    </div>
+  </div>
+
+  <div id="div_search">
+    <!-- <form> -->
+      <div class="input-field second-wrap">
+      </div>
+      <div class="input-field third-wrap">
       </div>
 
       <button id="k_btn_left" class="btn-search prev" type="button">
