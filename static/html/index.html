@@ -11,7 +11,7 @@
 
 <body>
   <div id="div_search">
-    <form>
+    <!-- <form> -->
       <div class="input-field second-wrap">
         <select id="tags"></select>
         <input id="key" type="text" placeholder="Enter Keywords?" value='ass'/>
@@ -30,7 +30,7 @@
       <button id="k_btn_right" class="btn-search next" type="button">
         >
       </button>
-    </form>
+    <!-- </form> -->
   </div>
   <div id="div_main">
   </div>
@@ -43,6 +43,13 @@
   </div>
 
   <script>
+    $(document.body).off('keypress', "#key");
+    $(document.body).off('keyup', "#key");
+
+    $("form").submit(function (e) {
+      console.log("form refresh");
+    });
+
     $('#busy').hide();
     $('#tags').on('change', function() {
       onSelect(this.value);
@@ -60,6 +67,11 @@
     });
     $('#pages').on('change', function() {
       onPage(this.value, $('#key').val());
+    });
+    $('#key').on('keypress', function(e){
+      if(e.keyCode == 13) {
+        onSearch();
+      }
     });
     $(document).ready(function () {
         window.scrollTo(0,0);

@@ -82,6 +82,12 @@ func handleStatic(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, data)
 }
 
+func handleBingSiteAuth(w http.ResponseWriter, r *http.Request) {
+	data := libs.ReadFile("BingSiteAuth.xml")
+
+	io.WriteString(w, data)
+}
+
 func handleIndex(w http.ResponseWriter, r *http.Request) {
 	libs.LogDebug("run handler hello " + r.URL.Path)
 
@@ -154,6 +160,9 @@ func main() {
 	h.Add("/tag", handleTag)
 	h.Add("/page", handlePage)
 	h.Add("/search", handleSearch)
+
+	h.Add("/BingSiteAuth.xml", handleBingSiteAuth)
+
 	http.Handle("/", h)
 	http.ListenAndServe(":"+port, nil)
 }
