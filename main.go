@@ -88,6 +88,12 @@ func handleBingSiteAuth(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, data)
 }
 
+func handleGoogleSiteAuth(w http.ResponseWriter, r *http.Request) {
+	data := libs.ReadFile("googleb295dd6d4113b434.html")
+
+	io.WriteString(w, data)
+}
+
 func handleIndex(w http.ResponseWriter, r *http.Request) {
 	libs.LogDebug("run handler hello " + r.URL.Path)
 
@@ -162,6 +168,7 @@ func main() {
 	h.Add("/search", handleSearch)
 
 	h.Add("/BingSiteAuth.xml", handleBingSiteAuth)
+	h.Add("/googleb295dd6d4113b434.html", handleGoogleSiteAuth)
 
 	http.Handle("/", h)
 	http.ListenAndServe(":"+port, nil)
