@@ -133,6 +133,8 @@ func IsVideo(uri string) bool {
 	LogDebug("Checking uri content length")
 
 	if res.ContentLength < 1 {
+		LogInfo("Content-length: " + fmt.Sprintf("%v", res.ContentLength))
+
 		return false
 	}
 
@@ -323,7 +325,18 @@ wloop:
 						//_, err := url.ParseRequestURI(src)
 
 						if IsImage(src) == false {
-							src = ""
+							src = tmp
+
+							src = strings.Replace(src, "thumbnail_", "", 1)
+							src = strings.Replace(src, "thumbnails", "images", 1)
+							LogDebug("Token image preview source: " + src)
+
+							if IsImage(src) == false {
+								src = tmp
+								src = strings.Replace(src, "thumbnail_", "", 1)
+								src = strings.Replace(src, "thumbnails", "/images", 1)
+								LogDebug("Token image preview source: " + src)
+							}
 						}
 					}
 
