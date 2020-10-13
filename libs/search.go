@@ -165,7 +165,7 @@ func convertThumb(src string, anim bool) string {
 		LogDebug("Token image preview source: " + src)
 
 		if strings.Contains(src, "?") {
-			src = strings.Split(src, "?")[0]
+			//src = strings.Split(src, "?")[0]
 		}
 
 		src = strings.Replace(src, "ny.rule34.xxx", "rule34.xxx", 1)
