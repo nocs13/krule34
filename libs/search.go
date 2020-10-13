@@ -94,16 +94,9 @@ func IsImage(uri string) bool {
 	res, err := http.Head(uri)
 
 	if err != nil {
+		LogDebug("Failed HEAD request for uri: " + uri)
+
 		return false
-	}
-
-	LogDebug("Checking uri content length")
-
-	if res.ContentLength < 1 {
-		LogInfo("URI [" + uri + "] content length is too small.")
-		LogInfo("Content-length: " + fmt.Sprintf("%v", res.ContentLength))
-
-		//return false
 	}
 
 	LogDebug("Checking uri content type")
@@ -114,6 +107,15 @@ func IsImage(uri string) bool {
 
 	if contentType == "" || strings.Contains(contentType, "image/") == false {
 		LogInfo("URI [" + uri + "] is not image type it is [" + contentType + "] content type.")
+
+		return false
+	}
+
+	LogDebug("Checking uri content length")
+
+	if res.ContentLength < 1 {
+		LogInfo("URI [" + uri + "] content length is too small.")
+		LogDebug("Content-length: " + fmt.Sprintf("%v", res.ContentLength))
 
 		return false
 	}
@@ -152,9 +154,99 @@ func IsVideo(uri string) bool {
 	return true
 }
 
+func convertThumb(src string, anim bool) string {
+	var r string
+
+	r = ""
+
+	LogInfo("Parsing thumb: " + src)
+
+	if src != "" {
+		LogDebug("Token image preview source: " + src)
+
+		if strings.Contains(src, "?") {
+			src = strings.Split(src, "?")[0]
+		}
+
+		src = strings.Replace(src, "ny.rule34.xxx", "rule34.xxx", 1)
+
+		tmp := src
+
+		src = strings.Replace(src, "thumbnail_", "sample_", 1)
+		src = strings.Replace(src, "thumbnails", "samples", 1)
+		LogDebug("Token image preview source: " + src)
+
+		if IsImage(src) == false {
+			src = tmp
+
+			src = strings.Replace(src, "thumbnail_", "sample_", 1)
+			src = strings.Replace(src, "thumbnails", "/samples", 1)
+
+			if IsImage(src) == false {
+				src = tmp
+
+				src = strings.Replace(src, "thumbnail_", "", 1)
+				src = strings.Replace(src, "thumbnails", "images", 1)
+
+				if IsImage(src) == false {
+					src = tmp
+					src = strings.Replace(src, "thumbnail_", "", 1)
+					src = strings.Replace(src, "thumbnails", "/images", 1)
+
+					if IsImage(src) == false {
+						src = tmp
+						src = strings.Replace(src, "thumbnail_", "", 1)
+						src = strings.Replace(src, "thumbnails", "/images", 1)
+						src = strings.Replace(src, "rule34.xxx", "himg.rule34.xxx", 1)
+
+						if IsImage(src) == false {
+							src = strings.Replace(src, ".jpg", ".jpeg", 1)
+
+							if IsImage(src) == false {
+								src = strings.Replace(src, ".jpeg", ".png", 1)
+
+								if IsImage(src) == false {
+									src = ""
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if src == "" && anim == true {
+			src = tmp
+
+			src = strings.Replace(src, "thumbnail_", "", 1)
+			src = strings.Replace(src, "thumbnails", "/images", 1)
+			src = strings.Replace(src, ".jpg", ".webm", 1)
+			src = strings.Replace(src, "rule34.xxx", "wwebm.rule34.xxx", 1)
+
+			if IsVideo(src) == false {
+				src = ""
+			}
+		}
+
+		if src != "" {
+			r = src
+		} else {
+			LogInfo("thumb [" + tmp + "] not parsed correct.")
+		}
+	}
+
+	LogInfo("convertThumb result is " + r)
+
+	return r
+}
+
 //Search is ...
 func Search(key string, pid string) *Content {
 	var r Content
+
+	var thumbs *list.List
+
+	thumbs = list.New()
 
 	r = Content{}
 
@@ -284,89 +376,36 @@ wloop:
 
 			LogDebug("Token text is: " + tn.Data)
 			if IsToken(&tn, "img", "preview") && alink == true {
-				var anim bool
+				//var anim bool
 
-				anim = false
+				//anim = false
 
 				LogDebug("Token for image preview.")
 				tit := GetTokenAttr(&tn, "img", "title")
 
 				if tit != "" && strings.Contains(tit, " animated ") {
-					anim = true
+					//anim = true
 
 					LogDebug("Token image preview is aniated.")
 				}
 
 				src := GetTokenAttr(&tn, "img", "src")
 
-				if src != "" {
-					LogDebug("Token image preview source: " + src)
-
-					if strings.Contains(src, "?") {
-						src = strings.Split(src, "?")[0]
-					}
-
-					src = strings.Replace(src, "ny.rule34.xxx", "rule34.xxx", 1)
-
-					tmp := src
-
-					//r.thumbs.PushBack(src)
-					src = strings.Replace(src, "thumbnail_", "sample_", 1)
-					src = strings.Replace(src, "thumbnails", "samples", 1)
-					LogDebug("Token image preview source: " + src)
-
-					//_, err := url.ParseRequestURI(src)
-
-					if IsImage(src) == false {
-						src = tmp
-
-						src = strings.Replace(src, "thumbnail_", "sample_", 1)
-						src = strings.Replace(src, "thumbnails", "/samples", 1)
-
-						//_, err := url.ParseRequestURI(src)
-
-						if IsImage(src) == false {
-							src = tmp
-
-							src = strings.Replace(src, "thumbnail_", "", 1)
-							src = strings.Replace(src, "thumbnails", "images", 1)
-							LogDebug("Token image preview source: " + src)
-
-							if IsImage(src) == false {
-								src = tmp
-								src = strings.Replace(src, "thumbnail_", "", 1)
-								src = strings.Replace(src, "thumbnails", "/images", 1)
-								LogDebug("Token image preview source: " + src)
-							}
-						}
-					}
-
-					if src == "" && anim == true {
-						src = tmp
-
-						src = strings.Replace(src, "thumbnail_", "", 1)
-						src = strings.Replace(src, "thumbnails", "/images", 1)
-						src = strings.Replace(src, ".jpg", ".webm", 1)
-						src = strings.Replace(src, "rule34.xxx", "wwebm.rule34.xxx", 1)
-
-						if IsVideo(src) == false {
-							src = ""
-						}
-					}
-
-					if src != "" {
-						r.images.PushBack(src)
-						r.thumbs.PushBack(tmp)
-					} else {
-						LogInfo("thumb [" + tmp + "] not parsed correct.")
-					}
-				}
+				thumbs.PushBack(src)
 			}
 		}
 	}
 
 	if err != nil {
 		LogError("Search document creator failed")
+	}
+
+	for e := thumbs.Front(); e != nil; e = e.Next() {
+		s := convertThumb(fmt.Sprintf("%v", e.Value), false)
+
+		if s != "" {
+			r.images.PushBack(s)
+		}
 	}
 
 	return &r
