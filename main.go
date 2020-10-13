@@ -111,7 +111,7 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 
 	libs.LogDebug("run handler search " + key)
 
-	var content = libs.Search(key, "")
+	var content = libs.SearchUS(key, "")
 
 	str := libs.ContentToXML(content)
 
@@ -156,7 +156,7 @@ func main() {
 		port = "5000"
 	}
 
-	libs.SetLogLevel(2)
+	libs.SetLogLevel(5)
 
 	libs.LogInfo("Using port: " + port)
 
