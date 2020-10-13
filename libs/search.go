@@ -291,6 +291,8 @@ func Search(key string, pid string) *Content {
 	alink = false
 	acount = 0
 
+	LogInfo("Start search procedure...")
+
 wloop:
 	for {
 		stat := tok.Next()
@@ -395,6 +397,8 @@ wloop:
 			}
 		}
 	}
+
+	LogInfo("End search procedure...")
 
 	if err != nil {
 		LogError("Search document creator failed")
