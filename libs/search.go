@@ -103,10 +103,10 @@ func IsImage(uri string) bool {
 
 	contentType := res.Header.Get("Content-type")
 
-	LogDebug("Checking uri content type is " + contentType)
+	LogInfo("Checking uri content type is " + contentType)
 
 	if contentType == "" || strings.Contains(contentType, "image/") == false {
-		LogInfo("URI [" + uri + "] is not image type it is [" + contentType + "] content type.")
+		LogDebug("URI [" + uri + "] is not image type it is [" + contentType + "] content type.")
 
 		return false
 	}
