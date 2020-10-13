@@ -89,21 +89,21 @@ func GetTokenAttr(tok *html.Token, tag string, key string) string {
 
 //IsImage ...
 func IsImage(uri string) bool {
-	LogDebug("Checking uri is image " + uri)
+	LogInfo("Checking uri is image " + uri)
 
 	res, err := http.Head(uri)
 
 	if err != nil {
-		LogDebug("Failed HEAD request for uri: " + uri)
+		LogDebug("Failed HEAD request.")
 
 		return false
 	}
 
-	LogDebug("Checking uri content type")
+	LogDebug("Checking uri content type.")
 
 	contentType := res.Header.Get("Content-type")
 
-	LogInfo("Checking uri content type is " + contentType)
+	LogInfo("Uri content type is " + contentType)
 
 	if contentType == "" || strings.Contains(contentType, "image/") == false {
 		LogDebug("URI [" + uri + "] is not image type it is [" + contentType + "] content type.")
