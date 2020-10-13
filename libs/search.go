@@ -475,6 +475,10 @@ wloop:
 				src := parseImage(bb + thumbHref)
 
 				if src != "" {
+					if strings.Contains(src, "us.rule34.xxx") {
+						src = strings.Replace(src, "us.rule34.xxx", "rule34.xxx", 1)
+					}
+					
 					r.images.PushBack(src)
 				}
 			}
