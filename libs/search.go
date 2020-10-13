@@ -240,13 +240,84 @@ func convertThumb(src string, anim bool) string {
 	return r
 }
 
+func parseImage(url string) string {
+	var r string
+
+	LogInfo("Parsing rul: " + url)
+
+	if url == "" {
+		LogError("Wrong url.")
+
+		return ""
+	}
+
+	client := &http.Client{}
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36")
+	req.AddCookie(&http.Cookie{Name: "resize-original", Value: "1"})
+	req.AddCookie(&http.Cookie{Name: "resize-notification", Value: "1"})
+
+	res, err := client.Do(req)
+
+	if err != nil || res == nil {
+		LogError("Failed GET request.")
+
+		return ""
+	}
+
+	defer res.Body.Close()
+
+	tok := html.NewTokenizer(res.Body)
+
+	avideo := false
+
+wloop:
+	for {
+		stat := tok.Next()
+
+		switch {
+		case stat == html.ErrorToken:
+			LogDebug("Tokenizer error.")
+			break wloop
+		case stat == html.StartTagToken:
+			tn := tok.Token()
+
+			if IsTokenAttr(&tn, "video", "id", "gelcomVideoPlayer") {
+				avideo = true
+				LogInfo("Video tag opened")
+			}
+		case stat == html.EndTagToken:
+			tn := tok.Token()
+
+			if IsTokenAttr(&tn, "video", "id", "gelcomVideoPlayer") {
+				LogInfo("Video tag closed")
+				avideo = false
+			}
+		case stat == html.SelfClosingTagToken:
+			tn := tok.Token()
+
+			if IsTokenAttr(&tn, "img", "id", "image") == true {
+				r = GetTokenAttr(&tn, "img", "src")
+			} else if avideo && IsTokenAttr(&tn, "source", "type", "video/webm") {
+				s := GetTokenAttr(&tn, "source", "src")
+
+				r = s
+			}
+		}
+	}
+
+	if err != nil {
+		LogError("Parse page error: " + fmt.Sprintf("%v", err))
+	}
+
+	LogInfo("Parsing result is: " + r)
+
+	return r
+}
+
 //Search is ...
 func Search(key string, pid string) *Content {
 	var r Content
-
-	var thumbs *list.List
-
-	thumbs = list.New()
 
 	r = Content{}
 
@@ -255,6 +326,10 @@ func Search(key string, pid string) *Content {
 	r.images = list.New()
 	r.thumbs = list.New()
 	r.artist = list.New()
+
+	var bb string
+
+	bb = "https://rule34.xxx/"
 
 	var ss string
 	ss = "https://rule34.xxx/index.php?page=post&s=list&tags=" + key
@@ -286,6 +361,8 @@ func Search(key string, pid string) *Content {
 
 	var alink bool
 	var acount int
+
+	var thumbHref string
 
 	ttype = ""
 	alink = false
@@ -345,6 +422,7 @@ wloop:
 					}
 				} else if ttype == "thumb" {
 					alink = true
+					thumbHref = GetTokenAttr(&tn, "a", "href")
 				} else if ttype == "pagination" {
 					alink = true
 
@@ -391,9 +469,14 @@ wloop:
 					LogDebug("Token image preview is aniated.")
 				}
 
-				src := GetTokenAttr(&tn, "img", "src")
+				//src := GetTokenAttr(&tn, "img", "src")
 
-				thumbs.PushBack(src)
+				//thumbs.PushBack(src)
+				src := parseImage(bb + thumbHref)
+
+				if src != "" {
+					r.images.PushBack(src)
+				}
 			}
 		}
 	}
@@ -404,13 +487,13 @@ wloop:
 		LogError("Search document creator failed")
 	}
 
-	for e := thumbs.Front(); e != nil; e = e.Next() {
+	/*for e := thumbs.Front(); e != nil; e = e.Next() {
 		s := convertThumb(fmt.Sprintf("%v", e.Value), false)
 
 		if s != "" {
 			r.images.PushBack(s)
 		}
-	}
+	}*/
 
 	return &r
 }
