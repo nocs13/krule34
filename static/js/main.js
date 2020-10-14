@@ -1,5 +1,6 @@
 var paginator = -1;
-var pages = null
+var pages = null;
+var thpp = 1; // thumbs per page for it may be 42
 
 class kSearch extends React.Component {
   render() {
@@ -107,7 +108,7 @@ function parseXML(data)
       d = d.replace('</page>', '');
 
       pages.push(d);
-      $('#pages').append('<option value="' + d + '">' + d / 42 + '</option>');
+      $('#pages').append('<option value="' + d + '">' + d / thpp + '</option>');
     }
   }
 
@@ -228,7 +229,7 @@ function onPage(pid, tag)
   })
   .done(function(){
     paginator = pid;
-    $('#pages').append('<option value="' + pid + '" selected>' + pid / 42 + '</option>');
+    $('#pages').append('<option value="' + pid + '" selected>' + pid / thpp + '</option>');
     window.scrollTo(0,0);
     console.log('success');
   })
@@ -270,7 +271,7 @@ function onPageSide(side, tag)
   })
   .done(function(){
     console.log('success');
-    $('#pages').append('<option value="' + pid + '" selected>' + pid / 42 + '</option>');
+    $('#pages').append('<option value="' + pid + '" selected>' + pid / thpp + '</option>');
     window.scrollTo(0,0);
   })
   .fail(function(){

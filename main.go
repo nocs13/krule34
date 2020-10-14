@@ -115,8 +115,6 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 
 	str := libs.ContentToXML(content)
 
-	//io.WriteString(w, "<div> search "+key+"</div>")
-
 	io.WriteString(w, str)
 }
 
@@ -128,7 +126,7 @@ func handlePage(w http.ResponseWriter, r *http.Request) {
 
 	libs.LogDebug("run handler search " + tag + " " + pid)
 
-	var content = libs.Search(tag, pid)
+	var content = libs.SearchUS(tag, pid)
 
 	str := libs.ContentToXML(content)
 
@@ -142,7 +140,7 @@ func handleTag(w http.ResponseWriter, r *http.Request) {
 
 	libs.LogDebug("run handler tag " + tag)
 
-	var content = libs.Search(tag, "")
+	var content = libs.SearchUS(tag, "")
 
 	str := libs.ContentToXML(content)
 

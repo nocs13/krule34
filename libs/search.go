@@ -575,7 +575,7 @@ wloop:
 					if strings.Contains(src, "us.rule34.xxx") {
 						src = strings.Replace(src, "us.rule34.xxx", "rule34.xxx", 1)
 					}
-					
+
 					r.images.PushBack(src)
 				}
 			}
@@ -656,6 +656,8 @@ func SearchUS(key string, pid string) *Content {
 	alink = false
 	acount = 0
 
+	startTagList := false
+
 	LogInfo("Start search procedure...")
 
 wloop:
@@ -669,25 +671,32 @@ wloop:
 		case stat == html.StartTagToken:
 			tn := tok.Token()
 
-			if IsTokenAttr(&tn, "li", "class", "copyright-tag") || IsTokenAttr(&tn, "li", "class", "general-tag") {
+			if IsTokenAttr(&tn, "li", "class", "copyright-tag") ||
+				IsTokenAttr(&tn, "li", "class", "general-tag") {
 				LogDebug("Token for tag.")
 				ttype = "tag"
 				acount = 0
 			} else if IsTokenAttr(&tn, "li", "class", "artist-tag") {
 				LogDebug("Token for artist.")
 				ttype = "artist"
+				acount = 0
 			} else if IsToken(&tn, "div", "thumbnail-preview") {
 				LogDebug("Token for thumb.")
 				ttype = "thumb"
 			} else if IsToken(&tn, "div", "pagination") {
 				LogDebug("Token for pagination.")
 				ttype = "pagination"
+			} else if IsToken(&tn, "ul", "tag-list-left") {
+				startTagList = true
+				LogDebug("Start tag list")
 			}
 
 			if tn.Data == "a" {
-				LogDebug("Token for A.")
+				LogDebug("Token a opening.")
+				LogDebug("Actual type is " + ttype)
+				LogDebug("Actual count is " + fmt.Sprintf("%v", acount))
 
-				if ttype == "tag" || ttype == "artist" {
+				if (startTagList == true) && (ttype == "tag" || ttype == "artist") {
 					alink = true
 					acount++
 
@@ -695,9 +704,9 @@ wloop:
 						href := GetTokenAttr(&tn, "a", "href")
 
 						if href != "" {
-							re := regexp.MustCompile(`tags=(.+)$`)
+							re := regexp.MustCompile(`q=(.+)$`)
 							mc := fmt.Sprintf("%v", re.FindString(href))
-							mc = strings.Replace(mc, "tags=", "", 1)
+							mc = strings.Replace(mc, "q=", "", 1)
 
 							LogDebug("Token tag is: " + mc)
 
@@ -707,6 +716,8 @@ wloop:
 								r.artist.PushBack(mc)
 							}
 						}
+
+						acount = 0
 					}
 				} else if ttype == "thumb" {
 					alink = true
@@ -717,9 +728,9 @@ wloop:
 					href := GetTokenAttr(&tn, "a", "href")
 
 					if href != "" {
-						re := regexp.MustCompile(`pid=(.+)$`)
+						re := regexp.MustCompile(`page=(.+)$`)
 						mc := fmt.Sprintf("%v", re.FindString(href))
-						mc = strings.Replace(mc, "pid=", "", 1)
+						mc = strings.Replace(mc, "page=", "", 1)
 
 						LogDebug("Token page is: " + mc)
 
@@ -734,8 +745,7 @@ wloop:
 
 			if tn.Data == "li" || tn.Data == "span" || tn.Data == "div" {
 				ttype = ""
-			}
-			if tn.Data == "a" {
+			} else if tn.Data == "a" {
 				LogDebug("Token a closing.")
 				alink = false
 			}
@@ -744,15 +754,17 @@ wloop:
 
 			LogDebug("Token text is: " + tn.Data)
 			if tn.Data == "img" && alink == true {
-				//var anim bool
-
-				//anim = false
-
 				src := parseImageUS(thumbHref)
-
-				if src != "" {
+				//src := ""
+				if src != "" && thumbHref != "" {
 					r.images.PushBack(src)
 				}
+			}
+		case stat == html.TextToken:
+			tn := tok.Token()
+
+			if ttype == "tag" || ttype == "artist" {
+				LogDebug("Tag content is: " + tn.Data)
 			}
 		}
 	}
@@ -762,14 +774,6 @@ wloop:
 	if err != nil {
 		LogError("Search document creator failed")
 	}
-
-	/*for e := thumbs.Front(); e != nil; e = e.Next() {
-		s := convertThumb(fmt.Sprintf("%v", e.Value), false)
-
-		if s != "" {
-			r.images.PushBack(s)
-		}
-	}*/
 
 	return &r
 }
