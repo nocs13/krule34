@@ -354,6 +354,7 @@ func parseImageUS(url string) string {
 
 	//wloop:
 	count := 0
+	avideo := false
 
 	for {
 		stat := tok.Next()
@@ -381,6 +382,14 @@ func parseImageUS(url string) string {
 
 					break
 				}
+			} else if tn.Data == "video" {
+				avideo = true
+			} else if tn.Data == "source" && avideo == true && divPushContent == true {
+				ss := GetTokenAttr(&tn, "source", "src")
+
+				if strings.Contains(ss, ".webm") {
+					r = ss
+				}
 			}
 
 			if IsToken(&tn, "div", "content_push") {
@@ -393,6 +402,8 @@ func parseImageUS(url string) string {
 		} else if stat == html.EndTagToken {
 			if tn.Data == "img" {
 				LogInfo("Img is close id " + fmt.Sprintf("%v", count))
+			} else if tn.Data == "video" {
+				avideo = false
 			}
 
 			if IsToken(&tn, "div", "content_push") {
@@ -400,6 +411,13 @@ func parseImageUS(url string) string {
 				LogInfo("Push content unset.")
 			}
 		} else if stat == html.SelfClosingTagToken {
+			if tn.Data == "source" && avideo == true && divPushContent == true {
+				ss := GetTokenAttr(&tn, "source", "src")
+
+				if strings.Contains(ss, ".webm") {
+					r = ss
+				}
+			}
 		}
 	}
 

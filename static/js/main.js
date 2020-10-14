@@ -130,7 +130,7 @@ function parseXML(data)
       d = d.replace('</image>', '');
 
       if (d.indexOf(".mp4") > 0 || d.indexOf(".webm") > 0) {
-        s += '<video style="width:100%" preload="auto">';
+        s += '<video style="width:100%" preload="auto" controls loop>';
         s += '  <source src="' + d + '" type="video/webm">';
         let d1 = d.replace(".webm", ".mp4")
         s += '  <source src="' + d1 + '" type="video/mp4">';
