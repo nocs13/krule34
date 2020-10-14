@@ -28,6 +28,10 @@ func ContentToXML(c *Content) string {
 		res += "<artist>" + fmt.Sprintf("%v", e.Value) + "</artist>"
 	}
 
+	for e := c.ids.Front(); e != nil; e = e.Next() {
+		res += "<id>" + fmt.Sprintf("%v", e.Value) + "</id>"
+	}
+
 	res += "</content>"
 
 	return res

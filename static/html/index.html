@@ -108,6 +108,10 @@
         onSearch();
       }
     });
+    $(document).on('click','img',function(){
+      onArtist(this.attributes[2].value);
+      console.log('click on image: ' + this.attributes[2].value);
+    });
     $(document).ready(function () {
         window.scrollTo(0,0);
     });

@@ -56,6 +56,34 @@ function pagePidRight(pid)
   return -1;
 }
 
+function parseArtist(data)
+{
+  var re = /<artist>(.*?)<\/artist>/gi;
+
+  var artists = data.match(re);
+
+  console.log('matches ' + artists);
+
+  if (artists == null)
+    return;
+
+  console.log('matches ' + artists.length);
+
+  if (artists.length < 1)
+    return
+
+  for(s in artists) {
+    console.log('match: ' + artists[s]);
+  }
+
+  var tag = artists[0];
+
+  tag = tag.replace("<artist>", "");
+  tag = tag.replace("</artist>", "");
+
+  onSelect(tag)
+}
+
 function parseXML(data)
 {
   $('#div_main').html("")
@@ -112,6 +140,9 @@ function parseXML(data)
     }
   }
 
+  re = /<id>(.*?)<\/id>/gi;
+  var ids = data.match(re);
+
   re = /<image>(.*?)<\/image>/gi;
   var images = data.match(re);
 
@@ -124,19 +155,34 @@ function parseXML(data)
   {
     for (i in images)
     {
+      var id = ""
       var s = '<div>';
       let d = images[i]
       d = d.replace('<image>', '');
       d = d.replace('</image>', '');
 
+      if (ids != null && ids[i] != null) {
+        let d = ids[i]
+        d = d.replace('<id>', '');
+        d = d.replace('</id>', '');
+
+        id = d;
+      }
+
       if (d.indexOf(".mp4") > 0 || d.indexOf(".webm") > 0) {
-        s += '<video style="width:100%" preload="auto" controls loop>';
+        s += '<video style="width:100%" preload="auto" controls loop';
+        if (id != "")
+          s += ' iid="' + id + '"';
+        s += '>';
         s += '  <source src="' + d + '" type="video/webm">';
         let d1 = d.replace(".webm", ".mp4")
         s += '  <source src="' + d1 + '" type="video/mp4">';
         s += '</video>';
       } else {
-        s += '<img src="' + d + '"  style="width:100%">';
+        s += '<img src="' + d + '"  style="width:100%"';
+        if (id != "")
+          s += ' iid="' + id + '"';
+        s += '>';
       }
       s += '</div>';
 
@@ -280,5 +326,29 @@ function onPageSide(side, tag)
   .always(function() {
     console.log( "finished" );
     $('#busy').hide();
+  });
+}
+
+function onArtist(id)
+{
+  $('#busy').show();
+
+  $.get("/getartist", {id: id}, function(data){
+    $('#busy').hide();
+    
+    if (data != "")
+      parseArtist(data)
+
+    console.log("Done");
+  })
+  .done(function(){
+    console.log('success');
+  })
+  .fail(function(){
+    console.log('fail');
+    $('#busy').hide();
+  })
+  .always(function() {
+    console.log( "finished" );
   });
 }

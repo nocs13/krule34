@@ -12,6 +12,7 @@ import (
 
 //Content is ...
 type Content struct {
+	ids    *list.List
 	tags   *list.List
 	images *list.List
 	thumbs *list.List
@@ -430,6 +431,92 @@ func parseImageUS(url string) string {
 	return r
 }
 
+//GetArtistUS ...
+func GetArtistUS(url string) string {
+	var r string
+
+	LogInfo("Parsing url: " + url)
+
+	if url == "" {
+		LogError("Wrong url.")
+
+		return ""
+	}
+
+	client := &http.Client{}
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36")
+	//req.AddCookie(&http.Cookie{Name: "resize-original", Value: "1"})
+	//req.AddCookie(&http.Cookie{Name: "resize-notification", Value: "1"})
+
+	res, err := client.Do(req)
+
+	if err != nil || res == nil {
+		LogError("Failed GET request.")
+
+		return ""
+	}
+
+	defer res.Body.Close()
+
+	tok := html.NewTokenizer(res.Body)
+
+	var atag = false
+
+	var artists []string
+
+	for {
+		stat := tok.Next()
+
+		tn := tok.Token()
+
+		if stat == html.ErrorToken {
+			break
+		} else if stat == html.StartTagToken {
+			if IsTokenAttr(&tn, "li", "class", "artist-tag") {
+				atag = true
+			} else if tn.Data == "a" && atag == true {
+				href := GetTokenAttr(&tn, "a", "href")
+
+				if href == "" {
+					continue
+				}
+
+				re := regexp.MustCompile(`q=(.+)$`)
+				mc := fmt.Sprintf("%v", re.FindString(href))
+				mc = strings.Replace(mc, "q=", "", 1)
+
+				if mc != "" {
+					artists = append(artists, mc)
+				}
+			}
+		} else if stat == html.EndTagToken {
+			if IsTokenAttr(&tn, "li", "class", "artist-tag") {
+				atag = false
+			}
+		} else if stat == html.SelfClosingTagToken {
+		}
+	}
+
+	if err != nil {
+		LogError("Parse page error: " + fmt.Sprintf("%v", err))
+	}
+
+	r = "<artists>"
+
+	if len(artists) > 0 {
+
+		for _, s := range artists {
+			r += "<artist>" + s + "</artist>"
+		}
+	}
+
+	r += "</artists>"
+	LogInfo("Parsing result is: " + r)
+
+	return r
+}
+
 //Search is ...
 func Search(key string, pid string) *Content {
 	var r Content
@@ -623,6 +710,7 @@ func SearchUS(key string, pid string) *Content {
 
 	r = Content{}
 
+	r.ids = list.New()
 	r.tags = list.New()
 	r.pages = list.New()
 	r.images = list.New()
@@ -776,6 +864,12 @@ wloop:
 				//src := ""
 				if src != "" && thumbHref != "" {
 					r.images.PushBack(src)
+
+					re := regexp.MustCompile(`id=(.+)$`)
+					mc := fmt.Sprintf("%v", re.FindString(thumbHref))
+					mc = strings.Replace(mc, "id=", "", 1)
+
+					r.ids.PushBack(mc)
 				}
 			}
 		case stat == html.TextToken:

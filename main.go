@@ -147,6 +147,24 @@ func handleTag(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, str)
 }
 
+func handleGetArtist(w http.ResponseWriter, r *http.Request) {
+	libs.LogDebug("run handler get artist " + r.URL.Path)
+
+	var id = getValue(r, "id")
+
+	libs.LogDebug("run handler getartist " + id)
+
+	url := "https://rule34.us/index.php?r=posts/view&id=" + id
+
+	str := libs.GetArtistUS(url)
+
+	if str == "" {
+		str = "<empty></empty>"
+	}
+
+	io.WriteString(w, str)
+}
+
 func main() {
 	port := os.Getenv("PORT")
 
@@ -164,6 +182,7 @@ func main() {
 	h.Add("/tag", handleTag)
 	h.Add("/page", handlePage)
 	h.Add("/search", handleSearch)
+	h.Add("/getartist", handleGetArtist)
 
 	h.Add("/BingSiteAuth.xml", handleBingSiteAuth)
 	h.Add("/googleb295dd6d4113b434.html", handleGoogleSiteAuth)
