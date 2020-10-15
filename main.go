@@ -41,6 +41,9 @@ func (h *WebHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if len(url) > len("/static/") && url[0:8] == "/static/" {
 		libs.LogDebug("Handle static")
 		handleStatic(w, r)
+	} else	if len(url) > len("/artist/") && url[0:8] == "/artist/" {
+		libs.LogDebug("Handle artist")
+		handleArtist(w, r)
 	} else {
 		libs.LogDebug("routes count " + strconv.Itoa(len(h.routes)))
 
@@ -165,6 +168,16 @@ func handleGetArtist(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, str)
 }
 
+func handleArtist(w http.ResponseWriter, r *http.Request) {
+	libs.LogDebug("run handler artist " + r.URL.Path)
+
+	t := libs.NewPage()
+
+	t.Init("index.html")
+
+	io.WriteString(w, t.Content)
+}
+
 func main() {
 	port := os.Getenv("PORT")
 
@@ -183,6 +196,8 @@ func main() {
 	h.Add("/page", handlePage)
 	h.Add("/search", handleSearch)
 	h.Add("/getartist", handleGetArtist)
+
+	//h.Add("/artist/", handleArtist)
 
 	h.Add("/BingSiteAuth.xml", handleBingSiteAuth)
 	h.Add("/googleb295dd6d4113b434.html", handleGoogleSiteAuth)

@@ -81,7 +81,10 @@ function parseArtist(data)
   tag = tag.replace("<artist>", "");
   tag = tag.replace("</artist>", "");
 
-  onSelect(tag)
+  if (tag != "") {
+    window.open(window.location.origin + "/artist/" + tag, '_blank');
+  }
+  //onSelect(tag)
 }
 
 function parseXML(data)
@@ -351,4 +354,22 @@ function onArtist(id)
   .always(function() {
     console.log( "finished" );
   });
+}
+
+function checkArtist()
+{
+  var href = window.location.href;
+  var re = /artist\/(.*?)$/gi;
+  var ar = href.match(re);
+
+  if (ar == null || ar.length < 1)
+    return;
+
+  var a = ar[0];
+  
+  a = a.replace("artist/", "");
+
+  if (a.length > 0) {
+    onSelect(a)
+  }
 }

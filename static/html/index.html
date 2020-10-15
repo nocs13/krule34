@@ -24,7 +24,7 @@
 <body>
   <div class="jumbotron text-center"
        style="height: 1px; padding-top: 5px; padding-bottom: 30px;">
-    <p>Rule 34 adult paint art collection.</p>
+    <a id="ntab" href="#">Rule</a> 34 adult paint and modeling art collection.
   </div>
 
   <div class="container">
@@ -108,12 +108,16 @@
         onSearch();
       }
     });
+    $('#ntab').on("click", function(){
+      window.open(window.location.href, '_blank');
+    });
     $(document).on('click','img',function(){
       onArtist(this.attributes[2].value);
       console.log('click on image: ' + this.attributes[2].value);
     });
     $(document).ready(function () {
-        window.scrollTo(0,0);
+      window.scrollTo(0,0);
+      checkArtist();
     });
   </script>
 </body>
