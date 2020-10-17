@@ -189,7 +189,7 @@ function parseXML(data)
         if (id != "")
           s += ' iid="' + id + '"';
         s += '>';*/
-        s += '<img id="' + id + '" iid="' + id + '">'
+        s += '<img id="' + id + '" iid="' + id + '" style="width:100%">'
       }
       s += '</div>';
 
