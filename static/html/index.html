@@ -30,7 +30,7 @@
   <div class="container">
     <div class="row">
       <div class="col-sm-4 pull-left" style="text-align: left;">
-        <input id="key" type="text" placeholder="Enter Keywords?" value='ass'/>
+        <input id="key" type="text" placeholder="Enter Keywords?" value='dc'/>
         <button id="btn_search" class="btn-search" type="button" onclick="onSearch()">
           Search
         </button>
@@ -112,12 +112,17 @@
       window.open(window.location.href, '_blank');
     });
     $(document).on('click','img',function(){
-      onArtist(this.attributes[2].value);
+      //onArtist(this.attributes[2].value);
+      onImage(this.attributes[0].value);
       console.log('click on image: ' + this.attributes[2].value);
     });
     $(document).ready(function () {
       window.scrollTo(0,0);
       checkArtist();
+    });
+    $(document).mousemove(function(e){
+      mspos.x = e.pageX;
+      mspos.y = e.pageY;
     });
   </script>
 </body>

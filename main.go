@@ -41,9 +41,12 @@ func (h *WebHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if len(url) > len("/static/") && url[0:8] == "/static/" {
 		libs.LogDebug("Handle static")
 		handleStatic(w, r)
-	} else	if len(url) > len("/artist/") && url[0:8] == "/artist/" {
+	} else if len(url) > len("/artist/") && url[0:8] == "/artist/" {
 		libs.LogDebug("Handle artist")
 		handleArtist(w, r)
+	} else if len(url) > len("/character/") && url[0:11] == "/character/" {
+		libs.LogDebug("Handle artist")
+		handleCharacter(w, r)
 	} else {
 		libs.LogDebug("routes count " + strconv.Itoa(len(h.routes)))
 
@@ -168,8 +171,36 @@ func handleGetArtist(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, str)
 }
 
+func handleGetCharacter(w http.ResponseWriter, r *http.Request) {
+	libs.LogDebug("run handler get character " + r.URL.Path)
+
+	var id = getValue(r, "id")
+
+	libs.LogDebug("run handler getcharacter " + id)
+
+	url := "https://rule34.us/index.php?r=posts/view&id=" + id
+
+	str := libs.GetCharacterUS(url)
+
+	if str == "" {
+		str = "<empty></empty>"
+	}
+
+	io.WriteString(w, str)
+}
+
 func handleArtist(w http.ResponseWriter, r *http.Request) {
 	libs.LogDebug("run handler artist " + r.URL.Path)
+
+	t := libs.NewPage()
+
+	t.Init("index.html")
+
+	io.WriteString(w, t.Content)
+}
+
+func handleCharacter(w http.ResponseWriter, r *http.Request) {
+	libs.LogDebug("run handler character " + r.URL.Path)
 
 	t := libs.NewPage()
 
@@ -196,8 +227,7 @@ func main() {
 	h.Add("/page", handlePage)
 	h.Add("/search", handleSearch)
 	h.Add("/getartist", handleGetArtist)
-
-	//h.Add("/artist/", handleArtist)
+	h.Add("/getcharacter", handleGetCharacter)
 
 	h.Add("/BingSiteAuth.xml", handleBingSiteAuth)
 	h.Add("/googleb295dd6d4113b434.html", handleGoogleSiteAuth)

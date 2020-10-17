@@ -1,7 +1,11 @@
 var paginator = -1;
 var pages = null;
 var thpp = 1; // thumbs per page for it may be 42
-var images = null;
+var images = null
+var mspos = new function() {
+  this.x = 0;
+  this.y = 0;
+}
 
 class kSearch extends React.Component {
   render() {
@@ -15,6 +19,50 @@ function resetPages()
   paginator = -1;
 
   pages = null
+}
+
+function hideImgMenu()
+{
+  var el =  document.getElementById('divImgMenu');
+
+  if (typeof(el) != 'undefined' && el != null)
+  {
+    $('#divImgMenu').hide();
+
+    el.parentNode.removeChild(el);
+  }
+}
+
+function showImgMenu(id)
+{
+  hideImgMenu();
+
+  var d = '<div id="divImgMenu" class="dropdown-menu" aria-labelledby="dropdownMenuLink">';
+      d += '<a  id="aImgArtist" class="dropdown-item">Artist</a>';
+      d += '<a  id="aImgCharacter" class="dropdown-item">Character</a>';
+      d += '<a  id="aImgCansel" class="dropdown-item">Cansel</a>';
+      d += '</div>';
+
+  $('body').append(d);
+
+
+  $('#divImgMenu').css({top: mspos.y + 'px', left: mspos.x + 'px', position:'absolute'});
+
+  $('#divImgMenu').show();
+
+  $('#aImgArtist').on('click', function(){
+    hideImgMenu();
+    onArtist(id);
+  });
+
+  $('#aImgCharacter').on('click', function(){
+    hideImgMenu();
+    onCharacter(id);
+  });
+
+  $('#aImgCansel').on('click', function(){
+    hideImgMenu();
+  });
 }
 
 function pagePidLeft(pid)
@@ -84,6 +132,37 @@ function parseArtist(data)
 
   if (tag != "") {
     window.open(window.location.origin + "/artist/" + tag, '_blank');
+  }
+  //onSelect(tag)
+}
+
+function parseCharacter(data)
+{
+  var re = /<character>(.*?)<\/character>/gi;
+
+  var characters = data.match(re);
+
+  console.log('matches ' + characters);
+
+  if (characters == null)
+    return;
+
+  console.log('matches ' + characters.length);
+
+  if (characters.length < 1)
+    return
+
+  for(s in characters) {
+    console.log('match: ' + characters[s]);
+  }
+
+  var tag = characters[0];
+
+  tag = tag.replace("<character>", "");
+  tag = tag.replace("</character>", "");
+
+  if (tag != "") {
+    window.open(window.location.origin + "/character/" + tag, '_blank');
   }
   //onSelect(tag)
 }
@@ -370,20 +449,63 @@ function onArtist(id)
   });
 }
 
+function onCharacter(id)
+{
+  $('#busy').show();
+
+  $.get("/getcharacter", {id: id}, function(data){
+    $('#busy').hide();
+
+    if (data != "")
+      parseCharacter(data)
+
+    console.log("Done");
+  })
+  .done(function(){
+    console.log('success');
+  })
+  .fail(function(){
+    console.log('fail');
+    $('#busy').hide();
+  })
+  .always(function() {
+    console.log( "finished" );
+  });
+}
+
 function checkArtist()
 {
   var href = window.location.href;
   var re = /artist\/(.*?)$/gi;
   var ar = href.match(re);
 
-  if (ar == null || ar.length < 1)
-    return;
+  var meta = "";
+  var a    = "";
 
-  var a = ar[0];
+  if (ar == null || ar.length < 1) {
+    var re = /character\/(.*?)$/gi;
+    var ar = href.match(re);
+    if (ar == null || ar.length < 1) {
+      return;
+    } else {
+      a = ar[0];
 
-  a = a.replace("artist/", "");
+      a = a.replace("character/", "");
+      meta = "character"
+    }
+  } else {
+    meta = "artist";
+    a = ar[0];
+
+    a = a.replace("artist/", "");
+  }
 
   if (a.length > 0) {
     onSelect(a)
   }
+}
+
+function onImage(id)
+{
+  showImgMenu(id);
 }
