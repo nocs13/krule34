@@ -1,6 +1,7 @@
 var paginator = -1;
 var pages = null;
 var thpp = 1; // thumbs per page for it may be 42
+var images = null;
 
 class kSearch extends React.Component {
   render() {
@@ -146,8 +147,10 @@ function parseXML(data)
   re = /<id>(.*?)<\/id>/gi;
   var ids = data.match(re);
 
+  images = null
+
   re = /<image>(.*?)<\/image>/gi;
-  var images = data.match(re);
+  images = data.match(re);
 
   //var parser = new DOMParser();
   //var xmlDoc = parser.parseFromString(data, "text/xml");
@@ -182,14 +185,25 @@ function parseXML(data)
         s += '  <source src="' + d1 + '" type="video/mp4">';
         s += '</video>';
       } else {
-        s += '<img src="' + d + '"  style="width:100%"';
+        /*s += '<img src="' + d + '"  style="width:100%" onload="console.log(\'IMG: \' + this.src);"';
         if (id != "")
           s += ' iid="' + id + '"';
-        s += '>';
+        s += '>';*/
+        s += '<img id="' + id + '" iid="' + id + '">'
       }
       s += '</div>';
 
       $('#div_container').append(s);
+      //var sid = '#' + id;
+      //$(sid).imageLoad(function(){
+      //  console.log('loaded: ' + this.src)
+      //}).attr('src', d);
+      var img = document.getElementById(id);
+
+      if (img != null) {
+        img.onload = function() { console.log("Height: " + this.height); }
+        img.src = d;
+      }
     }
   }
 }
@@ -338,7 +352,7 @@ function onArtist(id)
 
   $.get("/getartist", {id: id}, function(data){
     $('#busy').hide();
-    
+
     if (data != "")
       parseArtist(data)
 
@@ -366,7 +380,7 @@ function checkArtist()
     return;
 
   var a = ar[0];
-  
+
   a = a.replace("artist/", "");
 
   if (a.length > 0) {
