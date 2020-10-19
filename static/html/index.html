@@ -19,6 +19,8 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
             integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <script src="/static/js/main.js"></script>
+    <script src="/static/js/cookies.js"></script>
+    <script src="/static/js/slideimg.js"></script>
 </head>
 
 <body>
@@ -29,18 +31,26 @@
 
   <div class="container">
     <div class="row">
-      <div class="col-sm-4 pull-left" style="text-align: left;">
-        <input id="key" type="text" placeholder="Enter Keywords?" value='dc'/>
-        <button id="btn_search" class="btn-search" type="button" onclick="onSearch()">
-          Search
+      <div class="col-sm-3 pull-left" style="text-align: left;">
+        <input id="key" class="form-control" type="text" placeholder="Enter Keywords?" value='dress'/>
+        <button id="btn_search" class="btn btn-secondary" type="button" onclick="onSearch()" style="position: absolute; top: 0px; right: 15px">
+          S
         </button>
       </div>
-      <div class="col-sm-4">
+      <div class="col-sm-3">
         <select id="tags"></select>
       </div>
-      <div class="col-sm-4">
+      <div class="col-sm-3">
         <select id="pages"></select>
         <!-- <select id="artist"></select> -->
+      </div>
+      <div class="col-sm-3">
+        <div class="checkbox">
+          <label>
+            <input id="mode_gallery" type="checkbox" data-toggle="toggle">
+            Gallery.
+          </label>
+        </div>      
       </div>
     </div>
   </div>
@@ -111,13 +121,40 @@
     $('#ntab').on("click", function(){
       window.open(window.location.href, '_blank');
     });
+    $('#mode_gallery').on("change", function(){
+      if ($(this).is(':checked')){
+        Cookies.set('image_list_mode', 'gallery', 1);
+      } else {
+        Cookies.rem('image_list_mode');
+      }
+    });
     $(document).on('click','img',function(){
       //onArtist(this.attributes[2].value);
-      onImage(this.attributes[0].value);
+      if ($(this).hasClass('thumb')) {
+        onThumb(this.attributes[0].value);
+      } else if ($(this).hasClass('image')) {
+        onImage(this.attributes[0].value);
+      }
       console.log('click on image: ' + this.attributes[2].value);
     });
     $(document).ready(function () {
       window.scrollTo(0,0);
+
+      var imode = Cookies.get('image_list_mode');
+      if (imode == null || imode == "") {
+        imageListMode = "default";
+        $( "#mode_gallery" ).prop( "checked", false);
+        Cookies.set('image_list_mode', 'default');
+      } else {
+        if (imode == "gallery") {
+          imageListMode = "gallery";
+        $( "#mode_gallery" ).prop( "checked", true);
+        } else {
+          imageListMode = "default";
+          $( "#mode_gallery" ).prop( "checked", false);
+        }
+      }
+
       checkArtist();
     });
     $(document).mousemove(function(e){

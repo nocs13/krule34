@@ -842,6 +842,7 @@ func SearchUS(key string, pid string) *Content {
 	var acount int
 
 	var thumbHref string
+	var imageHref string
 
 	ttype = ""
 	alink = false
@@ -930,6 +931,9 @@ wloop:
 						}
 					}
 				}
+			} else if tn.Data == "img" && ttype == "thumb" {
+                imageHref = GetTokenAttr(&tn, "img", "src")			
+                LogDebug("thumblain link is " + imageHref)		
 			}
 		case stat == html.EndTagToken:
 			tn := tok.Token()
@@ -945,6 +949,7 @@ wloop:
 
 			LogDebug("Token text is: " + tn.Data)
 			if tn.Data == "img" && alink == true {
+				imageHref = GetTokenAttr(&tn, "img", "src")
 				src := parseImageUS(thumbHref)
 				//src := ""
 				if src != "" && thumbHref != "" {
@@ -955,7 +960,11 @@ wloop:
 					mc = strings.Replace(mc, "id=", "", 1)
 
 					r.ids.PushBack(mc)
+					r.thumbs.PushBack(imageHref)
 				}
+			} else if tn.Data == "img" && ttype == "thumb" {
+                imageHref = GetTokenAttr(&tn, "img", "src")					
+                LogDebug("thumbnail link is " + imageHref)		
 			}
 		case stat == html.TextToken:
 			tn := tok.Token()

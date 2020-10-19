@@ -1,7 +1,11 @@
 var paginator = -1;
 var pages = null;
 var thpp = 1; // thumbs per page for it may be 42
+
 var images = null
+var thumbs = null
+var ids    = null
+
 var mspos = new function() {
   this.x = 0;
   this.y = 0;
@@ -103,6 +107,64 @@ function pagePidRight(pid)
   }
 
   return -1;
+}
+
+function showImages(images, ids) 
+{
+    $('#div_container').html('');
+
+    for (i in images)
+    {
+      var id = ""
+      var s = '<div>';
+      let d = images[i]
+
+      if (ids != null && ids[i] != null) {
+        let d = ids[i]
+
+        id = d;
+      }
+
+      if (d.indexOf(".mp4") > 0 || d.indexOf(".webm") > 0) {
+        s += '<video style="width:100%" preload="auto" controls loop';
+        if (id != "")
+          s += ' iid="' + id + '"';
+        s += '>';
+        s += '  <source src="' + d + '" type="video/webm">';
+        let d1 = d.replace(".webm", ".mp4")
+        s += '  <source src="' + d1 + '" type="video/mp4">';
+        s += '</video>';
+      } else {
+        /*s += '<img src="' + d + '"  style="width:100%" onload="console.log(\'IMG: \' + this.src);"';
+        if (id != "")
+          s += ' iid="' + id + '"';
+        s += '>';*/
+        s += '<img id="' + id + '" iid="' + id + '" class="image demo cursor" style="width:100%">'
+      }
+      s += '</div>';
+
+      $('#div_container').append(s);
+      //var sid = '#' + id;
+      //$(sid).imageLoad(function(){
+      //  console.log('loaded: ' + this.src)
+      //}).attr('src', d);
+      var img = document.getElementById(id);
+
+      if (img != null) {
+        img.onload = function() { console.log("Height: " + this.height); }
+        img.src = d;
+      }
+    }
+}
+
+function showImageGallery(images, thumbs, ids) 
+{
+  imgSlide.new();
+
+  for (i in thumbs)
+    imgSlide.add(thumbs[i], ids[i]);
+
+  imgSlide.set(images[0], ids[0]);
 }
 
 function parseArtist(data)
@@ -223,67 +285,56 @@ function parseXML(data)
     }
   }
 
+  ids = null
+  ids = new Array()
   re = /<id>(.*?)<\/id>/gi;
-  var ids = data.match(re);
+  var tids = data.match(re);
+
+  for (i in tids) {
+    var t = tids[i];
+    t = t.replace('<id>', '');
+    t = t.replace('</id>', '');
+    ids.push(t);
+  }
+
+  thumbs = null
+  thumbs = new Array()
+  re = /<thumb>(.*?)<\/thumb>/gi;
+  var tthumbs = data.match(re);
+
+  for (i in tthumbs) {
+    var t = tthumbs[i];
+    t = t.replace('<thumb>', '');
+    t = t.replace('</thumb>', '');
+    thumbs.push(t);
+  }
 
   images = null
+  images = new Array()
 
   re = /<image>(.*?)<\/image>/gi;
-  images = data.match(re);
+  var timages = data.match(re);
+
+  for (i in timages) {
+    var t = timages[i];
+    t = t.replace('<image>', '');
+    t = t.replace('</image>', '');
+    images.push(t);
+  }
+
 
   //var parser = new DOMParser();
   //var xmlDoc = parser.parseFromString(data, "text/xml");
   //var images = xmlDoc.getElementsByTagName("image");
   //s += '<img src="' + i.childNodes[0].nodeValue + '"  style="width:100%">';
 
-  if (images != null && images.length > 0)
-  {
-    for (i in images)
-    {
-      var id = ""
-      var s = '<div>';
-      let d = images[i]
-      d = d.replace('<image>', '');
-      d = d.replace('</image>', '');
+  if (images != null && images.length > 0) {
+    var imode = Cookies.get('image_list_mode');
 
-      if (ids != null && ids[i] != null) {
-        let d = ids[i]
-        d = d.replace('<id>', '');
-        d = d.replace('</id>', '');
-
-        id = d;
-      }
-
-      if (d.indexOf(".mp4") > 0 || d.indexOf(".webm") > 0) {
-        s += '<video style="width:100%" preload="auto" controls loop';
-        if (id != "")
-          s += ' iid="' + id + '"';
-        s += '>';
-        s += '  <source src="' + d + '" type="video/webm">';
-        let d1 = d.replace(".webm", ".mp4")
-        s += '  <source src="' + d1 + '" type="video/mp4">';
-        s += '</video>';
-      } else {
-        /*s += '<img src="' + d + '"  style="width:100%" onload="console.log(\'IMG: \' + this.src);"';
-        if (id != "")
-          s += ' iid="' + id + '"';
-        s += '>';*/
-        s += '<img id="' + id + '" iid="' + id + '" style="width:100%">'
-      }
-      s += '</div>';
-
-      $('#div_container').append(s);
-      //var sid = '#' + id;
-      //$(sid).imageLoad(function(){
-      //  console.log('loaded: ' + this.src)
-      //}).attr('src', d);
-      var img = document.getElementById(id);
-
-      if (img != null) {
-        img.onload = function() { console.log("Height: " + this.height); }
-        img.src = d;
-      }
-    }
+    if (imode != null && imode == "gallery")
+      showImageGallery(images, thumbs, ids);
+    else
+      showImages(images, ids);
   }
 }
 
@@ -508,4 +559,15 @@ function checkArtist()
 function onImage(id)
 {
   showImgMenu(id);
+}
+
+function onThumb(id)
+{
+  for (i in ids) {
+    if (ids[i] == id) {
+      imgSlide.set(images[i], id);
+
+      return;
+    }
+  }
 }

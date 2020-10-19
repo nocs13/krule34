@@ -91,6 +91,59 @@ img {vertical-align: middle;}
   left: 50%;
 }
 
+div.scrollmenu {
+  background-color: #333;
+  overflow-x: scroll;
+  overflow-y: hide;
+  white-space: nowrap;
+}
+
+table.scrollable {
+  width: 100%;
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;  
+}
+
+table.scrollable thead,
+table.scrollable tbody {
+  width: 100%;
+}
+
+table.scrollable thead {
+  display: table;
+  /*table-layout: fixed;*/
+  /*width: calc(100% - 16px); /* assuming scrollbar width as 16px */
+}
+
+table.scrollable tbody {
+  overflow: auto;
+  height: 210px;
+  display: block;
+}
+
+table.scrollable tr {
+  text-align: left;
+  display: table;
+  /*table-layout: fixed;*/
+  overflow-x: scroll;
+}
+
+table.scrollable td {
+    width: 150px;
+    overflow: hide;
+}
+
+img.thumb {
+  border: 2px;
+  border-color: gray;
+}
+
+img.image {
+  border: 5px;
+  border-color: black;  
+}
+
 @-webkit-keyframes fade {
   from {opacity: .4}
   to {opacity: 1}
