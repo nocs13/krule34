@@ -28,7 +28,23 @@ var imgSlide = {
 	},
 
 	set: function(src, id) {
-        var th = '<img id="' + id + '" class="image demo cursor" src="' + src + '" style="width:100%">';
+		var th = "";
+
+	    if (src.indexOf(".mp4") > 0 || src.indexOf(".webm") > 0) {
+	    	var s = "";
+    	    s += '<video style="width:100%" preload="auto" controls loop';
+       		s += ' id="' + id + '"';
+        	s += '>';
+        	s += '  <source src="' + src + '" type="video/webm">';
+        	let d1 = src.replace(".webm", ".mp4")
+        	s += '  <source src="' + d1 + '" type="video/mp4">';
+        	s += '</video>';
+
+        	th = s;
+      	} else {
+	        th = '<img id="' + id + '" class="image demo cursor" src="' + src + '" style="width:100%">';
+    	}
+
         $('#div_image_slider_images').html('');
         $('#div_image_slider_images').append(th);
 	},
