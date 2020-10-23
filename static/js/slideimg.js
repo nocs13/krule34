@@ -24,8 +24,8 @@ var imgSlide = {
     	//var th = '<td>';
         //    th += '<img imgid="' + id + '" class="thumb demo cursor " src="' + src + '" onclick="" style="width: 150px; height: 200px;">';
         //    th += '</td>';
-    	var th = '<div class="col-sm-2"><a>';
-            th += '<img imgid="' + id + '" class="img-fluid thumb" src="' + src + '" onclick="" style="width: 150px; height: 200px;">';
+    	var th = '<div class="col-sm-3"><a>';
+            th += '<img imgid="' + id + '" class="img-fluid thumb" src="' + src + '" style="width: 150px; height: 200px;">';
             th += '</a></div>';
 
         //$('#div_image_slider_thumbs').append(th);
@@ -47,7 +47,7 @@ var imgSlide = {
 
         	th = s;
       	} else {
-	        th = '<img id="' + id + '" class="image demo cursor" src="' + src + '" style="width:100%">';
+	        th = '<img id="' + id + '" class="image demo cursor" src="' + src + '" style="width:100%" onload="window.scrollTo(0,0);">';
     	}
 
         $('#div_image_slider_images').html('');
