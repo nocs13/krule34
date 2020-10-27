@@ -144,6 +144,23 @@ img.image {
   border-color: black;  
 }
 
+img.lightbox {
+  display: block;
+  margin: auto;
+
+  height: auto;
+  max-height: 100%;
+
+  width: auto;
+  /*max-width: 100%;*/
+
+  object-fit: contain;
+}
+
+video.bord {
+  border: 5px solid blue;
+}
+
 @-webkit-keyframes fade {
   from {opacity: .4}
   to {opacity: 1}

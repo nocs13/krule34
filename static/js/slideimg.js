@@ -2,10 +2,11 @@ var imgSlide = {
 	new: function(){
 		this.remove();
 
-		var sl =  '<div id="div_image_slider" class="container-fluid">';
+		var sl =  '<div id="div_image_slider" class="container">';
 			sl += ' <div id="div_image_slider_images" class="row"></div>';
 			sl += '</div>';
 			//sl += '<table class="scrollable"><tr id="tr_image_slider_thumbs"></tr></table>';
+			sl += '<div class="container"><div class="row"><br></div></div>';
 			sl += '<div class="container"><div id="tr_image_slider_thumbs" class="row">';
 			sl += '</div></div>';
 
@@ -37,7 +38,7 @@ var imgSlide = {
 
 	    if (src.indexOf(".mp4") > 0 || src.indexOf(".webm") > 0) {
 	    	var s = "";
-    	    s += '<video style="width:100%" preload="auto" controls loop';
+    	    s += '<video class="bord" style="width:100%" preload="auto" controls loop';
        		s += ' id="' + id + '"';
         	s += '>';
         	s += '  <source src="' + src + '" type="video/webm">';

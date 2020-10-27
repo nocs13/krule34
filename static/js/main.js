@@ -44,6 +44,7 @@ function showImgMenu(id)
   var d = '<div id="divImgMenu" class="dropdown-menu" aria-labelledby="dropdownMenuLink">';
       d += '<a  id="aImgArtist" class="dropdown-item">Artist</a>';
       d += '<a  id="aImgCharacter" class="dropdown-item">Character</a>';
+      d += '<a  id="aImgLightbox" class="dropdown-item">Modal</a>';
       d += '<a  id="aImgCansel" class="dropdown-item">Cansel</a>';
       d += '</div>';
 
@@ -62,6 +63,11 @@ function showImgMenu(id)
   $('#aImgCharacter').on('click', function(){
     hideImgMenu();
     onCharacter(id);
+  });
+
+  $('#aImgLightbox').on('click', function(){
+    hideImgMenu();
+    onLightbox(id);
   });
 
   $('#aImgCansel').on('click', function(){
@@ -522,6 +528,22 @@ function onCharacter(id)
   .always(function() {
     console.log( "finished" );
   });
+}
+
+function onLightbox(id)
+{
+  lightBox.new();
+
+  var index = -1;
+
+  for (var i in images) {
+    if (id == ids[i])
+      index = i;
+
+    lightBox.add(images[i]);
+  }
+
+  lightBox.set(index);
 }
 
 function checkArtist()
