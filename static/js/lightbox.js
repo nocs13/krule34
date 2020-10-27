@@ -3,7 +3,7 @@ var lightBox = {
 		this.images = new Array();
 		this.index = 0;
 
-		var sl =  '<div id="div_lightbox" class="modal" style="display: block; background-color: gray;">';
+		var sl =  '<div id="div_lightbox" class="modal" style="display: block;">';
 			sl += ' <span class="close cursor" onclick="lightBox.close()">×</span>';
 			sl += ' <div class="modal-content">';
 			sl += '  <div class="lightbox-slides">';
