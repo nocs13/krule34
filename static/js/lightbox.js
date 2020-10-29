@@ -7,13 +7,15 @@ var lightBox = {
 			sl += ' <span class="close cursor" onclick="lightBox.close()">×</span>';
 			sl += ' <div class="modal-content">';
 			sl += '  <div class="lightbox-slides">';
-			sl += '   <img id="lightbox-image" class="lightbox" src="" onload="lightBox.onLoad(this)">';
+			sl += '   <img id="lightbox-image" class="lightbox" src="" onload="lightBox.onLoad(this)" onclick="lightBox.menu()">';
 			sl += '  </div>';
 			sl += '  <a class="prev" onclick="lightBox.prev()">❮</a>';
 			sl += '  <a class="next" onclick="lightBox.next()">❯</a>';
 			sl += '</div></div>';
 
 		$('#div_main').css("display", "none");
+		$('#k_head').css("display", "none");
+		$('#k_panel').css("display", "none");
 		$('body').append(sl);
 	},
 
@@ -26,6 +28,8 @@ var lightBox = {
 		this.images = null;
 		this.index = 0;
 
+		$('#k_head').css("display", "block");
+		$('#k_panel').css("display", "block");
 		$('#div_main').css("display", "block");
 	},
 
@@ -54,6 +58,10 @@ var lightBox = {
 
 	prev: function() {
 		this.set(Number(this.index) - 1);
+	},
+
+	menu: function() {
+		this.next();
 	},
 
 	onLoad: function(o) {
