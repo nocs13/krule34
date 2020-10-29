@@ -4,7 +4,7 @@ var lightBox = {
 		this.index = 0;
 
 		var sl =  '<div id="div_lightbox" class="modal" style="display: block;">';
-			sl += ' <span class="close cursor" onclick="lightBox.close()">×</span>';
+			sl += ' <span class="close cursor" onclick="lightBox.close()">X</span>';
 			sl += ' <div class="modal-content">';
 			sl += '  <div class="lightbox-slides">';
 			sl += '   <img id="lightbox-image" class="lightbox" src="" onload="lightBox.onLoad(this)" onclick="lightBox.menu()">';
