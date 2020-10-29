@@ -256,7 +256,7 @@ function parseXML(data)
 
   for(s in tags) {
     console.log('match: ' + tags[s]);
-    $('#tags').append('<option>' + tags[s] + '</option>');
+    $('#tags').append('<option>' + decodeURI(tags[s]) + '</option>');
   }
 
   re = /<artist>(.*?)<\/artist>/gi;
@@ -574,7 +574,7 @@ function checkArtist()
   }
 
   if (a.length > 0) {
-    onSelect(a)
+    onSelect(decodeURI(a));
   }
 }
 
