@@ -14,7 +14,7 @@ var lightBox = {
 			sl += '</div></div>';
 
 		$('#div_main').css("display", "none");
-		$('#k_head').css("display", "none");
+		$('#k_header').css("display", "none");
 		$('#k_panel').css("display", "none");
 		$('body').append(sl);
 	},
@@ -28,7 +28,7 @@ var lightBox = {
 		this.images = null;
 		this.index = 0;
 
-		$('#k_head').css("display", "block");
+		$('#k_header').css("display", "block");
 		$('#k_panel').css("display", "block");
 		$('#div_main').css("display", "block");
 	},
