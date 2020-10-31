@@ -89,6 +89,7 @@ img {vertical-align: middle;}
   position: fixed;
   top: 50%;
   left: 50%;
+  z-index: 1355;
 }
 
 .cursor {
@@ -105,6 +106,32 @@ img {vertical-align: middle;}
   background-color: white;
   width: 10px;
   height: 10px;
+}
+
+.artist {
+  color: black;
+  position: absolute;
+  top: 10px;
+  right: 55px;
+  font-size: 10px;
+  font-weight: bold;
+  background-color: white;
+  width: 10px;
+  height: 10px;
+  border: thin solid;
+}
+
+.character {
+  color: black;
+  position: absolute;
+  top: 10px;
+  right: 75px;
+  font-size: 10px;
+  font-weight: bold;
+  background-color: white;
+  width: 10px;
+  height: 10px;
+  border: thin solid;
 }
 
 /*span.close {

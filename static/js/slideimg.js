@@ -26,7 +26,7 @@ var imgSlide = {
         //    th += '<img imgid="' + id + '" class="thumb demo cursor " src="' + src + '" onclick="" style="width: 150px; height: 200px;">';
         //    th += '</td>';
     	var th = '<div class="col-sm-3"><a>';
-            th += '<img imgid="' + id + '" class="img-fluid thumb" src="' + src + '" style="width: 150px; height: 200px;">';
+            th += '<img imgid="' + id + '" class="img-fluid thumb cursor" src="' + src + '" style="width: 150px; height: 200px;">';
             th += '</a></div>';
 
         //$('#div_image_slider_thumbs').append(th);

@@ -540,10 +540,16 @@ function onLightbox(id)
     if (id == ids[i])
       index = i;
 
-    lightBox.add(images[i]);
+    lightBox.add(images[i], ids[i]);
   }
 
   lightBox.set(index);
+  lightBox.fn_artist = function(id) {
+    onArtist(id);
+  };
+  lightBox.fn_character = function(id) {
+    onCharacter(id);
+  };
 }
 
 function checkArtist()

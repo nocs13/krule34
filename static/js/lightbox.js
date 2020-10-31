@@ -1,16 +1,21 @@
 var lightBox = {
 	new: function(){
 		this.images = new Array();
+		this.imgids = new Array();
 		this.index = 0;
 		this.zoom = false;
 		this.img_w = 0;
 		this.img_h = 0;
+		this.fn_artist = null;
+		this.fn_character = null;
 
 		var sl =  '<div id="div_lightbox" class="modal" style="display: block;">';
 			sl += ' <span class="close cursor" onclick="lightBox.close()">x</span>';
 			sl += ' <span id="lightbox-zoom" class="zoom cursor" onclick="lightBox.onzoom()">';
 			sl += '  <img src="/static/img/zoom-in.svg" style="width: 10px; height: 10px" alt="zoom-in">'
 			sl += ' </span>';
+			sl += ' <span class="artist cursor" onclick="lightBox.artist()">A</span>';
+			sl += ' <span class="character cursor" onclick="lightBox.character()">C</span>';
 			sl += ' <div class="modal-content">';
 			sl += '  <div class="lightbox-slides" style="overflow: auto; background-color: gray; white-space: nowrap;">';
 			sl += '   <img id="lightbox-image" class="lightbox" src="" onload="lightBox.onload(this)" onclick="lightBox.menu()">';
@@ -32,6 +37,7 @@ var lightBox = {
 			sl.parentNode.removeChild(sl);
 
 		this.images = null;
+		this.imgids = null;
 		this.index = 0;
 		this.zoom = false;
 
@@ -44,8 +50,9 @@ var lightBox = {
 		this.remove();
 	},
 
-	add: function(src) {
+	add: function(src, id) {
 		this.images.push(src);
+		this.imgids.push(id);
 	},
 
 	set: function(i) {
@@ -54,6 +61,8 @@ var lightBox = {
 			this.index = i;
 		else
 			return;
+
+		$('#busy').show();
 
 		//this.setzoom(false);
 		$('#lightbox-zoom').html('<img src="/static/img/zoom-in.svg" style="width: 10px; height: 10px">');
@@ -156,7 +165,19 @@ var lightBox = {
 		}
 	},
 
+	artist: function() {
+		if (this.fn_artist != null && this.imgids != null && this.index < this.imgids.length)
+			this.fn_artist(this.imgids[this.index]);
+	},
+
+	character: function() {
+		if (this.fn_character != null && this.imgids != null && this.index < this.imgids.length)
+			this.fn_character(this.imgids[this.index]);
+	},
+
 	onload: function(o) {
+		$('#busy').hide();
+
 		this.img_w = o.naturalWidth;
 		this.img_h = o.naturalHeight;
 
