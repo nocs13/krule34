@@ -7,12 +7,12 @@ var lightBox = {
 		this.img_h = 0;
 
 		var sl =  '<div id="div_lightbox" class="modal" style="display: block;">';
-			sl += ' <span class="close cursor" onclick="lightBox.close()">X</span>';
+			sl += ' <span class="close cursor" onclick="lightBox.close()">x</span>';
 			sl += ' <span id="lightbox-zoom" class="zoom cursor" onclick="lightBox.onzoom()">';
-			sl += '  <img src="/static/img/zoom-in.svg" style="width: 10px; height: 10px">'
+			sl += '  <img src="/static/img/zoom-in.svg" style="width: 10px; height: 10px" alt="zoom-in">'
 			sl += ' </span>';
 			sl += ' <div class="modal-content">';
-			sl += '  <div class="lightbox-slides">';
+			sl += '  <div class="lightbox-slides" style="overflow: auto; background-color: gray; white-space: nowrap;">';
 			sl += '   <img id="lightbox-image" class="lightbox" src="" onload="lightBox.onload(this)" onclick="lightBox.menu()">';
 			sl += '  </div>';
 			sl += '  <a class="prev" onclick="lightBox.prev()">❮</a>';
@@ -101,8 +101,11 @@ var lightBox = {
 			this.zoom = true;
 			$("#lightbox-image").css("height", this.img_h + "px");
 			$("#lightbox-image").css("width", this.img_w + "px");
-			$("#lightbox-image").mousemove(function(e){
+			$("#lightbox-image").parent().css("max-width", window.innerWidth + "px");
+			$("#lightbox-image").parent().css("max-height", (window.innerHeight - 30) + "px");
 
+			$("#lightbox-image").mousemove(function(e){
+				return;
 				if (e.which === 1 && lightBox.zoom == true) {
 					$("#lightbox-image").css('position', 'absolute');
 
@@ -144,6 +147,8 @@ var lightBox = {
 		} else {
 			$('#lightbox-zoom').html('<img src="/static/img/zoom-in.svg" style="width: 10px; height: 10px">');
 			$("#lightbox-image").css('position', 'relative');
+			$("#lightbox-image").parent().css("max-width", "100%");
+			$("#lightbox-image").parent().css("max-height", "100%");
 			this.zoom = false;
 			this.stretch();
 			$("#lightbox-image").mousemove(function(e){
