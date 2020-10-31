@@ -48,10 +48,17 @@ var imgSlide = {
 
         	th = s;
       	} else {
-	        th = '<img id="' + id + '" class="image demo cursor" src="' + src + '" style="width:100%" onload="window.scrollTo(0,0);">';
+			$('#busy').show();
+	        th = '<img id="' + id + '" class="image demo cursor" src="' + src + '" style="width:100%" onload="imgSlide.onload()">';
     	}
 
         $('#div_image_slider_images').html('');
         $('#div_image_slider_images').append(th);
 	},
+
+	onload: function() {
+		$('#busy').hide();
+
+		window.scrollTo(0,0);
+	}
 };

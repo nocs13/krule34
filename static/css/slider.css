@@ -95,6 +95,17 @@ img {vertical-align: middle;}
     cursor: pointer;
 }
 
+.zoom {
+  color: white;
+  position: absolute;
+  top: 10px;
+  right: 35px;
+  font-size: 10px;
+  font-weight: bold;
+  background-color: gray;
+  width: 10px;
+  height: 10px;
+}
 
 /*span.close {
   color: white;
