@@ -17,7 +17,7 @@ var lightBox = {
 			sl += ' <span class="artist cursor" onclick="lightBox.artist()">A</span>';
 			sl += ' <span class="character cursor" onclick="lightBox.character()">C</span>';
 			sl += ' <div class="modal-content">';
-			sl += '  <div class="lightbox-slides" style="overflow: auto; background-color: gray; white-space: nowrap;">';
+			sl += '  <div id="lightbox-content" class="lightbox-slides" style="overflow: auto; background-color: gray; white-space: nowrap;">';
 			sl += '   <img id="lightbox-image" class="lightbox" src="" onload="lightBox.onload(this)" onclick="lightBox.menu()">';
 			sl += '  </div>';
 			sl += '  <a class="prev" onclick="lightBox.prev()">❮</a>';
@@ -62,20 +62,32 @@ var lightBox = {
 		else
 			return;
 
-		$('#busy').show();
+		var src = this.images[i];
+		var id = this.imgids[i];
 
-		//this.setzoom(false);
+	    if (src.indexOf(".mp4") > 0 || src.indexOf(".webm") > 0) {
+	    	var s = "";
+    	    s += '<video class="bord" style="width:100%" preload="auto" controls loop';
+       		s += ' id="' + id + '"';
+        	s += '>';
+        	s += '  <source src="' + src + '" type="video/webm">';
+        	let d1 = src.replace(".webm", ".mp4")
+        	s += '  <source src="' + d1 + '" type="video/mp4">';
+        	s += '</video>';
+      		$("#lightbox-content").html(s);
+      	} else {
+			$('#busy').show();
+      		$("#lightbox-content").html('<img id="lightbox-image" class="lightbox" src="" onload="lightBox.onload(this)" onclick="lightBox.menu()">');
+			$("#lightbox-image").attr({"src": this.images[i]});
+			$("#lightbox-image").css('position', 'relative');
+			$("#lightbox-image").mousemove(function(e){});
+		}
+
 		$('#lightbox-zoom').html('<img src="/static/img/zoom-in.svg" style="width: 10px; height: 10px">');
-		$("#lightbox-image").css('position', 'relative');
 		this.zoom = false;
 
 
 		console.log('choosed ' +  this.images[i]);
-
-		$("#lightbox-image").attr({"src": this.images[i]});
-		$("#lightbox-image").mousemove(function(e){
-
-		});
 	},
 
 	next: function() {

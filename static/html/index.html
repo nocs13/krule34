@@ -5,7 +5,7 @@
     <link href="/static/css/slider.css" rel="stylesheet" />
 
     <title>Nude arts - If it exists...</title>
-    <meta name="keywords" content="Rule34, cartoon porn, hentai, cartoon mature art, paint nude arts, xxx, XXX." />
+    <meta name="keywords" content="Rule34, cartoon porn, hentai, cartoon mature art, paint nude arts, xxx." />
     <meta name="description" content="The best hentai or porn of Uzaki-chan, Naruto, Pokemon, Zelda, gifs and videos, SFM, and even Spirit Blossom Ahri! After all, if it exists, there is porn of it!." />
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
@@ -33,7 +33,7 @@
   <div id="k_panel" class="container">
     <div class="row">
       <div class="col-sm-3 pull-left" style="text-align: left;">
-        <input id="key" class="form-control" type="text" placeholder="Enter Keywords?" value='schoolgirl'/>
+        <input id="key" class="form-control" type="text" placeholder="Enter Keywords?" value='webm'/>
         <button id="btn_search" class="btn btn-secondary" type="button" onclick="onSearch()" style="position: absolute; top: 0px; right: 15px">
           S
         </button>
@@ -45,11 +45,18 @@
         <select id="pages" class="form-control" style="width: 50px;"></select>
         <!-- <select id="artist"></select> -->
       </div>
-      <div class="col-sm-3">
+      <div class="col-sm-2">
         <div class="custom-control custom-switch">
           <input id="mode_gallery" type="checkbox" class="custom-control-input" data-toggle="toggle">
           <label class="custom-control-label" for="mode_gallery">Gallery.</label>
         </div>      
+      </div>
+      <div class="col-sm-1">
+        <div id="k_menu" style="display: none;">
+          <span class="artist cursor" onclick="k_menuArtist()">A</span>
+          <span class="character cursor" onclick="k_menuCharacter()">C</span>
+          <span class="modemod cursor" onclick="k_menuLightbox()">M</span>
+        </div>
       </div>
     </div>
   </div>
@@ -121,8 +128,10 @@
     $('#mode_gallery').on("change", function(){
       if ($(this).is(':checked')){
         Cookies.set('image_list_mode', 'gallery', 1);
+        $('#k_menu').css('display', 'block');
       } else {
         Cookies.rem('image_list_mode');
+        $('#k_menu').css('display', 'none');
       }
     });
     $(document).on('click','img',function(){
@@ -144,10 +153,12 @@
       } else {
         if (imode == "gallery") {
           imageListMode = "gallery";
-        $( "#mode_gallery" ).prop( "checked", true);
-        } else {
+          $( "#mode_gallery" ).prop( "checked", true);
+          $('#k_menu').css('display', 'block');
+      } else {
           imageListMode = "default";
           $( "#mode_gallery" ).prop( "checked", false);
+          $('#k_menu').css('display', 'none');
         }
       }
 

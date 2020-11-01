@@ -599,3 +599,39 @@ function onThumb(id)
     }
   }
 }
+
+function k_menuArtist() {
+  var imode = Cookies.get('image_list_mode');
+
+  if (imode == null || imode != "gallery")
+    return;
+
+  if (imgSlide.imgid === undefined || imgSlide.imgid == "")
+    return;
+
+  onArtist(imgSlide.imgid);
+}
+
+function k_menuCharacter() {  
+  var imode = Cookies.get('image_list_mode');
+
+  if (imode == null || imode != "gallery")
+    return;
+
+  if (imgSlide.imgid === undefined || imgSlide.imgid == "")
+    return;
+
+  onCharacter(imgSlide.imgid);
+}
+
+function k_menuLightbox() {
+  var imode = Cookies.get('image_list_mode');
+
+  if (imode == null || imode != "gallery")
+    return;
+
+  if (imgSlide.imgid === undefined || imgSlide.imgid == "")
+    return;
+
+  onLightbox(imgSlide.imgid);  
+}

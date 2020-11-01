@@ -5,7 +5,6 @@ var imgSlide = {
 		var sl =  '<div id="div_image_slider" class="container">';
 			sl += ' <div id="div_image_slider_images" class="row"></div>';
 			sl += '</div>';
-			//sl += '<table class="scrollable"><tr id="tr_image_slider_thumbs"></tr></table>';
 			sl += '<div class="container"><div class="row"><br></div></div>';
 			sl += '<div class="container"><div id="tr_image_slider_thumbs" class="row">';
 			sl += '</div></div>';
@@ -22,19 +21,17 @@ var imgSlide = {
 	},
 
 	add: function(src, id) {
-    	//var th = '<td>';
-        //    th += '<img imgid="' + id + '" class="thumb demo cursor " src="' + src + '" onclick="" style="width: 150px; height: 200px;">';
-        //    th += '</td>';
     	var th = '<div class="col-sm-3"><a>';
             th += '<img imgid="' + id + '" class="img-fluid thumb cursor" src="' + src + '" style="width: 150px; height: 200px;">';
             th += '</a></div>';
 
-        //$('#div_image_slider_thumbs').append(th);
         $('#tr_image_slider_thumbs').append(th);
 	},
 
 	set: function(src, id) {
 		var th = "";
+
+		this.imgid = id;
 
 	    if (src.indexOf(".mp4") > 0 || src.indexOf(".webm") > 0) {
 	    	var s = "";
