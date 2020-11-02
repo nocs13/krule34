@@ -33,7 +33,7 @@
   <div id="k_panel" class="container">
     <div class="row">
       <div class="col-sm-3 pull-left" style="text-align: left;">
-        <input id="key" class="form-control" type="text" placeholder="Enter Keywords?" value='webm'/>
+        <input id="key" class="form-control" type="text" placeholder="Enter Keywords?" value='nier'/>
         <button id="btn_search" class="btn btn-secondary" type="button" onclick="onSearch()" style="position: absolute; top: 0px; right: 15px">
           S
         </button>
@@ -91,6 +91,12 @@
   </div>
 
   <script>
+    var browser = "";
+
+    if(navigator.userAgent.indexOf("Firefox") != -1 ) {
+        browser = 'firefox';
+    }
+
     $(document.body).off('keypress', "#key");
     $(document.body).off('keyup', "#key");
 

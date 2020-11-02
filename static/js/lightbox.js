@@ -76,8 +76,14 @@ var lightBox = {
         	s += '</video>';
       		$("#lightbox-content").html(s);
       	} else {
+      		var s = "";
+      		
+   			s += '<div>'
+      		s += '<img id="lightbox-image" class="lightbox" src="" onload="lightBox.onload(this)" onclick="lightBox.menu()">';
+   			s += '</div">'
+
 			$('#busy').show();
-      		$("#lightbox-content").html('<img id="lightbox-image" class="lightbox" src="" onload="lightBox.onload(this)" onclick="lightBox.menu()">');
+      		$("#lightbox-content").html(s);
 			$("#lightbox-image").attr({"src": this.images[i]});
 			$("#lightbox-image").css('position', 'relative');
 			$("#lightbox-image").mousemove(function(e){});
@@ -122,8 +128,8 @@ var lightBox = {
 			this.zoom = true;
 			$("#lightbox-image").css("height", this.img_h + "px");
 			$("#lightbox-image").css("width", this.img_w + "px");
-			$("#lightbox-image").parent().css("max-width", window.innerWidth + "px");
-			$("#lightbox-image").parent().css("max-height", (window.innerHeight - 30) + "px");
+			$("#lightbox-content").css("max-width", window.innerWidth + "px");
+			$("#lightbox-content").css("max-height", (window.innerHeight - 30) + "px");
 
 			$("#lightbox-image").mousemove(function(e){
 				return;
@@ -168,8 +174,8 @@ var lightBox = {
 		} else {
 			$('#lightbox-zoom').html('<img src="/static/img/zoom-in.svg" style="width: 10px; height: 10px">');
 			$("#lightbox-image").css('position', 'relative');
-			$("#lightbox-image").parent().css("max-width", "100%");
-			$("#lightbox-image").parent().css("max-height", "100%");
+			$("#lightbox-content").css("max-width", "100%");
+			$("#lightbox-content").css("max-height", "100%");
 			this.zoom = false;
 			this.stretch();
 			$("#lightbox-image").mousemove(function(e){
