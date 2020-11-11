@@ -114,10 +114,10 @@
       onSelect(this.value);
       $('#key').val(this.value);
     });
-    $('#k_btn_left').on("click", function(){
+    $('#k_btn_left').on("click", function() {
       onPageSide(-1, $('#key').val());
     });
-    $('#k_btn_right').on("click", function(){
+    $('#k_btn_right').on("click", function() {
       onPageSide(1, $('#key').val());
     });
     $('#pages').on('change', function() {
@@ -128,8 +128,8 @@
         onSearch();
       }
     });
-    $('#ntab').on("click", function(){
-      window.open(window.location.href, '_blank');
+    $('#ntab').on("click", function() {
+      window.open(window.location.origin, '_blank');
     });
     $('#mode_gallery').on("change", function(){
       if ($(this).is(':checked')){
@@ -140,7 +140,7 @@
         $('#k_menu').css('display', 'none');
       }
     });
-    $(document).on('click','img',function(){
+    $(document).on('click','img',function() {
       //onArtist(this.attributes[2].value);
       if ($(this).hasClass('thumb')) {
         onThumb(this.attributes[0].value);
@@ -170,7 +170,7 @@
 
       checkArtist();
     });
-    $(document).mousemove(function(e){
+    $(document).mousemove(function(e) {
       mspos.x = e.pageX;
       mspos.y = e.pageY;
     });
