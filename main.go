@@ -100,6 +100,12 @@ func handleGoogleSiteAuth(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, data)
 }
 
+func handleSitemap(w http.ResponseWriter, r *http.Request) {
+	data := libs.ReadFile("sitemap.xml")
+
+	io.WriteString(w, data)
+}
+
 func handleIndex(w http.ResponseWriter, r *http.Request) {
 	libs.LogDebug("run handler hello " + r.URL.Path)
 
@@ -229,6 +235,7 @@ func main() {
 	h.Add("/getartist", handleGetArtist)
 	h.Add("/getcharacter", handleGetCharacter)
 
+	h.Add("/sitemap.xml", handleSitemap)
 	h.Add("/BingSiteAuth.xml", handleBingSiteAuth)
 	h.Add("/googleb295dd6d4113b434.html", handleGoogleSiteAuth)
 
