@@ -115,10 +115,12 @@ img {vertical-align: middle;}
   right: 55px;
   font-size: 10px;
   font-weight: bold;
-  background-color: white;
-  width: 10px;
-  height: 10px;
+  background-color: #e66b14;
+  width: 14px;
+  height: 16px;
   border: thin solid;
+  border-radius: 7px;
+  padding: 2px;
 }
 
 .character {
@@ -128,10 +130,12 @@ img {vertical-align: middle;}
   right: 75px;
   font-size: 10px;
   font-weight: bold;
-  background-color: white;
-  width: 10px;
-  height: 10px;
+  background-color: #e66b14;
+  width: 14px;
+  height: 16px;
   border: thin solid;
+  border-radius: 7px;
+  padding: 2px;
 }
 
 .modemod {
@@ -141,10 +145,12 @@ img {vertical-align: middle;}
   right: 95px;
   font-size: 10px;
   font-weight: bold;
-  background-color: white;
-  width: 10px;
-  height: 10px;
+  background-color: #e66b14;
+  width: 14px;
+  height: 16px;
   border: thin solid;
+  border-radius: 7px;
+  padding: 2px;
 }
 
 /*span.close {
