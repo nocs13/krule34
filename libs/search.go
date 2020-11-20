@@ -872,8 +872,8 @@ wloop:
 				LogDebug("Token for artist.")
 				ttype = "artist"
 				acount = 0
-			} else if IsToken(&tn, "div", "thumbnail-preview") {
-				LogDebug("Token for thumb.")
+			} else if IsToken(&tn, "div", "thumbail-container") {
+				LogDebug("Token for thumbnails.")
 				ttype = "thumb"
 			} else if IsToken(&tn, "div", "pagination") {
 				LogDebug("Token for pagination.")
@@ -938,9 +938,12 @@ wloop:
 		case stat == html.EndTagToken:
 			tn := tok.Token()
 
-			if tn.Data == "li" || tn.Data == "span" || tn.Data == "div" {
+			if tn.Data == "li" || tn.Data == "span" {
 				ttype = ""
-			} else if tn.Data == "a" {
+			} 	else if tn.Data == "div" && IsToken(&tn, "div", "thumbail-container") {
+				LogDebug("Token div thumbail-container closing.")
+				ttype = ""
+			}	else if tn.Data == "a" {
 				LogDebug("Token a closing.")
 				alink = false
 			}
