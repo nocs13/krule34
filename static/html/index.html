@@ -141,10 +141,12 @@
     });
     $('#mode_gallery').on("change", function(){
       if ($(this).is(':checked')){
-        Cookies.set('image_list_mode', 'gallery', 1);
+        //Cookies.set('image_list_mode', 'gallery', 1);
+        sessionStorage.setItem('image_list_mode', 'gallery');
         $('#k_menu').css('display', 'block');
       } else {
-        Cookies.rem('image_list_mode');
+        //Cookies.rem('image_list_mode');
+        sessionStorage.setItem('image_list_mode', 'default');
         $('#k_menu').css('display', 'none');
       }
     });
@@ -159,11 +161,13 @@
     $(document).ready(function () {
       window.scrollTo(0,0);
 
-      var imode = Cookies.get('image_list_mode');
+      //var imode = Cookies.get('image_list_mode');
+      var imode = sessionStorage.getItem('image_list_mode');
       if (imode == null || imode == "") {
         imageListMode = "default";
         $( "#mode_gallery" ).prop( "checked", false);
-        Cookies.set('image_list_mode', 'default');
+        //Cookies.set('image_list_mode', 'default');
+        sessionStorage.setItem('image_list_mode', 'default');
       } else {
         if (imode == "gallery") {
           imageListMode = "gallery";
