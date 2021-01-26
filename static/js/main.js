@@ -336,7 +336,7 @@ function parseXML(data)
 
   if (images != null && images.length > 0) {
     //var imode = Cookies.get('image_list_mode');
-    var imode = localStorage.get('image_list_mode');
+    var imode = sessionStorage.getItem('image_list_mode');
 
     if (imode != null && imode == "gallery")
       showImageGallery(images, thumbs, ids);
@@ -566,7 +566,7 @@ function checkArtist()
     var re = /character\/(.*?)$/gi;
     var ar = href.match(re);
     if (ar == null || ar.length < 1) {
-      return;
+      return false;
     } else {
       a = ar[0];
 
@@ -582,7 +582,11 @@ function checkArtist()
 
   if (a.length > 0) {
     onSelect(decodeURI(a));
+
+    return true;
   }
+
+  return false;
 }
 
 function onImage(id)
@@ -603,7 +607,7 @@ function onThumb(id)
 
 function k_menuArtist() {
   //var imode = Cookies.get('image_list_mode');
-  var imode = sessionStorage.get('image_list_mode');
+  var imode = sessionStorage.getItem('image_list_mode');
 
   if (imode == null || imode != "gallery")
     return;
@@ -616,7 +620,7 @@ function k_menuArtist() {
 
 function k_menuCharacter() {  
   //var imode = Cookies.get('image_list_mode');
-  var imode = sessionStorage.get('image_list_mode');
+  var imode = sessionStorage.getItem('image_list_mode');
 
   if (imode == null || imode != "gallery")
     return;
@@ -629,7 +633,7 @@ function k_menuCharacter() {
 
 function k_menuLightbox() {
   //var imode = Cookies.get('image_list_mode');
-  var imode = sessionStorage.get('image_list_mode');
+  var imode = sessionStorage.getItem('image_list_mode');
 
   if (imode == null || imode != "gallery")
     return;
@@ -638,4 +642,8 @@ function k_menuLightbox() {
     return;
 
   onLightbox(imgSlide.imgid);  
+}
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
 }
