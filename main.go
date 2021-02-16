@@ -47,6 +47,12 @@ func (h *WebHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	} else if len(url) > len("/character/") && url[0:11] == "/character/" {
 		libs.LogDebug("Handle artist")
 		handleCharacter(w, r)
+	} else if len(url) > len("/images/") && url[0:8] == "/images/" {
+		libs.LogDebug("Handle images")
+		handleGetImage(w, r)
+	} else if len(url) > len("/thumbnails/") && url[0:12] == "/thumbnails/" {
+		libs.LogDebug("Handle thumbnails")
+		handleGetImage(w, r)
 	} else {
 		libs.LogDebug("routes count " + strconv.Itoa(len(h.routes)))
 
@@ -215,6 +221,29 @@ func handleCharacter(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, t.Content)
 }
 
+func handleGetImage(w http.ResponseWriter, r *http.Request) {
+	libs.LogDebug("run handler get image " + r.URL.Path)
+
+	ri := libs.GetImageUS(r.URL.Path)
+
+	if ri == nil {
+		libs.LogError("while handle get image " + r.URL.Path)
+	}
+
+	w.Header().Set("Content-Type", "image/jpeg")
+	io.Copy(w, ri)
+}
+
+func handleGetThumbnail(w http.ResponseWriter, r *http.Request) {
+	libs.LogDebug("run handler character " + r.URL.Path)
+
+	t := libs.NewPage()
+
+	t.Init("index.html")
+
+	io.WriteString(w, t.Content)
+}
+
 func main() {
 	port := os.Getenv("PORT")
 
@@ -234,6 +263,9 @@ func main() {
 	h.Add("/search", handleSearch)
 	h.Add("/getartist", handleGetArtist)
 	h.Add("/getcharacter", handleGetCharacter)
+
+	h.Add("/thumbnails", handleGetThumbnail)
+	h.Add("/images", handleGetImage)
 
 	h.Add("/sitemap.xml", handleSitemap)
 	h.Add("/BingSiteAuth.xml", handleBingSiteAuth)

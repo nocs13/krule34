@@ -1,6 +1,7 @@
 package libs
 
 import (
+	"io"
 	"container/list"
 	"fmt"
 	"net/http"
@@ -428,7 +429,8 @@ func parseImageUS(url string) string {
 
 	LogInfo("Parsing result is: " + r)
 
-	return r
+	//return r
+	return strings.Replace(r, "https://img2.rule34.us", "", -1)
 }
 
 //GetArtistUS ...
@@ -963,7 +965,8 @@ wloop:
 					mc = strings.Replace(mc, "id=", "", 1)
 
 					r.ids.PushBack(mc)
-					r.thumbs.PushBack(imageHref)
+					//r.thumbs.PushBack(imageHref)
+					r.thumbs.PushBack(strings.Replace(imageHref, "https://img2.rule34.us", "", -1))
 				}
 			} else if tn.Data == "img" && ttype == "thumb" {
                 imageHref = GetTokenAttr(&tn, "img", "src")					
@@ -985,4 +988,32 @@ wloop:
 	}
 
 	return &r
+}
+
+
+//Get Image
+func GetImageUS(uri string) io.Reader {
+	url := "https://img2.rule34.us" + uri
+
+	response, err := http.Get(url)
+
+	if err != nil {
+		LogError("Cannot get image from url: " + url)
+
+		return nil
+	}
+
+	if response.StatusCode != 200 {
+		LogError("Received non 200 response code")
+
+		return nil
+	}
+
+	//Write the bytes to the fiel
+	//_, err = io.Copy(file, response.Body)
+	//if err != nil {
+	//	return err
+	//}
+
+	return response.Body
 }
