@@ -28,7 +28,7 @@ type WebHandler struct {
 
 func (h *WebHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	h.mu.Lock()
+	//h.mu.Lock()
 
 	libs.LogDebug("Run web handler " + r.URL.Path)
 
@@ -63,7 +63,7 @@ func (h *WebHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	defer h.mu.Unlock()
+	//defer h.mu.Unlock()
 }
 
 //Add is ...
@@ -263,9 +263,6 @@ func main() {
 	h.Add("/search", handleSearch)
 	h.Add("/getartist", handleGetArtist)
 	h.Add("/getcharacter", handleGetCharacter)
-
-	h.Add("/thumbnails", handleGetThumbnail)
-	h.Add("/images", handleGetImage)
 
 	h.Add("/sitemap.xml", handleSitemap)
 	h.Add("/BingSiteAuth.xml", handleBingSiteAuth)
