@@ -50,6 +50,9 @@ func (h *WebHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	} else if len(url) > len("/images/") && url[0:8] == "/images/" {
 		libs.LogDebug("Handle images")
 		handleGetImage(w, r)
+	} else if len(url) > len("/video/") && url[0:7] == "/video/" {
+		libs.LogDebug("Handle video")
+		handleGetVideo(w, r)
 	} else if len(url) > len("/thumbnails/") && url[0:12] == "/thumbnails/" {
 		libs.LogDebug("Handle thumbnails")
 		handleGetImage(w, r)
@@ -231,6 +234,19 @@ func handleGetImage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "image/jpeg")
+	io.Copy(w, ri)
+}
+
+func handleGetVideo(w http.ResponseWriter, r *http.Request) {
+	libs.LogDebug("run handler get video " + r.URL.Path)
+
+	ri := libs.GetVideoUS(r.URL.Path)
+
+	if ri == nil {
+		libs.LogError("while handle get video " + r.URL.Path)
+	}
+
+	w.Header().Set("Content-Type", "video/webm")
 	io.Copy(w, ri)
 }
 

@@ -1,9 +1,9 @@
 package libs
 
 import (
-	"io"
 	"container/list"
 	"fmt"
+	"io"
 	"net/http"
 	"regexp"
 	"strings"
@@ -430,6 +430,10 @@ func parseImageUS(url string) string {
 	LogInfo("Parsing result is: " + r)
 
 	//return r
+	if strings.Index(r, "https://video.rule34.us/") != -1 {
+		return strings.Replace(r, "https://video.rule34.us/", "/video/", -1)
+	}
+
 	return strings.Replace(r, "https://img2.rule34.us", "", -1)
 }
 
@@ -934,18 +938,18 @@ wloop:
 					}
 				}
 			} else if tn.Data == "img" && ttype == "thumb" {
-                imageHref = GetTokenAttr(&tn, "img", "src")			
-                LogDebug("thumblain link is " + imageHref)		
+				imageHref = GetTokenAttr(&tn, "img", "src")
+				LogDebug("thumblain link is " + imageHref)
 			}
 		case stat == html.EndTagToken:
 			tn := tok.Token()
 
 			if tn.Data == "li" || tn.Data == "span" {
 				ttype = ""
-			} 	else if tn.Data == "div" && IsToken(&tn, "div", "thumbail-container") {
+			} else if tn.Data == "div" && IsToken(&tn, "div", "thumbail-container") {
 				LogDebug("Token div thumbail-container closing.")
 				ttype = ""
-			}	else if tn.Data == "a" {
+			} else if tn.Data == "a" {
 				LogDebug("Token a closing.")
 				alink = false
 			}
@@ -969,8 +973,8 @@ wloop:
 					r.thumbs.PushBack(strings.Replace(imageHref, "https://img2.rule34.us", "", -1))
 				}
 			} else if tn.Data == "img" && ttype == "thumb" {
-                imageHref = GetTokenAttr(&tn, "img", "src")					
-                LogDebug("thumbnail link is " + imageHref)		
+				imageHref = GetTokenAttr(&tn, "img", "src")
+				LogDebug("thumbnail link is " + imageHref)
 			}
 		case stat == html.TextToken:
 			tn := tok.Token()
@@ -990,8 +994,7 @@ wloop:
 	return &r
 }
 
-
-//Get Image
+//GetImageUS is ...
 func GetImageUS(uri string) io.Reader {
 	url := "https://img2.rule34.us" + uri
 
@@ -1009,11 +1012,33 @@ func GetImageUS(uri string) io.Reader {
 		return nil
 	}
 
-	//Write the bytes to the fiel
-	//_, err = io.Copy(file, response.Body)
-	//if err != nil {
-	//	return err
-	//}
+	return response.Body
+}
+
+//GetVideoUS is ...
+func GetVideoUS(uri string) io.Reader {
+	if strings.Index(uri, "/video/") == -1 {
+		LogError("Invalid video url: " + uri)
+
+		return nil
+	}
+
+	//url := "https://img2.rule34.us" + uri
+	url := strings.Replace(uri, "/video/", "https://video.rule34.us/", -1)
+
+	response, err := http.Get(url)
+
+	if err != nil {
+		LogError("Cannot get video from url: " + url)
+
+		return nil
+	}
+
+	if response.StatusCode != 200 {
+		LogError("Received non 200 response code")
+
+		return nil
+	}
 
 	return response.Body
 }
