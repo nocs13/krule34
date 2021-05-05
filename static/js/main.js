@@ -23,6 +23,8 @@ function resetPages()
   paginator = -1;
 
   pages = null
+
+  $('#pages').empty();
 }
 
 function hideImgMenu()
@@ -241,6 +243,8 @@ function parseXML(data)
   $('#div_main').append('<div id="div_container" class="slideshow-container"></div>');
   $('#div_pages').html("")
   $('#div_tags').html("");
+
+  resetPages();
 
   var re = /<tag>(.*?)<\/tag>/gi;
 
