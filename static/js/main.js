@@ -2,9 +2,9 @@ var paginator = -1;
 var pages = null;
 var thpp = 1; // thumbs per page for it may be 42
 
-var images = null
-var thumbs = null
-var ids    = null
+var images = null;
+var thumbs = null;
+var ids    = null;
 
 var mspos = new function() {
   this.x = 0;
@@ -42,6 +42,11 @@ function hideImgMenu()
 function showImgMenu(id)
 {
   hideImgMenu();
+
+  let type = sessionStorage.getItem('image_list_mode');
+
+  if (type == 'gallery')
+    return;
 
   var d = '<div id="divImgMenu" class="dropdown-menu" aria-labelledby="dropdownMenuLink">';
       d += '<a  id="aImgArtist" class="dropdown-item">Artist</a>';
@@ -128,12 +133,30 @@ function showImages(images, ids)
       let d = images[i]
 
       if (ids != null && ids[i] != null) {
-        let d = ids[i]
+        let di = ids[i]
 
-        id = d;
+        id = di;
       }
 
+      /*
+      console.log("d id is " + d);
+      console.log("type is " + d.substr(0, 7));
+
+      if (d.substring(0, 7) == "/video/")
+      {
+        d = d.replace("/video/", "https://video.rule34.us/");
+      }
+      */
+     
+      var ivideo = false;
+
       if (d.indexOf(".mp4") > 0 || d.indexOf(".webm") > 0) {
+        ivideo = true;
+      }
+
+      var imode = sessionStorage.getItem('image_list_mode');
+
+      if (ivideo && (imode == 'gallery')) {
         s += '<video style="width:100%" preload="auto" controls loop';
         if (id != "")
           s += ' iid="' + id + '"';
@@ -142,7 +165,7 @@ function showImages(images, ids)
         let d1 = d.replace(".webm", ".mp4")
         s += '  <source src="' + d1 + '" type="video/mp4">';
         s += '</video>';
-      } else {
+      } else if (ivideo == false) {
         /*s += '<img src="' + d + '"  style="width:100%" onload="console.log(\'IMG: \' + this.src);"';
         if (id != "")
           s += ' iid="' + id + '"';
@@ -170,7 +193,7 @@ function showImageGallery(images, thumbs, ids)
   imgSlide.new();
 
   for (i in thumbs)
-    imgSlide.add(thumbs[i], ids[i]);
+    imgSlide.add(thumbs[i], ids[i], images[i]);
 
   imgSlide.set(images[0], ids[0]);
 }
@@ -596,6 +619,19 @@ function checkArtist()
 function onImage(id)
 {
   showImgMenu(id);
+
+  var imode = sessionStorage.getItem('image_list_mode');
+
+  if (imode != null && imode == "gallery") {
+    let offset = $('#div_image_slider_images').offset();
+    let dx = mspos.x - offset.left;
+    let w = $('#div_image_slider_images').width();
+
+    if (dx < (w / 3))
+      imgSlide.prev();
+    else
+      imgSlide.next();
+  }
 }
 
 function onThumb(id)

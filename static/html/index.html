@@ -150,7 +150,10 @@
         $('#k_menu').css('display', 'none');
       }
     });
-    $(document).on('click','img',function() {
+    $(document).on('click','img',function(e) {
+      mspos.x = e.pageX;
+      mspos.y = e.pageY;
+
       //onArtist(this.attributes[2].value);
       if ($(this).hasClass('thumb')) {
         onThumb(this.attributes[0].value);
@@ -187,7 +190,7 @@
                          "yakimi_27", "tsukasawa_takamatsu", "nemesis_3d", "houtengeki", "lunasanguinis", "luminyu",
                          "sakimichan", "kelvin_hiu", "potchi", "liquidn", "vgerotica", "coffeeslice", "Real_XXIII"];
         var base_tag  = base_tags[getRandomInt(19)];
-
+        base_tag = 'webm';
         $('#key').val(base_tag);
         onSearch();
       }
