@@ -497,6 +497,7 @@ function onPageSide(side, tag)
     console.log("Done");
   })
   .done(function(){
+    paginator = pid;
     console.log('success');
     $('#pages').append('<option value="' + pid + '" selected>' + pid / thpp + '</option>');
     window.scrollTo(0,0);
