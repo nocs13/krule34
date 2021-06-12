@@ -122,7 +122,29 @@ function pagePidRight(pid)
   return -1;
 }
 
-function showImages(images, ids) 
+function getPagesMinMax() {
+    var res = {min: 0, max: 0};
+
+    if (pages == null)
+        return res;
+
+    var n;
+
+    for (n = 0; n < pages.length; n++) {
+        let ni = parseInt(pages[n]);
+
+        console.log('Current page value is ' + pages[n]);
+
+        if (ni < res.min)
+            res.min = ni
+        else if (ni > res.max)
+            res.max = ni
+    }
+
+    return res
+}
+
+function showImages(images, ids)
 {
     $('#div_container').html('');
 
@@ -147,7 +169,7 @@ function showImages(images, ids)
         d = d.replace("/video/", "https://video.rule34.us/");
       }
       */
-     
+
       var ivideo = false;
 
       if (d.indexOf(".mp4") > 0 || d.indexOf(".webm") > 0) {
@@ -188,7 +210,7 @@ function showImages(images, ids)
     }
 }
 
-function showImageGallery(images, thumbs, ids) 
+function showImageGallery(images, thumbs, ids)
 {
   imgSlide.new();
 
@@ -312,9 +334,10 @@ function parseXML(data)
       let d = pagin[i]
       d = d.replace('<page>', '');
       d = d.replace('</page>', '');
-
+      console.log('Pushing page ' + d);
       pages.push(d);
       $('#pages').append('<option value="' + d + '">' + d / thpp + '</option>');
+      console.log('Append page value ' + d / thpp);
     }
   }
 
@@ -659,7 +682,7 @@ function k_menuArtist() {
   onArtist(imgSlide.imgid);
 }
 
-function k_menuCharacter() {  
+function k_menuCharacter() {
   //var imode = Cookies.get('image_list_mode');
   var imode = sessionStorage.getItem('image_list_mode');
 
@@ -682,7 +705,7 @@ function k_menuLightbox() {
   if (imgSlide.imgid === undefined || imgSlide.imgid == "")
     return;
 
-  onLightbox(imgSlide.imgid);  
+  onLightbox(imgSlide.imgid);
 }
 
 function getRandomInt(max) {

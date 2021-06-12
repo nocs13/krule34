@@ -2,14 +2,14 @@
 <head>
     <title>Nude arts - If it exists...</title>
 
-    <meta name="description" content="The best hentai or porn of Uzaki-chan, Naruto, Pokemon, Zelda, gifs and videos, SFM, and even  
+    <meta name="description" content="The best hentai or porn of Uzaki-chan, Naruto, Pokemon, Zelda, gifs and videos, SFM, and even
                 Spirit Blossom Ahri! After all, if it exists, there is porn of it!.">
-    
+
     <meta name="keywords" content="Rule34, cartoon porn, hentai, cartoon mature art, paint nude arts, xxx.">
-    
+
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <meta name="google-site-verification" content="Pdd78Gf37mDDpxZ0AUTLGF1Jb8iVx04IFXtDAXrvq9k" />
 
     <link href="https://fonts.googleapis.com/css?family=Poppins" rel="stylesheet" />
@@ -50,14 +50,24 @@
         <select id="tags" class="form-control" ></select>
       </div>
       <div class="col-sm-3">
-        <select id="pages" class="form-control" style="width: 50px;"></select>
+        <table id="pages_value_table">
+          <tr>
+            <td>
+              <select id="pages" class="form-control" style="width: 50px;"></select>
+            </td>
+            <td>
+              <span id="range_value" style="display: none; text-align: center;" >0</span>
+              <input type="range" class="custom-range" min="0" max="15" id="pages_range" style="display: none;">
+            </td>
+          </tr>
+        </table>
         <!-- <select id="artist"></select> -->
       </div>
       <div class="col-sm-2">
         <div class="custom-control custom-switch">
           <input id="mode_gallery" type="checkbox" class="custom-control-input" data-toggle="toggle">
           <label class="custom-control-label" for="mode_gallery">Gallery.</label>
-        </div>      
+        </div>
       </div>
       <div class="col-sm-1">
         <div id="k_menu" style="display: none;">
@@ -150,6 +160,40 @@
         $('#k_menu').css('display', 'none');
       }
     });
+    $("#pages_value_table").click(function() {
+        let v = getPagesMinMax();
+
+        if (v.max < 5)
+            return;
+
+        let t = $("#pages_range").attr('type');
+
+        if ( $("#pages_range").is(':hidden') ) {
+            $( "#pages_range" ).show();
+            $( "#range_value" ).show();
+        } else if ( $("#pages_range").is(':visible') ) {
+            $( "#pages_range" ).hide();
+            $( "#range_value" ).hide();
+        }
+
+        $('#pages_range').prop('min', v.min);
+        $('#pages_range').prop('max', v.max);
+        $('#pages_range').prop('value', 0);
+        $("#range_value").text("0");
+    });
+    $('#pages_range').on('input', function(e){
+        var v = $(this).val();
+        //$('#pages').val(v);
+        $("#range_value").text(v);
+        console.log("Range actual value is " + v);
+    });
+    $('#pages_range').on('change',function(e){
+        var v = $(this).val();
+        $("#pages_range").hide();
+        $("#range_value").hide();
+        onPage(v, $('#key').val());
+    });
+
     $(document).on('click','img',function(e) {
       mspos.x = e.pageX;
       mspos.y = e.pageY;
@@ -160,6 +204,14 @@
       } else if ($(this).hasClass('image')) {
         onImage(this.attributes[0].value);
       }
+    });
+    $(document).click(function(e){
+        if ( $("#pages_range").is(':visible') ) {
+            if ((e.target.id != "pages_range") && (e.target.id != "pages")) {
+                $( "#pages_range" ).hide();
+                $( "#range_value" ).hide();
+            }
+        }
     });
     $(document).ready(function () {
       window.scrollTo(0,0);
@@ -190,7 +242,7 @@
                          "yakimi_27", "tsukasawa_takamatsu", "nemesis_3d", "houtengeki", "lunasanguinis", "luminyu",
                          "sakimichan", "kelvin_hiu", "potchi", "liquidn", "vgerotica", "coffeeslice", "Real_XXIII"];
         var base_tag  = base_tags[getRandomInt(19)];
-        //base_tag = 'webm';
+        base_tag = 'dress';
         $('#key').val(base_tag);
         onSearch();
       }
