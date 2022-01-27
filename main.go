@@ -132,9 +132,15 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 
 	libs.LogDebug("run handler search " + key)
 
-	var content = libs.SearchUS(key, "")
+	var content = libs.Search(key, "")
 
-	str := libs.ContentToXML(content)
+	if content == "" {
+		return
+	}
+
+	str := string(content)
+
+	//str := libs.ContentToXML(content)
 
 	io.WriteString(w, str)
 }
@@ -147,11 +153,11 @@ func handlePage(w http.ResponseWriter, r *http.Request) {
 
 	libs.LogDebug("run handler search " + tag + " " + pid)
 
-	var content = libs.SearchUS(tag, pid)
+	var content = libs.Search(tag, pid)
 
-	str := libs.ContentToXML(content)
+	//str := libs.ContentToXML(content)
 
-	io.WriteString(w, str)
+	io.WriteString(w, content)
 }
 
 func handleTag(w http.ResponseWriter, r *http.Request) {
@@ -161,11 +167,11 @@ func handleTag(w http.ResponseWriter, r *http.Request) {
 
 	libs.LogDebug("run handler tag " + tag)
 
-	var content = libs.SearchUS(tag, "")
+	var content = libs.Search(tag, "")
 
-	str := libs.ContentToXML(content)
+	//str := libs.ContentToXML(content)
 
-	io.WriteString(w, str)
+	io.WriteString(w, content)
 }
 
 func handleGetArtist(w http.ResponseWriter, r *http.Request) {
@@ -175,13 +181,7 @@ func handleGetArtist(w http.ResponseWriter, r *http.Request) {
 
 	libs.LogDebug("run handler getartist " + id)
 
-	url := "https://rule34.us/index.php?r=posts/view&id=" + id
-
-	str := libs.GetArtistUS(url)
-
-	if str == "" {
-		str = "<empty></empty>"
-	}
+	str := libs.GetArtist(id)
 
 	io.WriteString(w, str)
 }
@@ -193,9 +193,7 @@ func handleGetCharacter(w http.ResponseWriter, r *http.Request) {
 
 	libs.LogDebug("run handler getcharacter " + id)
 
-	url := "https://rule34.us/index.php?r=posts/view&id=" + id
-
-	str := libs.GetCharacterUS(url)
+	str := libs.GetCharacter(id)
 
 	if str == "" {
 		str = "<empty></empty>"
@@ -227,10 +225,14 @@ func handleCharacter(w http.ResponseWriter, r *http.Request) {
 func handleGetImage(w http.ResponseWriter, r *http.Request) {
 	libs.LogDebug("run handler get image " + r.URL.Path)
 
-	ri := libs.GetImageUS(r.URL.Path)
+	var url = getValue(r, "url")
+
+	ri := libs.GetImage(url)
 
 	if ri == nil {
 		libs.LogError("while handle get image " + r.URL.Path)
+
+		return
 	}
 
 	w.Header().Set("Content-Type", "image/jpeg")
@@ -277,6 +279,7 @@ func main() {
 	h.Add("/tag", handleTag)
 	h.Add("/page", handlePage)
 	h.Add("/search", handleSearch)
+	h.Add("/getimage", handleGetImage)
 	h.Add("/getartist", handleGetArtist)
 	h.Add("/getcharacter", handleGetCharacter)
 

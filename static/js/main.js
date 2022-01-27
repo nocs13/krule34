@@ -1,10 +1,9 @@
-var paginator = -1;
-var pages = null;
-var thpp = 1; // thumbs per page for it may be 42
+var page = 0;
+var thpp = 42; // thumbs per page for it may be 42
 
-var images = null;
-var thumbs = null;
-var ids    = null;
+var items  = null;
+var count  = 0;
+var offset = 0;
 
 var mspos = new function() {
   this.x = 0;
@@ -20,9 +19,7 @@ class kSearch extends React.Component {
 
 function resetPages()
 {
-  paginator = -1;
-
-  pages = null
+  pages = 0;
 
   $('#pages').empty();
 }
@@ -84,154 +81,88 @@ function showImgMenu(id)
 
 function pagePidLeft(pid)
 {
-  if (pages == null || pages.length < 1)
-    return -1;
-
   pid = parseInt(pid, 10);
 
-  for (var i = pages.length - 1; i >= 0; i--)
-  {
-    var val = parseInt(pages[i], 10);
+  if (pid > 0)
+    return (pid - 1);
 
-    if (val < pid)
-    {
-      return pages[i]
-    }
-  }
+  let pages = count / thpp;
 
   return -1;
 }
 
 function pagePidRight(pid)
 {
-  if (pages == null || pages.length < 1)
-    return -1;
-
   pid = parseInt(pid, 10);
 
-  for (var i = 0; i < pages.length; i++)
-  {
-    var val = parseInt(pages[i], 10);
+  let pages = count / thpp;
 
-    if (val > pid)
-    {
-      return pages[i]
-    }
-  }
+  if (pid < pages)
+    return (pid + 1);
 
   return -1;
 }
 
-function getPagesMinMax() {
-    var res = {min: 0, max: 0};
-
-    if (pages == null)
-        return res;
-
-    var n;
-
-    for (n = 0; n < pages.length; n++) {
-        let ni = parseInt(pages[n]);
-
-        console.log('Current page value is ' + pages[n]);
-
-        if (ni < res.min)
-            res.min = ni
-        else if (ni > res.max)
-            res.max = ni
-    }
-
-    return res
-}
-
 function showImages(images, ids)
 {
-    $('#div_container').html('');
+  $('#div_container').html('');
 
-    for (i in images)
-    {
-      var id = ""
-      var s = '<div>';
-      let d = images[i]
+   for (i in items)
+   {
+    var id = items[i].id;
+    var s = '<div>';
+    let d = items[i].image;
 
-      if (ids != null && ids[i] != null) {
-        let di = ids[i]
+    var ivideo = false;
 
-        id = di;
-      }
-
-      /*
-      console.log("d id is " + d);
-      console.log("type is " + d.substr(0, 7));
-
-      if (d.substring(0, 7) == "/video/")
-      {
-        d = d.replace("/video/", "https://video.rule34.us/");
-      }
-      */
-
-      var ivideo = false;
-
-      if (d.indexOf(".mp4") > 0 || d.indexOf(".webm") > 0) {
-        ivideo = true;
-      }
-
-      var imode = sessionStorage.getItem('image_list_mode');
-
-      if (ivideo && (imode == 'gallery')) {
-        s += '<video style="width:100%" preload="auto" controls loop';
-        if (id != "")
-          s += ' iid="' + id + '"';
-        s += '>';
-        s += '  <source src="' + d + '" type="video/webm">';
-        let d1 = d.replace(".webm", ".mp4")
-        s += '  <source src="' + d1 + '" type="video/mp4">';
-        s += '</video>';
-      } else if (ivideo == false) {
-        /*s += '<img src="' + d + '"  style="width:100%" onload="console.log(\'IMG: \' + this.src);"';
-        if (id != "")
-          s += ' iid="' + id + '"';
-        s += '>';*/
-        s += '<img id="' + id + '" iid="' + id + '" class="image demo cursor" style="width:100%">'
-      }
-      s += '</div>';
-
-      $('#div_container').append(s);
-      //var sid = '#' + id;
-      //$(sid).imageLoad(function(){
-      //  console.log('loaded: ' + this.src)
-      //}).attr('src', d);
-      var img = document.getElementById(id);
-
-      if (img != null) {
-        img.onload = function() { console.log("Height: " + this.height); }
-        img.src = d;
-      }
+    if (d.indexOf(".mp4") > 0 || d.indexOf(".webm") > 0) {
+      ivideo = true;
     }
+
+    var imode = sessionStorage.getItem('image_list_mode');
+
+    if (ivideo && (imode == 'gallery')) {
+      s += '<video style="width:100%" preload="auto" controls loop';
+      if (id != "")
+        s += ' iid="' + id + '"';
+      s += '>';
+      s += '  <source src="' + d + '" type="video/webm">';
+      let d1 = d.replace(".webm", ".mp4")
+      s += '  <source src="' + d1 + '" type="video/mp4">';
+      s += '</video>';
+    } else if (ivideo == false) {
+      s += '<img id="' + id + '" class="image demo cursor" style="width:100%">'
+    }
+
+    s += '</div>';
+
+    $('#div_container').append(s);
+    var img = document.getElementById(id);
+
+    if (img != null) {
+      img.onload = function() { console.log("Height: " + this.height); }
+      img.src = "/getimage?url=" + d;
+    }
+  }
 }
 
 function showImageGallery(images, thumbs, ids)
 {
   imgSlide.new();
 
-  for (i in thumbs)
-    imgSlide.add(thumbs[i], ids[i], images[i]);
+  for (i in items)
+    imgSlide.add('/getimage?url=' + items[i].thumb, items[i].id, '/getimage?url=' + items[i].image);
 
-  imgSlide.set(images[0], ids[0]);
+  imgSlide.set('/getimage?url=' + items[0].image, items[0].id);
 }
 
 function parseArtist(data)
 {
-  var re = /<artist>(.*?)<\/artist>/gi;
+  var items = JSON.parse(data);
 
-  var artists = data.match(re);
+  var list = items.artists;
 
-  console.log('matches ' + artists);
-
-  if (artists == null)
-    return;
-
-  console.log('matches ' + artists.length);
+  var artists = list.split(',');
 
   if (artists.length < 1)
     return
@@ -242,27 +173,18 @@ function parseArtist(data)
 
   var tag = artists[0];
 
-  tag = tag.replace("<artist>", "");
-  tag = tag.replace("</artist>", "");
-
   if (tag != "") {
     window.open(window.location.origin + "/artist/" + tag, '_blank');
   }
-  //onSelect(tag)
 }
 
 function parseCharacter(data)
 {
-  var re = /<character>(.*?)<\/character>/gi;
+  var items = JSON.parse(data);
 
-  var characters = data.match(re);
+  var list = items.characters;
 
-  console.log('matches ' + characters);
-
-  if (characters == null)
-    return;
-
-  console.log('matches ' + characters.length);
+  var characters = list.split(',');
 
   if (characters.length < 1)
     return
@@ -273,17 +195,18 @@ function parseCharacter(data)
 
   var tag = characters[0];
 
-  tag = tag.replace("<character>", "");
-  tag = tag.replace("</character>", "");
-
   if (tag != "") {
     window.open(window.location.origin + "/character/" + tag, '_blank');
   }
-  //onSelect(tag)
 }
 
-function parseXML(data)
+function parseJSON(data)
 {
+  if (items != null)
+    items = null;
+
+  items = JSON.parse(data);
+
   $('#div_main').html("")
   $('#div_main').append('<div id="div_container" class="slideshow-container"></div>');
   $('#div_pages').html("")
@@ -291,114 +214,47 @@ function parseXML(data)
 
   resetPages();
 
-  var re = /<tag>(.*?)<\/tag>/gi;
-
-  var tags = data.match(re);
-
-  console.log('matches ' + tags);
-
-  if (tags != null)
-    console.log('matches ' + tags.length);
-
-  if (tags != null && tags.length > 0)
-    $('#tags').empty();
-
-  for(s in tags) {
-    console.log('match: ' + tags[s]);
-    $('#tags').append('<option>' + decodeURI(tags[s]) + '</option>');
+  if (items == null) {
+    return;
   }
 
-  re = /<artist>(.*?)<\/artist>/gi;
-  var artist = data.match(re);
+  var ops = items.pop();
 
-  if (artist != null && artist.length > 0) {
-    $('#artist').empty();
+  count = parseInt(ops.count, 10);
+  offset = parseInt(ops.offset, 10);
 
-    for (a in artist) {
-      var v = artist[a]
-      $('#artist').append('<option selected value="' + v + '">' + v + '</option>');
-    }
-  }
+  var maxPages = parseInt(count / thpp, 10);
 
-  re = /<page>(.*?)<\/page>/gi;
-  var pagin = data.match(re);
+  if (maxPages > 1000)
+    maxPages = 1000;
 
-  if (pagin != null && pagin.length > 0) {
-    $('#pages').empty();
-    $('#pages').append('<option disabled selected value></option>');
+  $('#pagesMax').text(maxPages);
+  
+  $('#pages').attr({ "max" : maxPages, "min" : 0 });
 
-    pages = new Array()
-
-    for (i in pagin)
-    {
-      let d = pagin[i]
-      d = d.replace('<page>', '');
-      d = d.replace('</page>', '');
-      console.log('Pushing page ' + d);
-      pages.push(d);
-      $('#pages').append('<option value="' + d + '">' + d / thpp + '</option>');
-      console.log('Append page value ' + d / thpp);
-    }
-  }
-
-  ids = null
-  ids = new Array()
-  re = /<id>(.*?)<\/id>/gi;
-  var tids = data.match(re);
-
-  for (i in tids) {
-    var t = tids[i];
-    t = t.replace('<id>', '');
-    t = t.replace('</id>', '');
-    ids.push(t);
-  }
-
-  thumbs = null
-  thumbs = new Array()
-  re = /<thumb>(.*?)<\/thumb>/gi;
-  var tthumbs = data.match(re);
-
-  for (i in tthumbs) {
-    var t = tthumbs[i];
-    t = t.replace('<thumb>', '');
-    t = t.replace('</thumb>', '');
-    thumbs.push(t);
-  }
-
-  images = null
-  images = new Array()
-
-  re = /<image>(.*?)<\/image>/gi;
-  var timages = data.match(re);
-
-  for (i in timages) {
-    var t = timages[i];
-    t = t.replace('<image>', '');
-    t = t.replace('</image>', '');
-    images.push(t);
-  }
-
-
-  //var parser = new DOMParser();
-  //var xmlDoc = parser.parseFromString(data, "text/xml");
-  //var images = xmlDoc.getElementsByTagName("image");
-  //s += '<img src="' + i.childNodes[0].nodeValue + '"  style="width:100%">';
-
-  if (images != null && images.length > 0) {
-    //var imode = Cookies.get('image_list_mode');
+  if (items.length > 0) {
     var imode = sessionStorage.getItem('image_list_mode');
 
     if (imode != null && imode == "gallery")
-      showImageGallery(images, thumbs, ids);
+      showImageGallery();
     else
-      showImages(images, ids);
+      showImages();
+  }
+
+  var stag = items[0].tags;
+  var tags = stag.split(' ');
+
+  $('#tags').html("");
+
+  for (i in tags) {
+    var t = tags[i]
+    $('#tags').append('<button class="dropdown-item" type="button">' + t + '</button>');
   }
 }
 
 function onStart()
 {
-  alert('onStart');
-
+  //alert('onStart');
   //ReactDOM.render(React.createElement(kSearch, null), document.getElementById('div_main'));
 }
 
@@ -416,12 +272,14 @@ function onSearch()
   $('#busy').show();
   $.get("/search", {key: key}, function(data){
     if (data != "")
-      parseXML(data)
+      parseJSON(data);
 
     console.log("Done");
   })
   .done(function(){
     paginator = 0;
+    $('#pagesValue').text(0)
+    $('#pages').val(0)
     window.scrollTo(0,0);
     console.log('success');
   })
@@ -447,7 +305,7 @@ function onSelect(tag)
 
   $.get("/tag", {tag: tag}, function(data){
     if (data != "")
-      parseXML(data);
+      parseJSON(data);
 
     $('#key').val(tag);
 
@@ -455,6 +313,9 @@ function onSelect(tag)
   })
   .done(function(){
     paginator = 0;
+    $('#pagesValue').text(0)
+    $('#pages').val(0)
+
     window.scrollTo(0,0);
     console.log('success');
   })
@@ -473,13 +334,17 @@ function onPage(pid, tag)
 
   $.get("/page", {pid: pid, tag: tag}, function(data){
     if (data != "")
-      parseXML(data)
+      parseJSON(data)
 
     console.log("Done");
   })
   .done(function(){
     paginator = pid;
-    $('#pages').append('<option value="' + pid + '" selected>' + pid / thpp + '</option>');
+    //$('#pages').append('<option value="' + pid + '" selected>' + pid / thpp + '</option>');
+    //$('#pages').append('<li value="' + pid + '" selected>' + pid / thpp + '</li>');
+    $('#pagesValue').text(pid)
+    $('#pages').val(pid)
+
     window.scrollTo(0,0);
     console.log('success');
   })
@@ -511,18 +376,19 @@ function onPageSide(side, tag)
   if (pid < 0)
     return;
 
-  $('#busy').show();
+  onPage(pid, tag);
+
+  /*$('#busy').show();
 
   $.get("/page", {pid: pid, tag: tag}, function(data){
     if (data != "")
-      parseXML(data)
+      parseJSON(data)
 
     console.log("Done");
   })
   .done(function(){
     paginator = pid;
     console.log('success');
-    $('#pages').append('<option value="' + pid + '" selected>' + pid / thpp + '</option>');
     window.scrollTo(0,0);
   })
   .fail(function(){
@@ -531,7 +397,7 @@ function onPageSide(side, tag)
   .always(function() {
     console.log( "finished" );
     $('#busy').hide();
-  });
+  });*/
 }
 
 function onArtist(id)
@@ -660,9 +526,9 @@ function onImage(id)
 
 function onThumb(id)
 {
-  for (i in ids) {
-    if (ids[i] == id) {
-      imgSlide.set(images[i], id);
+  for (i in items) {
+    if (items[i].id == id) {
+      imgSlide.set('/getimage?url=' + items[i].image, id);
 
       return;
     }
@@ -710,4 +576,12 @@ function k_menuLightbox() {
 
 function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max));
+}
+
+function getPagesMinMax() {
+  var v = {min: 0, max: 0};
+
+  v.max = parseInt(count / thpp, 10);
+
+  return v;
 }

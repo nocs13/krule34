@@ -22,6 +22,7 @@
     <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
             integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
@@ -47,21 +48,28 @@
         </button>
       </div>
       <div class="col-sm-3">
-        <select id="tags" class="form-control" ></select>
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Tags
+          </button>
+          <div id= 'tags' class="dropdown-menu k34tags" aria-labelledby="dropdownMenu2">
+          </div>
+        </div>
       </div>
       <div class="col-sm-3">
-        <table id="pages_value_table">
+        <table>
           <tr>
             <td>
-              <select id="pages" class="form-control" style="width: 50px;"></select>
+              <span id="pagesValue" style="text-align: center;" >0</span>
             </td>
             <td>
-              <span id="range_value" style="display: none; text-align: center;" >0</span>
-              <input type="range" class="custom-range" min="0" max="15" id="pages_range" style="display: none;">
+              <input id="pages" type="range" min="0" max="10" value="0" step="1"/>
+            </td>
+            <td>
+              <span id="pagesMax" style="text-align: center;" >0</span>
             </td>
           </tr>
         </table>
-        <!-- <select id="artist"></select> -->
       </div>
       <div class="col-sm-2">
         <div class="custom-control custom-switch">
@@ -124,9 +132,12 @@
 
     $('#info').hide();
     $('#busy').hide();
-    $('#tags').on('change', function() {
-      onSelect(this.value);
-      $('#key').val(this.value);
+    $('.dropdown-menu button').click(function () {           
+      alert($(this).text());
+    });
+    $('div.k34tags').on("click", "button", function(e) { 
+      onSelect($(this).text());
+      $('#key').val($(this).text());
     });
     $('#artist').on('change', function() {
       onSelect(this.value);
@@ -138,8 +149,11 @@
     $('#k_btn_right').on("click", function() {
       onPageSide(1, $('#key').val());
     });
-    $('#pages').on('change', function() {
-      onPage(this.value, $('#key').val());
+    $('#pages').change(function(){
+      onPage($(this).val(), $('#key').val());
+    });
+    $('#pages').on('input', function(){
+      $('#pagesValue').text($(this).val());
     });
     $('#key').on('keypress', function(e){
       if(e.keyCode == 13) {
@@ -151,54 +165,17 @@
     });
     $('#mode_gallery').on("change", function(){
       if ($(this).is(':checked')){
-        //Cookies.set('image_list_mode', 'gallery', 1);
         sessionStorage.setItem('image_list_mode', 'gallery');
         $('#k_menu').css('display', 'block');
       } else {
-        //Cookies.rem('image_list_mode');
         sessionStorage.setItem('image_list_mode', 'default');
         $('#k_menu').css('display', 'none');
       }
     });
-    $("#pages_value_table").click(function() {
-        let v = getPagesMinMax();
-
-        if (v.max < 5)
-            return;
-
-        let t = $("#pages_range").attr('type');
-
-        if ( $("#pages_range").is(':hidden') ) {
-            $( "#pages_range" ).show();
-            $( "#range_value" ).show();
-        } else if ( $("#pages_range").is(':visible') ) {
-            $( "#pages_range" ).hide();
-            $( "#range_value" ).hide();
-        }
-
-        $('#pages_range').prop('min', v.min);
-        $('#pages_range').prop('max', v.max);
-        $('#pages_range').prop('value', 0);
-        $("#range_value").text("0");
-    });
-    $('#pages_range').on('input', function(e){
-        var v = $(this).val();
-        //$('#pages').val(v);
-        $("#range_value").text(v);
-        console.log("Range actual value is " + v);
-    });
-    $('#pages_range').on('change',function(e){
-        var v = $(this).val();
-        $("#pages_range").hide();
-        $("#range_value").hide();
-        onPage(v, $('#key').val());
-    });
-
     $(document).on('click','img',function(e) {
       mspos.x = e.pageX;
       mspos.y = e.pageY;
 
-      //onArtist(this.attributes[2].value);
       if ($(this).hasClass('thumb')) {
         onThumb(this.attributes[0].value);
       } else if ($(this).hasClass('image')) {
@@ -243,7 +220,7 @@
                          "sakimichan", "kelvin_hiu", "potchi", "liquidn", "vgerotica", "coffeeslice", "Real_XXIII",
                          "dress", "lingerie", "thong", "knee_highs", "knee_highs", "bra", "thighhighs", "thick_thighs"];
         var base_tag  = base_tags[getRandomInt(27)];
-        //base_tag = 'dress';
+        base_tag = 'nonude';
         $('#key').val(base_tag);
         onSearch();
       }
