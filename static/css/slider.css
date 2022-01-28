@@ -209,6 +209,8 @@ table.scrollable td {
 img.thumb {
   border: 2px;
   border-color: gray;
+  max-width: 150px;
+  max-height: 200px;
 }
 
 img.image {

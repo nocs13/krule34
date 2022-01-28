@@ -44,8 +44,10 @@ function showImgMenu(id)
 
   if (type == 'gallery')
     return;
+  
+  var date = new Date();
 
-  var d = '<div id="divImgMenu" class="dropdown-menu" aria-labelledby="dropdownMenuLink">';
+  var d = '<div id="divImgMenu" class="dropdown-menu" aria-labelledby="dropdownMenuLink" birth="' + date.getTime() + '">';
       d += '<a  id="aImgArtist" class="dropdown-item">Artist</a>';
       d += '<a  id="aImgCharacter" class="dropdown-item">Character</a>';
       d += '<a  id="aImgLightbox" class="dropdown-item">Modal</a>';
@@ -57,6 +59,7 @@ function showImgMenu(id)
 
   $('#divImgMenu').css({top: mspos.y + 'px', left: mspos.x + 'px', position:'absolute'});
 
+  $( "#divImgMenu" ).selectmenu();
   $('#divImgMenu').show();
 
   $('#aImgArtist').on('click', function(){
@@ -213,6 +216,7 @@ function parseJSON(data)
   $('#div_tags').html("");
 
   resetPages();
+  hideImgMenu();
 
   if (items == null) {
     return;
@@ -533,6 +537,35 @@ function onThumb(id)
       return;
     }
   }
+}
+
+function onAutocompete(id) {
+  $.get("/getautocomplete", {id: id}, function(data){
+    if (data != "") {
+      var items = JSON.parse(data);
+      $('#keyauto').empty();
+
+      //var tags = new Array();
+
+      for (i in items) {
+        $('#keyauto').append('<a class="dropdown-item" href="#">' + items[i].label + '</a>');
+        //tags.push(items[i].label);
+      }
+
+      $('#keyauto').show();
+      //$( "#key" ).autocomplete({
+      //  source: tags
+      //});
+    }
+
+    console.log("Done");
+  })
+  .done(function(){
+  })
+  .fail(function(){
+  })
+  .always(function() {
+  }); 
 }
 
 function k_menuArtist() {

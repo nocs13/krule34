@@ -41,8 +41,11 @@
 
   <div id="k_panel" class="container">
     <div class="row">
-      <div class="col-sm-3 pull-left" style="text-align: left;">
-        <input id="key" class="form-control" type="text" placeholder="Enter Keywords?" value=''/>
+      <div class="col-sm-3 pull-left ui-widget" style="text-align: left;">
+        <input id="key" class="form-control" type="text" placeholder="Enter Keywords?" autocomplete="off" value=""/>
+        <div id= 'keyauto' class="dropdown-menu" aria-labelledby="key">
+        </div>
+        <!-- <ul id='keyauto' class='kr34auto'></ul> -->
         <button id="btn_search" class="btn btn-secondary" type="button" onclick="onSearch()" style="position: absolute; top: 0px; right: 15px">
           S
         </button>
@@ -132,6 +135,19 @@
 
     $('#info').hide();
     $('#busy').hide();
+    $('#key').keyup(function() {
+      onAutocompete(this.value);
+    });
+    //$('#keyauto a').click(function () {           
+      //alert($(this).text());
+      //console.log($(this).text());
+    //});    
+    $("#keyauto").on("click", "a", function(event){
+      console.log("You clicked the drop downs", $(this).text())
+      var tag = $(this).text().split(' ');
+      $("#keyauto").hide();
+      onSelect(tag[0]);
+    })
     $('.dropdown-menu button').click(function () {           
       alert($(this).text());
     });
@@ -229,6 +245,25 @@
     $(document).mousemove(function(e) {
       mspos.x = e.pageX;
       mspos.y = e.pageY;
+    });
+
+    $(document).click(function(e){
+      if($(e.target).closest('#keyauto').length == 0) 
+        $('#keyauto').hide();
+
+      if((document.getElementById("divImgMenu") !== null) && 
+        ($('#divImgMenu').is(':visible')&& ($(e.target).closest('#divImgMenu').length == 0)))
+      {
+        var date = new Date();
+        var birth = parseInt($('#divImgMenu').attr('birth'), 10);
+        var d = date - birth;
+
+        if (d > 300)
+          hideImgMenu();
+      }
+      //if ($('#divImgMenu').is(':visible') && ($(e.target).closest('#divImgMenu').length == 0))
+      //  $('#divImgMenu').hide();
+      return true;
     });
 
   </script>

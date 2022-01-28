@@ -674,6 +674,38 @@ func GetCharacter(id string) string {
 	return r
 }
 
+func GetAutocomplete(id string) string {
+	url := "https://rule34.xxx/autocomplete.php?q=" + id
+
+	client := &http.Client{}
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36")
+
+	res, err := client.Do(req)
+
+	if err != nil || res == nil {
+		LogError("Failed GET request.")
+
+		return ""
+	}
+
+	defer res.Body.Close()
+
+	responseData, err := ioutil.ReadAll(res.Body)
+
+	if err != nil {
+		LogError("Read body data error:" + err.Error())
+
+		return ""
+	}
+
+	final := string(responseData)
+
+	LogDebug("Autocomplete: " + final)
+
+	return final
+}
+
 type JsNode struct {
 	Preview_url   string
 	Sample_url    string

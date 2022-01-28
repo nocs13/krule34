@@ -262,6 +262,18 @@ func handleGetThumbnail(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, t.Content)
 }
 
+func handleGetAutocomplete(w http.ResponseWriter, r *http.Request) {
+	libs.LogDebug("run handler get autocomplete " + r.URL.Path)
+
+	var id = getValue(r, "id")
+
+	libs.LogDebug("run handler get autocomplete " + id)
+
+	str := libs.GetAutocomplete(id)
+
+	io.WriteString(w, str)
+}
+
 func main() {
 	port := os.Getenv("PORT")
 
@@ -282,6 +294,7 @@ func main() {
 	h.Add("/getimage", handleGetImage)
 	h.Add("/getartist", handleGetArtist)
 	h.Add("/getcharacter", handleGetCharacter)
+	h.Add("/getautocomplete", handleGetAutocomplete)
 
 	h.Add("/sitemap.xml", handleSitemap)
 	h.Add("/BingSiteAuth.xml", handleBingSiteAuth)

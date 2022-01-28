@@ -33,7 +33,8 @@ var imgSlide = {
 			this.images.push(d);
 
     	var th = '<div class="col-sm-3"><a>';
-            th += '<img imgid="' + id + '" class="img-fluid thumb cursor" src="' + src + '" style="width: 150px; height: 200px;">';
+            //th += '<img imgid="' + id + '" class="img-fluid thumb cursor" src="' + src + '" style="max-width: 150px; max-height: 200px;">';
+            th += '<img imgid="' + id + '" class="img-fluid thumb cursor" src="' + src + '">';
             th += '</a></div>';
 
         $('#tr_image_slider_thumbs').append(th);
