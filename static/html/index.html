@@ -12,12 +12,13 @@
 
     <meta name="google-site-verification" content="Pdd78Gf37mDDpxZ0AUTLGF1Jb8iVx04IFXtDAXrvq9k" />
 
-    <link href="https://fonts.googleapis.com/css?family=Poppins" rel="stylesheet" />
-    <link href="/static/css/slider.css" rel="stylesheet" />
-
-
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <link href="https://fonts.googleapis.com/css?family=Poppins" rel="stylesheet" />
+    <link href="/static/css/slider.css" rel="stylesheet" />
+    <link href="/static/css/main.css" rel="stylesheet" />
+
 
     <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
@@ -45,7 +46,6 @@
         <input id="key" class="form-control" type="text" placeholder="Enter Keywords?" autocomplete="off" value=""/>
         <div id= 'keyauto' class="dropdown-menu" aria-labelledby="key">
         </div>
-        <!-- <ul id='keyauto' class='kr34auto'></ul> -->
         <button id="btn_search" class="btn btn-secondary" type="button" onclick="onSearch()" style="position: absolute; top: 0px; right: 15px">
           S
         </button>
@@ -135,13 +135,6 @@
 
     $('#info').hide();
     $('#busy').hide();
-    $('#key').keyup(function() {
-      onAutocompete(this.value);
-    });
-    //$('#keyauto a').click(function () {           
-      //alert($(this).text());
-      //console.log($(this).text());
-    //});    
     $("#keyauto").on("click", "a", function(event){
       console.log("You clicked the drop downs", $(this).text())
       var tag = $(this).text().split(' ');
@@ -176,6 +169,73 @@
         onSearch();
       }
     });
+    $('#key').keyup(function(e) {
+      console.log('Pressed key: ' + e.keyCode);
+      if (e.keyCode == 13) {
+      } else if (e.keyCode == 40) {
+        if ($('#keyauto').is(':visible')) {
+          $('#key').blur();
+          $('#keyauto').focus();
+          var kids = $('#keyauto').children();
+          $(kids[0]).focus();
+        }
+      } else if (e.keyCode == 38) {
+        if ($('#keyauto').is(':visible')) {
+          $('#keyauto').focus();
+        }
+      } else {
+        onAutocompete(this.value);
+      }
+    });
+    $('#keyauto').on('keydown', function (e) {
+      var kids = $('#keyauto').children();
+      var i = 0;
+      try {
+
+      if (e.keyCode == 40) {
+        for (i = 0; i < kids.length; i++) {
+          var k = kids[i];
+
+          if ($(k).is(':focus') && (i < (kids.length - 1))) {
+            $(k).removeClass('k34autoitem');
+            $(k).blur();
+            k = kids[i + 1];
+            $(k).focus();
+            $(k).addClass('k34autoitem');
+            break;
+          }
+        }
+      } else if (e.keyCode == 38) {
+        for (i = 0; i < kids.length; i++) {
+          var k = kids[i];
+
+          if ($(k).is(':focus') && (i > 0)) {
+            $(k).removeClass('k34autoitem');
+            $(k).blur();
+            k = kids[i - 1];
+            $(k).focus();
+            $(k).addClass('k34autoitem');
+            break;
+          }
+        }
+      } else if (e.keyCode == 13) {
+        for (i = 0; i < kids.length; i++) {
+          var k = kids[i];
+          if ($(k).is(':focus')) {
+            $('#key').val($(k).text().split(' ')[0]);
+            $('#keyauto').hide();
+            onSearch();
+            break;
+          }
+        }
+      }
+
+      } catch(e) {
+        console.error(e);
+      }
+
+      return false;
+    });
     $('#ntab').on("click", function() {
       window.open(window.location.origin, '_blank');
     });
@@ -208,6 +268,7 @@
     });
     $(document).ready(function () {
       window.scrollTo(0,0);
+      $('#key').focus();
 
       //var imode = Cookies.get('image_list_mode');
       var imode = sessionStorage.getItem('image_list_mode');
@@ -236,7 +297,8 @@
                          "sakimichan", "kelvin_hiu", "potchi", "liquidn", "vgerotica", "coffeeslice", "Real_XXIII",
                          "dress", "lingerie", "thong", "knee_highs", "knee_highs", "bra", "thighhighs", "thick_thighs"];
         var base_tag  = base_tags[getRandomInt(27)];
-        base_tag = 'nonude';
+        //base_tag = 'nonude';
+        base_tag = 'animated 2d';
         $('#key').val(base_tag);
         onSearch();
       }
@@ -252,7 +314,7 @@
         $('#keyauto').hide();
 
       if((document.getElementById("divImgMenu") !== null) && 
-        ($('#divImgMenu').is(':visible')&& ($(e.target).closest('#divImgMenu').length == 0)))
+        ($('#divImgMenu').is(':visible') && ($(e.target).closest('#divImgMenu').length == 0)))
       {
         var date = new Date();
         var birth = parseInt($('#divImgMenu').attr('birth'), 10);

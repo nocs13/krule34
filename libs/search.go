@@ -838,9 +838,12 @@ func Search(key string, pid string) string {
 	return r
 }
 
-//GetImageUS is ...
-func GetImage(uri string) io.Reader {
+//GetImage is ...
+//func GetImage(uri string) io.Reader {
+func GetImage(uri string) *http.Response {
 	response, err := http.Get(uri)
+
+	LogDebug("GetImage: " + uri)
 
 	if err != nil {
 		LogError("Cannot get image from url: " + uri)
@@ -854,7 +857,7 @@ func GetImage(uri string) io.Reader {
 		return nil
 	}
 
-	return response.Body
+	return response
 }
 
 //GetVideoUS is ...

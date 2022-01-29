@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"sync"
 )
 
@@ -235,8 +236,33 @@ func handleGetImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "image/jpeg")
-	io.Copy(w, ri)
+	var contentType string = "image/jpeg"
+
+	if strings.HasSuffix(url, ".png") {
+		contentType = "image/png"
+	} else if strings.HasSuffix(url, ".jpg") {
+		contentType = "image/jpeg"
+	} else if strings.HasSuffix(url, ".mp4") {
+		contentType = "video/mp4"
+	} else if strings.HasSuffix(url, ".webm") {
+		contentType = "video/webm"
+	}
+
+	contentSize := strconv.FormatInt(ri.ContentLength, 10)
+	s64, _ := strconv.ParseInt(contentSize, 10, 32)
+	s64--
+	//s32 := strconv.Itoa(int(s64))
+
+	w.Header().Set("Content-Type", contentType)
+	w.Header().Add("Accept-Ranges", "bytes")
+	w.Header().Add("Content-Length", contentSize)
+
+	//requestedBytes := r.Header.Get("Range")
+	//w.Header().Add("Content-Range", "bytes "+requestedBytes[6:len(requestedBytes)]+
+	//	s32+"/"+contentSize)
+	w.Header().Add("Content-Range", "bytes 0 "+contentSize+"/"+contentSize)
+
+	io.Copy(w, ri.Body)
 }
 
 func handleGetVideo(w http.ResponseWriter, r *http.Request) {

@@ -143,7 +143,9 @@ function showImages(images, ids)
     var img = document.getElementById(id);
 
     if (img != null) {
-      img.onload = function() { console.log("Height: " + this.height); }
+      img.onload = function() { 
+        //console.log("Height: " + this.height); 
+      }
       img.src = "/getimage?url=" + d;
     }
   }
@@ -161,7 +163,14 @@ function showImageGallery(images, thumbs, ids)
 
 function parseArtist(data)
 {
-  var items = JSON.parse(data);
+  var items;
+
+  try {
+    items = JSON.parse(data);
+  } catch(e) {
+    console.error(e);
+    return;
+  }
 
   var list = items.artists;
 
@@ -183,7 +192,14 @@ function parseArtist(data)
 
 function parseCharacter(data)
 {
-  var items = JSON.parse(data);
+  var items;
+
+  try {
+    items = JSON.parse(data);
+  } catch(e) {
+    console.error(e);
+    return;
+  }
 
   var list = items.characters;
 
@@ -208,7 +224,12 @@ function parseJSON(data)
   if (items != null)
     items = null;
 
-  items = JSON.parse(data);
+  try {
+    items = JSON.parse(data);
+  } catch(e) {
+    console.error(e);
+    return;
+  }
 
   $('#div_main').html("")
   $('#div_main').append('<div id="div_container" class="slideshow-container"></div>');
@@ -546,6 +567,8 @@ function onAutocompete(id) {
       $('#keyauto').empty();
 
       //var tags = new Array();
+      if (items.length < 1)
+        return;
 
       for (i in items) {
         $('#keyauto').append('<a class="dropdown-item" href="#">' + items[i].label + '</a>');

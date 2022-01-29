@@ -24,6 +24,10 @@ ul.kr34auto {
   left: 0;
 }
 
+a.k34autoitem {
+  background-color: #a598ee;
+}
+
 /**
  * Add the correct display in IE 9-.
  */
