@@ -792,7 +792,7 @@ func Search(key string, pid string) string {
 
 	final := string(responseData)
 
-	LogInfo(final)
+	//LogInfo(final)
 
 	err = xml.Unmarshal([]byte(final), &posts)
 
@@ -815,8 +815,12 @@ func Search(key string, pid string) string {
 		r += `"id":`
 		r += `"` + strconv.Itoa(n.Id) + `",`
 
+		t := n.Tags
+
+		t = strings.Replace(t, `\||/`, "", -1)
+
 		r += `"tags":`
-		r += `"` + n.Tags + `",`
+		r += `"` + t + `",`
 
 		r += `"thumb":`
 		r += `"` + n.Preview_url + `",`
@@ -824,7 +828,7 @@ func Search(key string, pid string) string {
 		r += `"image":`
 		r += `"` + n.Sample_url + `"`
 
-		r += "},"
+		r += "},\n"
 	}
 
 	//if len(r) > 1 {
@@ -834,6 +838,8 @@ func Search(key string, pid string) string {
 	r += "{" + `"count":"` + strconv.Itoa(posts.Count) + `", "offset":"` + strconv.Itoa(posts.Offset) + `"}`
 
 	r += "]"
+
+	LogInfo("JSON: " + r)
 
 	return r
 }

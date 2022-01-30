@@ -240,12 +240,17 @@
       window.open(window.location.origin, '_blank');
     });
     $('#mode_gallery').on("change", function(){
+      var k = $('#key').val();
+      var p = $('#pages').val();
+
       if ($(this).is(':checked')){
         sessionStorage.setItem('image_list_mode', 'gallery');
         $('#k_menu').css('display', 'block');
+        onPage(p, k);
       } else {
         sessionStorage.setItem('image_list_mode', 'default');
         $('#k_menu').css('display', 'none');
+        onPage(p, k);
       }
     });
     $(document).on('click','img',function(e) {
