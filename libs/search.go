@@ -568,9 +568,7 @@ func GetArtist(id string) string {
 		for _, s := range artists {
 			r += s + ","
 		}
-	}
 
-	if len(r) > 1 {
 		r = r[:len(r)-1]
 	}
 
@@ -661,9 +659,7 @@ func GetCharacter(id string) string {
 		for _, s := range characters {
 			r += s + ","
 		}
-	}
 
-	if len(r) > 1 {
 		r = r[:len(r)-1]
 	}
 
@@ -817,7 +813,8 @@ func Search(key string, pid string) string {
 
 		t := n.Tags
 
-		t = strings.Replace(t, `\||/`, "", -1)
+		//t = strings.Replace(t, `\||/`, "", -1)
+		t = strings.Replace(t, "\\", "\\\\", -1)
 
 		r += `"tags":`
 		r += `"` + t + `",`
