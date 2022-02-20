@@ -820,6 +820,7 @@ func Search(key string, pid string) string {
 		//t = strings.Replace(t, `\||/`, "", -1)
 		t = strings.Replace(t, "\\", "\\\\", -1)
 		t = strings.Replace(t, "\n", "", -1)
+		t = strings.Replace(t, "\"", " ", -1)
 
 		r += `"tags":`
 		r += `"` + t + `",`
