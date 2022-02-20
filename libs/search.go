@@ -806,15 +806,20 @@ func Search(key string, pid string) string {
 	r = "["
 
 	for _, n := range posts.Posts {
+		t := n.Tags
+
+		if string(t[0:1]) == "\\" {
+			continue
+		}
+
 		//LogInfo("Element " + n.Hash)
 		r += "{"
 		r += `"id":`
 		r += `"` + strconv.Itoa(n.Id) + `",`
 
-		t := n.Tags
-
 		//t = strings.Replace(t, `\||/`, "", -1)
 		t = strings.Replace(t, "\\", "\\\\", -1)
+		t = strings.Replace(t, "\n", "", -1)
 
 		r += `"tags":`
 		r += `"` + t + `",`

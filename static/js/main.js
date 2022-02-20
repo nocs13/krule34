@@ -22,6 +22,8 @@ function resetPages()
   pages = 0;
 
   $('#pages').empty();
+  $('#pagesMax').text(0);  
+  $('#pages').attr({ "max" : 0, "min" : 0 });
 }
 
 function hideImgMenu()
@@ -244,6 +246,10 @@ function parseJSON(data)
   }
 
   var ops = items.pop();
+
+  if (items.length < 1) {
+    return;
+  }
 
   count = parseInt(ops.count, 10);
   offset = parseInt(ops.offset, 10);
@@ -571,6 +577,8 @@ function onAutocompete(id) {
         return;
 
       for (i in items) {
+        if (items[i].label[0] == '\\')
+          continue;
         $('#keyauto').append('<a class="dropdown-item" href="#">' + items[i].label + '</a>');
         //tags.push(items[i].label);
       }
