@@ -97,10 +97,10 @@
       <div class="input-field third-wrap">
       </div>
 
-      <button id="k_btn_left" class="btn-search prev" type="button">
+      <button id="k_btn_left" class="btn-search prev" style="z-index: 1000" type="button">
         <
       </button>
-      <button id="k_btn_right" class="btn-search next" type="button">
+      <button id="k_btn_right" class="btn-search next"  style="z-index: 1000" type="button">
         >
       </button>
     <!-- </form> -->
@@ -227,9 +227,23 @@
         for (i = 0; i < kids.length; i++) {
           var k = kids[i];
           if ($(k).is(':focus')) {
-            $('#key').val($(k).text().split(' ')[0]);
+            let cpos = document.getElementById("key").selectionStart;
+            let v = $('#key').val();
+
+            if (cpos > 0) {
+              let ss = v.substring(0, cpos);
+              let li = ss.lastIndexOf(" ");
+              v = v.substring(0, li + 1);
+            } else {
+              v = "";
+            }
+
+            v = v + $(k).text().split(' ')[0];
+            
+            $('#key').val(v);
             $('#keyauto').hide();
-            onSearch();
+            $('#key').focus();
+            //onSearch();
             break;
           }
         }
@@ -307,7 +321,7 @@
                          "sakimichan", "kelvin_hiu", "potchi", "liquidn", "vgerotica", "coffeeslice", "Real_XXIII",
                          "dress", "lingerie", "thong", "knee_highs", "knee_highs", "bra", "thighhighs", "thick_thighs"];
         var base_tag  = base_tags[getRandomInt(27)];
-        //base_tag = 'nonude';
+        base_tag = 'nonude';
         //base_tag = 'animated 2d';
         //base_tag = 'flaccid_while_penetrated';
         $('#key').val(base_tag);
