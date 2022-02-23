@@ -155,7 +155,7 @@ function showImages(images, ids)
 
 function showImageGallery(images, thumbs, ids)
 {
-  imgSlide.new();
+  imgSlide.new(function(){ onPageSide(-1, $('#key').val()); }, function() {onPageSide(1, $('#key').val()); });
 
   for (i in items)
     imgSlide.add('/getimage?url=' + items[i].thumb, items[i].id, '/getimage?url=' + items[i].image);

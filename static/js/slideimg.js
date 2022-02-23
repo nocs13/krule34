@@ -1,9 +1,11 @@
 var imgSlide = {
-	new: function(){
+	new: function(gprev, gnext){
 		this.remove();
 
 		this.index = 0;
 		this.images = new Array();
+		this.gprev = gprev;
+		this.gnext = gnext;
 
 		var sl =  '<div id="div_image_slider" class="container">';
 			sl += ' <div id="div_image_slider_images" class="row"></div>';
@@ -99,8 +101,12 @@ var imgSlide = {
   },
 
 	next: function() {
-		if (this.index >= (this.images.length - 1))
+		if (this.index >= (this.images.length - 1)) {
+			if (this.gnext != null)
+				this.gnext();
+
 			return;
+		}
 
 		let i = this.index + 1;
 		let id = this.images[i].id;
@@ -110,8 +116,12 @@ var imgSlide = {
 	},
 
 	prev: function() {
-		if (this.index <= 0)
+		if (this.index <= 0) {
+			if (this.gprev != null)
+				this.gprev();
+
 			return;
+		}
 
 		let i = this.index - 1;
 		let id = this.images[i].id;
