@@ -31,15 +31,25 @@ var imgSlide = {
 
 	add: function(src, id, img) {
 			var d = {'id': id, 'src': src, 'img': img};
+			let ext = '';
+
+			if (img != null) {
+				ext = img.split('.').pop();
+			}
 
 			this.images.push(d);
 
     	var th = '<div class="col-sm-3"><a>';
             //th += '<img imgid="' + id + '" class="img-fluid thumb cursor" src="' + src + '" style="max-width: 150px; max-height: 200px;">';
-            th += '<img imgid="' + id + '" class="img-fluid thumb cursor" src="' + src + '">';
-            th += '</a></div>';
+			if (ext == "mp4" || ext == "webm") {
+       	th += '<img imgid="' + id + '" class="img-fluid thumb cursor" src="' + src + '" style="border: 5px solid #555;">';
+			} else {
+       	th += '<img imgid="' + id + '" class="img-fluid thumb cursor" src="' + src + '">';
+			}
 
-        $('#tr_image_slider_thumbs').append(th);
+      th += '</a></div>';
+
+      $('#tr_image_slider_thumbs').append(th);
 	},
 
 	set: function(src, id) {

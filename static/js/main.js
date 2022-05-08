@@ -485,11 +485,12 @@ function onLightbox(id)
 
   var index = -1;
 
-  for (var i in images) {
-    if (id == ids[i])
+  for (var i in items) {
+    //imgSlide.add('/getimage?url=' + items[i].thumb, items[i].id, '/getimage?url=' + items[i].image);
+    if (id == items[i].id)
       index = i;
 
-    lightBox.add(images[i], ids[i]);
+    lightBox.add('/getimage?url=' + items[i].image, items[i].id);
   }
 
   lightBox.set(index);
