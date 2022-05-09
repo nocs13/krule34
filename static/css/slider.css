@@ -231,6 +231,13 @@ img.lightbox {
   object-fit: contain;
 }
 
+img.video {
+  border-color: gray;
+  max-width: 150px;
+  max-height: 200px;
+  border: 5px solid #555;
+}
+
 video.bord {
   border: 5px solid blue;
 }

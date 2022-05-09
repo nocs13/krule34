@@ -8,15 +8,15 @@ var imgSlide = {
 		this.gnext = gnext;
 
 		var sl =  '<div id="div_image_slider" class="container">';
-			sl += ' <div id="div_image_slider_images" class="row"></div>';
-			sl += '</div>';
-			sl += '<div class="container"><div class="row"><br></div></div>';
-			sl += '<div class="container"><div class="row">';
-		  sl += '<a id="a_image_slider_imgprev" class="imgprev" onclick="imgSlide.prev()">❮</a>';
-		  sl += '<a id="a_image_slider_imgnext" class="imgnext" onclick="imgSlide.next()">❯</a>';
-			sl += '</div></div>';
-			sl += '<div class="container"><div id="tr_image_slider_thumbs" class="row">';
-			sl += '</div></div>';
+			  sl += ' <div id="div_image_slider_images" class="row"></div>';
+			  sl += '</div>';
+			  sl += '<div class="container"><div class="row"><br></div></div>';
+			  sl += '<div class="container"><div class="row">';
+		    sl += '<a id="a_image_slider_imgprev" class="imgprev" onclick="imgSlide.prev()">❮</a>';
+		    sl += '<a id="a_image_slider_imgnext" class="imgnext" onclick="imgSlide.next()">❯</a>';
+			  sl += '</div></div>';
+			  sl += '<div class="container"><div id="tr_image_slider_thumbs" class="row">';
+			  sl += '</div></div>';
 
 		$('#div_main').html('');
 		$('#div_main').append(sl);
@@ -42,7 +42,7 @@ var imgSlide = {
     	var th = '<div class="col-sm-3"><a>';
             //th += '<img imgid="' + id + '" class="img-fluid thumb cursor" src="' + src + '" style="max-width: 150px; max-height: 200px;">';
 			if (ext == "mp4" || ext == "webm") {
-       	th += '<img imgid="' + id + '" class="img-fluid thumb cursor" src="' + src + '" style="border: 5px solid #555;">';
+       	th += '<img imgid="' + id + '" class="video thumb cursor" src="' + src + '" >';
 			} else {
        	th += '<img imgid="' + id + '" class="img-fluid thumb cursor" src="' + src + '">';
 			}
@@ -66,24 +66,38 @@ var imgSlide = {
 
 		this.imgid = id;
 
-	    if (src.indexOf(".mp4") > 0 || src.indexOf(".webm") > 0) {
-	    	var s = "";
-    	    s += '<video class="bord" style="width:100%" preload="auto" controls loop';
-       		s += ' id="' + id + '"';
-        	s += '>';
-        	s += '  <source src="' + src + '" type="video/webm">';
-        	let d1 = src.replace(".webm", ".mp4")
-        	s += '  <source src="' + d1 + '" type="video/mp4">';
-        	s += '</video>';
+		let isvid  = false;
+		let vol = 1.0;
 
-        	th = s;
-      } else {
+    if (src.indexOf(".mp4") > 0 || src.indexOf(".webm") > 0) {
+	    	var s = "";
+				let vid = $("video");
+
+				if (vid != null)
+					vol = $(vid).prop("volume");
+
+    	  s += '<video class="bord" style="width:100%" preload="auto" controls loop';
+       	s += ' id="' + id + '"';
+        s += '>';
+        s += '  <source src="' + src + '" type="video/webm">';
+        let d1 = src.replace(".webm", ".mp4")
+        s += '  <source src="' + d1 + '" type="video/mp4">';
+        s += '</video>';
+
+        th = s;
+
+				isvid = true;
+    } else {
 				$('#busy').show();
 	        th = '<img id="' + id + '" class="image demo cursor" src="' + src + '" style="width:100%" onload="imgSlide.onload()">';
-    		}
+    }
 
-        $('#div_image_slider_images').html('');
-        $('#div_image_slider_images').append(th);
+    $('#div_image_slider_images').html('');
+    $('#div_image_slider_images').append(th);
+
+		if (isvid) {
+			$("video").prop("volume", vol);
+		}
 				/*
         $('#div_image_slider_images').mouseover(function(){
 					 var sl = '';
