@@ -236,6 +236,9 @@ func handleGetImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	farr := strings.Split(url, "/")
+	fname := farr[len(farr)-1]
+
 	var contentType string = "image/jpeg"
 
 	if strings.HasSuffix(url, ".png") {
@@ -256,6 +259,7 @@ func handleGetImage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", contentType)
 	w.Header().Add("Accept-Ranges", "bytes")
 	w.Header().Add("Content-Length", contentSize)
+	w.Header().Add("Content-Disposition", "inline; filename="+fname+"")
 
 	//requestedBytes := r.Header.Get("Range")
 	//w.Header().Add("Content-Range", "bytes "+requestedBytes[6:len(requestedBytes)]+

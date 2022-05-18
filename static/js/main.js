@@ -117,6 +117,7 @@ function showImages(images, ids)
     var id = items[i].id;
     var s = '<div>';
     let d = items[i].image;
+    let f = items[i].image.split("/").at(-1);
 
     var ivideo = false;
 
@@ -136,13 +137,14 @@ function showImages(images, ids)
       s += '  <source src="' + d1 + '" type="video/mp4">';
       s += '</video>';
     } else if (ivideo == false) {
-      s += '<img id="' + id + '" class="image demo cursor" style="width:100%">'
+      s += '<img id="' + id + '" class="image demo cursor" style="width:100%">';
     }
 
     s += '</div>';
 
     $('#div_container').append(s);
     var img = document.getElementById(id);
+    $(img).attr("alt", items[i].tags);
 
     if (img != null) {
       img.onload = function() { 
