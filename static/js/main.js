@@ -52,6 +52,7 @@ function showImgMenu(id)
   var d = '<div id="divImgMenu" class="dropdown-menu" aria-labelledby="dropdownMenuLink" birth="' + date.getTime() + '">';
       d += '<a  id="aImgArtist" class="dropdown-item">Artist</a>';
       d += '<a  id="aImgCharacter" class="dropdown-item">Character</a>';
+      d += '<a  id="aImgInfo" class="dropdown-item">Info</a>';
       d += '<a  id="aImgLightbox" class="dropdown-item">Modal</a>';
       d += '<a  id="aImgCansel" class="dropdown-item">Cansel</a>';
       d += '</div>';
@@ -74,6 +75,11 @@ function showImgMenu(id)
     onCharacter(id);
   });
 
+  $('#aImgInfo').on('click', function(){
+    hideImgMenu();
+    onInfo(id);
+  });
+
   $('#aImgLightbox').on('click', function(){
     hideImgMenu();
     onLightbox(id);
@@ -84,6 +90,99 @@ function showImgMenu(id)
   });
 }
 
+////
+function hideImgInfo()
+{
+  var el =  document.getElementById('divImgInfo');
+
+  if (typeof(el) != 'undefined' && el != null)
+  {
+    $('#divImgInfo').hide();
+
+    el.parentNode.removeChild(el);
+  }
+}
+
+function showImgInfo(arts, char, tags)
+{
+  hideImgInfo();
+
+  let type = sessionStorage.getItem('image_list_mode');
+
+  if (type == 'gallery')
+    return;
+
+  var as = null;
+  var cs = null;
+  var ts = null;
+
+  if (arts)
+    as = JSON.parse(arts).artists.split(",");
+
+  if (char)
+    cs = JSON.parse(char).characters.split(",");
+
+  if (tags)
+    ts = tags.split(" ");
+  
+  var date = new Date();
+
+  var d = '<div id="divImgInfo" class="dropdown-menu" aria-labelledby="dropdownMenuLink" birth="' + date.getTime() + '">';
+
+  for (i in as) {
+    if (as[i].length > 0)
+      d += '<a  class="k34imginfoitemartist dropdown-item" style="color: red">' + as[i] + '</a>';
+  }
+
+  for (i in cs) {
+    if (cs[i].length > 0)
+      d += '<a  class="k34imginfoitemcharacter dropdown-item" style="color: green">' + cs[i] + '</a>';
+  }
+  
+  for (i in ts) {
+        if (ts[i].length > 0)
+          d += '<a  class="k34imginfoitemtag dropdown-item" style="color: blue">' + ts[i] + '</a>';
+  }
+  d += '<a  id="aImgInfoCansel" class="dropdown-item">Cansel</a>';
+  d += '</div>';
+
+  $('body').append(d);
+
+
+  //$('#divImgInfo').css({top: 0 + 'px', left: 1024 + 'px', position:'absolute'});
+  $('#divImgInfo').css({top: mspos.y + 'px', left: mspos.x + 'px', position:'absolute'});
+
+  $("#divImgInfo").selectmenu();
+  $('#divImgInfo').show();
+
+  $('#aImgInfoCansel').on('click', function(){
+    hideImgInfo();
+  });
+
+  $('.k34imginfoitemtag').on('click', function(i){
+    let tag = i.target.text;
+    hideImgInfo();
+    if (tag != "") {
+      window.open(window.location.origin + "/k34tag/" + tag, '_blank');
+    }  
+  });
+  $('.k34imginfoitemartist').on('click', function(i){
+    let tag = i.target.text;
+    hideImgInfo();
+    if (tag != "") {
+      window.open(window.location.origin + "/artist/" + tag, '_blank');
+    }  
+  });
+  $('.k34imginfoitemcharacter').on('click', function(i){
+    let tag = i.target.text;
+    hideImgInfo();
+    if (tag != "") {
+      window.open(window.location.origin + "/character/" + tag, '_blank');
+    }  
+  });
+}
+
+////
 function pagePidLeft(pid)
 {
   pid = parseInt(pid, 10);
@@ -481,6 +580,53 @@ function onCharacter(id)
   });
 }
 
+function onInfo(id) {
+  $('#busy').show();
+
+  let char = null;
+  let arts = null;
+
+  let item = null;
+
+  
+   for (var i = 0; i < items.length; i++) {
+    if (items[i].id == id) {
+      item = items[i];
+      break;
+    }
+  } 
+  
+  if (!item) {
+    $('#busy').hide();
+
+    return;
+  }
+
+  $.get("/getcharacter", {id: id}, function(data){
+    $('#busy').hide();
+
+    char = data;
+  })
+  .done(function(){
+    $.get("/getartist", {id: id}, function(data){  
+      arts = data;
+    })
+    .done(function(){
+      if (char == null && arts == null){
+
+      }
+      $('#busy').hide();
+      showImgInfo(arts, char, item.tags);
+    })
+    .fail(function(){
+      $('#busy').hide();
+    })
+  })
+  .fail(function(){
+    $('#busy').hide();
+  })
+}
+
 function onLightbox(id)
 {
   lightBox.new();
@@ -516,8 +662,19 @@ function checkArtist()
   if (ar == null || ar.length < 1) {
     var re = /character\/(.*?)$/gi;
     var ar = href.match(re);
+
     if (ar == null || ar.length < 1) {
-      return false;
+      var re = /k34tag\/(.*?)$/gi;
+      var ar = href.match(re);
+      if (ar == null || ar.length < 1) {
+        return false;
+      } else {
+        a = ar[0];
+
+        a = a.replace("k34tag/", "");
+        meta = "tag"
+  
+      }
     } else {
       a = ar[0];
 
@@ -626,6 +783,19 @@ function k_menuCharacter() {
     return;
 
   onCharacter(imgSlide.imgid);
+}
+
+function k_menuInfo() {
+  //var imode = Cookies.get('image_list_mode');
+  var imode = sessionStorage.getItem('image_list_mode');
+
+  if (imode == null || imode != "gallery")
+    return;
+
+  if (imgSlide.imgid === undefined || imgSlide.imgid == "")
+    return;
+
+  onInfo(imgSlide.imgid);
 }
 
 function k_menuLightbox() {

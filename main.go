@@ -48,6 +48,9 @@ func (h *WebHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	} else if len(url) > len("/character/") && url[0:11] == "/character/" {
 		libs.LogDebug("Handle artist")
 		handleCharacter(w, r)
+	} else if len(url) > len("/k34tag/") && url[0:8] == "/k34tag/" {
+		libs.LogDebug("Handle artist")
+		handleCharacter(w, r)
 	} else if len(url) > len("/images/") && url[0:8] == "/images/" {
 		libs.LogDebug("Handle images")
 		handleGetImage(w, r)

@@ -28,6 +28,21 @@ a.k34autoitem {
   background-color: #a598ee;
 }
 
+a.k34imginfoitemtag {
+  border:#00BCD4;
+  color:blue
+}
+
+a.k34imginfoitemartist {
+  border:#00BCD4;
+  color:red
+}
+
+a.k34imginfoitemcharacter {
+  border:#00BCD4;
+  color:green
+}
+
 /**
  * Add the correct display in IE 9-.
  */
