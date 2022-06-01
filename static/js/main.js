@@ -52,7 +52,7 @@ function showImgMenu(id)
   var d = '<div id="divImgMenu" class="dropdown-menu" aria-labelledby="dropdownMenuLink" birth="' + date.getTime() + '">';
       d += '<a  id="aImgArtist" class="dropdown-item">Artist</a>';
       d += '<a  id="aImgCharacter" class="dropdown-item">Character</a>';
-      d += '<a  id="aImgInfo" class="dropdown-item">Info</a>';
+      d += '<a  id="aImgInfo" class="dropdown-item">Tags</a>';
       d += '<a  id="aImgLightbox" class="dropdown-item">Modal</a>';
       d += '<a  id="aImgCansel" class="dropdown-item">Cansel</a>';
       d += '</div>';

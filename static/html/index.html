@@ -352,6 +352,60 @@
       return true;
     });
 
+    let touchDate;
+    let touchPos;
+    let touchEnd;
+
+    $(document).on('mousedown', function(e) {
+      touchPos = { x: e.pageX, y: e.pageY };
+      touchDate = new Date();
+    });
+
+    $(document).on('mouseup', function(e) {
+      let date = new Date();
+      let pos = { x: e.pageX, y: e.pageY };
+      let mls = date.getTime() - touchDate.getTime();
+
+      let dis = Math.abs(pos.x - touchPos.x);
+
+      if (mls > 100 && dis > 40) {
+        let side = pos.x - touchPos.x;
+
+        if (side < 0) {
+          onPageSide( 1, $('#key').val());
+        } else if (side > 0) {
+          onPageSide(-1, $('#key').val());
+        }
+      }
+    });
+
+    $(document).on('touchstart', (e) => {
+      touchPos = { x: e.originalEvent.touches[0].pageX, y: e.originalEvent.touches[0].pageY };
+      touchDate = new Date();
+    });
+
+    $(document).on('touchmove', (e) => {
+      touchEnd = { x: e.originalEvent.touches[0].pageX, y: e.originalEvent.touches[0].pageY };
+    });
+
+    $(document).on('touchend', (e) => {
+      let date = new Date();
+      let pos = touchEnd;
+      let mls = date.getTime() - touchDate.getTime();
+
+      let dis = Math.abs(pos.x - touchPos.x);
+
+      if (mls > 50 && dis > 50) {
+        let side = pos.x - touchPos.x;
+
+        if (side < 0) {
+          onPageSide( 1, $('#key').val());
+        } else if (side > 0) {
+          onPageSide(-1, $('#key').val());
+        }
+      }
+    });
+
   </script>
 </body>
 </html>
