@@ -26,6 +26,8 @@ function resetPages()
   $('#pages').attr({ "max" : 0, "min" : 0 });
 }
 
+let posImgMenu = null;
+
 function hideImgMenu()
 {
   var el =  document.getElementById('divImgMenu');
@@ -59,6 +61,7 @@ function showImgMenu(id)
 
   $('body').append(d);
 
+  posImgMenu = {x: mspos.x, y: mspos.y};
 
   $('#divImgMenu').css({top: mspos.y + 'px', left: mspos.x + 'px', position:'absolute'});
 
@@ -148,9 +151,9 @@ function showImgInfo(arts, char, tags)
 
   $('body').append(d);
 
-
+  let mnpos = posImgMenu;
   //$('#divImgInfo').css({top: 0 + 'px', left: 1024 + 'px', position:'absolute'});
-  $('#divImgInfo').css({top: mspos.y + 'px', left: mspos.x + 'px', position:'absolute'});
+  $('#divImgInfo').css({top: mnpos.y + 'px', left: mnpos.x + 'px', position:'absolute'});
 
   $("#divImgInfo").selectmenu();
   $('#divImgInfo').show();

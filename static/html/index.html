@@ -347,14 +347,21 @@
         if (d > 300)
           hideImgMenu();
       }
-      //if ($('#divImgMenu').is(':visible') && ($(e.target).closest('#divImgMenu').length == 0))
-      //  $('#divImgMenu').hide();
+
+      if ($('#divImgInfo').is(':visible') && ($(e.target).closest('#divImgInfo').length == 0))
+        hideImgInfo();
+      
       return true;
     });
+
+    const swap_time_ms = 100;
+    const swap_time_ds = 70;
 
     let touchDate;
     let touchPos;
     let touchEnd;
+
+    let is_swipe = false;
 
     $(document).on('mousedown', function(e) {
       touchPos = { x: e.pageX, y: e.pageY };
@@ -368,7 +375,7 @@
 
       let dis = Math.abs(pos.x - touchPos.x);
 
-      if (mls > 100 && dis > 40) {
+      if (mls > swap_time_ms && dis > swap_time_ds) {
         let side = pos.x - touchPos.x;
 
         if (side < 0) {
@@ -386,6 +393,11 @@
 
     $(document).on('touchmove', (e) => {
       touchEnd = { x: e.originalEvent.touches[0].pageX, y: e.originalEvent.touches[0].pageY };
+      let date = new Date();
+      let mls = date.getTime() - touchDate.getTime();
+
+      if (!is_swipe && (mls > 20))
+        is_swipe = true;
     });
 
     $(document).on('touchend', (e) => {
@@ -395,7 +407,10 @@
 
       let dis = Math.abs(pos.x - touchPos.x);
 
-      if (mls > 50 && dis > 50) {
+      if (!is_swipe)
+        return;
+
+      if (mls > swap_time_ms && dis > swap_time_ds) {
         let side = pos.x - touchPos.x;
 
         if (side < 0) {
@@ -404,6 +419,8 @@
           onPageSide(-1, $('#key').val());
         }
       }
+
+      is_swipe = false;
     });
 
   </script>
