@@ -413,6 +413,13 @@
       if (!is_swipe)
         return;
 
+      let $target = $(e.target);
+
+      if (!$target.hasClass('image') && !$target.hasId('div_container')) {
+        is_swipe = false;
+        return;
+      } 
+
       if (mls > swap_time_ms && dis > swap_time_ds) {
         let side = pos.x - touchPos.x;
 
