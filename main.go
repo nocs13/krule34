@@ -248,10 +248,6 @@ func handleGetImage(w http.ResponseWriter, r *http.Request) {
 		contentType = "image/png"
 	} else if strings.HasSuffix(url, ".jpg") {
 		contentType = "image/jpeg"
-	} else if strings.HasSuffix(url, ".mp4") {
-		contentType = "video/mp4"
-	} else if strings.HasSuffix(url, ".webm") {
-		contentType = "video/webm"
 	}
 
 	contentSize := strconv.FormatInt(ri.ContentLength, 10)
@@ -273,16 +269,47 @@ func handleGetImage(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGetVideo(w http.ResponseWriter, r *http.Request) {
-	libs.LogDebug("run handler get video " + r.URL.Path)
+	libs.LogDebug("run handler get video.")
 
-	ri := libs.GetVideoUS(r.URL.Path)
+	var url = getValue(r, "url")
+
+	libs.LogDebug("video url is " + url)
+
+	ri := libs.GetVideo(url)
 
 	if ri == nil {
 		libs.LogError("while handle get video " + r.URL.Path)
+
+		return
 	}
 
-	w.Header().Set("Content-Type", "video/webm")
-	io.Copy(w, ri)
+	farr := strings.Split(url, "/")
+
+	fname := farr[len(farr)-1]
+
+	var contentType string = ""
+
+	if strings.HasSuffix(url, ".mp4") {
+		contentType = "video/mp4"
+	} else if strings.HasSuffix(url, ".webm") {
+		contentType = "video/webm"
+	}
+
+	contentSize := strconv.FormatInt(ri.ContentLength, 10)
+	s64, _ := strconv.ParseInt(contentSize, 10, 32)
+	s64--
+
+	w.Header().Set("Content-Type", contentType)
+	w.Header().Add("Accept-Ranges", "bytes")
+	w.Header().Add("Content-Length", contentSize)
+	w.Header().Add("Content-Disposition", "inline; filename="+fname+"")
+
+	//requestedBytes := r.Header.Get("Range")
+	//w.Header().Add("Content-Range", "bytes "+requestedBytes[6:len(requestedBytes)]+
+	//	s32+"/"+contentSize)
+	w.Header().Add("Content-Range", "bytes 0 "+contentSize+"/"+contentSize)
+
+	io.Copy(w, ri.Body)
 }
 
 func handleGetThumbnail(w http.ResponseWriter, r *http.Request) {
@@ -325,6 +352,7 @@ func main() {
 	h.Add("/page", handlePage)
 	h.Add("/search", handleSearch)
 	h.Add("/getimage", handleGetImage)
+	h.Add("/getvideo", handleGetVideo)
 	h.Add("/getartist", handleGetArtist)
 	h.Add("/getcharacter", handleGetCharacter)
 	h.Add("/getautocomplete", handleGetAutocomplete)

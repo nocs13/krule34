@@ -48,13 +48,14 @@ function showImgMenu(id)
 
   if (type == 'gallery')
     return;
-  
+
   var date = new Date();
 
   var d = '<div id="divImgMenu" class="dropdown-menu" aria-labelledby="dropdownMenuLink" birth="' + date.getTime() + '">';
       d += '<a  id="aImgArtist" class="dropdown-item">Artist</a>';
       d += '<a  id="aImgCharacter" class="dropdown-item">Character</a>';
       d += '<a  id="aImgInfo" class="dropdown-item">Tags</a>';
+      d += '<a  id="aImgView" class="dropdown-item">View</a>';
       d += '<a  id="aImgLightbox" class="dropdown-item">Modal</a>';
       d += '<a  id="aImgCansel" class="dropdown-item">Cansel</a>';
       d += '</div>';
@@ -81,6 +82,11 @@ function showImgMenu(id)
   $('#aImgInfo').on('click', function(){
     hideImgMenu();
     onInfo(id);
+  });
+
+  $('#aImgView').on('click', function(){
+    hideImgMenu();
+    onView(id);
   });
 
   $('#aImgLightbox').on('click', function(){
@@ -218,8 +224,11 @@ function showImages(images, ids)
    {
     var id = items[i].id;
     var s = '<div>';
+
+    let t = items[i].thumb;
     let d = items[i].image;
     let f = items[i].image.split("/").at(-1);
+
 
     var ivideo = false;
 
@@ -229,15 +238,18 @@ function showImages(images, ids)
 
     var imode = sessionStorage.getItem('image_list_mode');
 
-    if (ivideo && (imode == 'gallery')) {
+    if (ivideo) { // && (imode == 'gallery')) {
+      /*
       s += '<video style="width:100%" preload="auto" controls loop';
       if (id != "")
         s += ' iid="' + id + '"';
       s += '>';
-      s += '  <source src="' + d + '" type="video/webm">';
+      s += '  <source src=/getimage?url="' + th + '" type="video/webm">';
       let d1 = d.replace(".webm", ".mp4")
-      s += '  <source src="' + d1 + '" type="video/mp4">';
-      s += '</video>';
+      s += '  <source src=/getvideo?url="' + th + '" type="video/mp4">';
+      s += '</video>'; */
+      //s += '<img id="' + id + '" src="/getimage?url=' + th + '" class="image demo cursor" style="width:100%; border: 5px; ">';
+      s += '<img id="' + id + '" class="image demo cursor" style="width:100%; border: 5px solid #555;">';
     } else if (ivideo == false) {
       s += '<img id="' + id + '" class="image demo cursor" style="width:100%">';
     }
@@ -252,7 +264,12 @@ function showImages(images, ids)
       img.onload = function() { 
         //console.log("Height: " + this.height); 
       }
-      img.src = "/getimage?url=" + d;
+
+      if (d.indexOf(".mp4") > 0 || d.indexOf(".webm") > 0) {
+        img.src = "/getimage?url=" + t;
+      } else {
+        img.src = "/getimage?url=" + d;
+      }
     }
   }
 }
@@ -581,6 +598,76 @@ function onCharacter(id)
   .always(function() {
     console.log( "finished" );
   });
+}
+
+function onView(id) {
+  let item = null;
+
+  for (let i in items) {
+    if (items[i].id == id) {
+      item = items[i];
+      break;
+    }
+  }
+
+  if (!item)
+    return;
+
+  var ivideo = false;
+
+  if (item.image.indexOf(".mp4") > 0 || item.image.indexOf(".webm") > 0) {
+    ivideo = true;
+  }
+
+  let modal = '<div id="modal" class="k34-modal">';  
+
+  if (ivideo) {
+    let d = item.image;
+    modal += '<video id=' + item.id + ' class="k34-modal-content" style="width:100%" preload="auto" controls loop>';
+    modal += '  <source src=/getvideo?url=' + d + ' type="video/webm">';
+    let d1 = d.replace(".webm", ".mp4")
+    modal += '  <source src=/getvideo?url=' + d1 + ' type="video/mp4">';
+    modal += '</video>'; 
+  } else {
+    modal += '<img class="k34-modal-content" src="/getimage?url=' + item.image + '">';
+  }
+
+  modal += '</div>';
+
+  $('body').append(modal);
+  $('#modal').css('visibility', 'visible');
+  $('#modal').show();
+
+  $('#modal').on('click', function(e) {
+    var $target = $(e.target);
+
+    if($target.hasClass('k34-modal-content')) {
+
+    } else {
+      $('#modal').remove();
+    }
+  });
+  /*
+  for (let i in $('#div_container').children()) {
+    try {
+      let div = $('#div_container').children()[i];
+      let img = $(div).children()[0];
+      if (img.id == id) {
+        let s = '<video id="' + id + '" style="width:100%" preload="auto" controls loop>';
+        s += '  <source src="/getvideo?url=' + item.image + '" type="video/webm">';
+        s += '  <source src="/getvideo?url=' + item.image + '" type="video/mp4">';
+        s += '</video>';
+  
+        $(div).empty();
+        $(div).append(s);
+        break;
+      }
+    } catch(e) {
+      console.log('unable replase video: ' + e);
+      break;
+    }
+  }
+  */
 }
 
 function onInfo(id) {

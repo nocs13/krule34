@@ -869,6 +869,28 @@ func GetImage(uri string) *http.Response {
 	return response
 }
 
+//GetVideo is ...
+//func GetVideo(uri string) io.Reader {
+func GetVideo(uri string) *http.Response {
+	response, err := http.Get(uri)
+
+	LogDebug("GetVideo: " + uri)
+
+	if err != nil {
+		LogError("Cannot get video as: " + err.Error())
+
+		return nil
+	}
+
+	if response.StatusCode != 200 {
+		LogError("Received non 200 response code")
+
+		return nil
+	}
+
+	return response
+}
+
 //GetVideoUS is ...
 func GetVideoUS(uri string) io.Reader {
 	if strings.Index(uri, "/video/") == -1 {
