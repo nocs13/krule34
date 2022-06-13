@@ -132,7 +132,7 @@ function showImgInfo(arts, char, tags)
     cs = JSON.parse(char).characters.split(",");
 
   if (tags)
-    ts = tags.split(" ");
+    ts = tags.split(" "); 
   
   var date = new Date();
 
@@ -140,17 +140,17 @@ function showImgInfo(arts, char, tags)
 
   for (i in as) {
     if (as[i].length > 0)
-      d += '<a  class="k34imginfoitemartist dropdown-item" style="color: red">' + as[i] + '</a>';
+      d += '<a  class="k34imginfoitemartist dropdown-item" style="color: red">' + decodeURI(as[i]) + '</a>';
   }
 
   for (i in cs) {
     if (cs[i].length > 0)
-      d += '<a  class="k34imginfoitemcharacter dropdown-item" style="color: green">' + cs[i] + '</a>';
+      d += '<a  class="k34imginfoitemcharacter dropdown-item" style="color: green">' + decodeURI(cs[i]) + '</a>';
   }
   
   for (i in ts) {
         if (ts[i].length > 0)
-          d += '<a  class="k34imginfoitemtag dropdown-item" style="color: blue">' + ts[i] + '</a>';
+          d += '<a  class="k34imginfoitemtag dropdown-item" style="color: blue">' + decodeURI(ts[i]) + '</a>';
   }
   d += '<a  id="aImgInfoCansel" class="dropdown-item">Cansel</a>';
   d += '</div>';
