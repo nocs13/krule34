@@ -56,7 +56,7 @@ function showImgMenu(id)
       d += '<a  id="aImgCharacter" class="dropdown-item">Character</a>';
       d += '<a  id="aImgInfo" class="dropdown-item">Tags</a>';
       d += '<a  id="aImgView" class="dropdown-item">View</a>';
-      d += '<a  id="aImgLightbox" class="dropdown-item">Modal</a>';
+      //d += '<a  id="aImgLightbox" class="dropdown-item">Modal</a>';
       d += '<a  id="aImgCansel" class="dropdown-item">Cansel</a>';
       d += '</div>';
 
@@ -118,8 +118,8 @@ function showImgInfo(arts, char, tags)
 
   let type = sessionStorage.getItem('image_list_mode');
 
-  if (type == 'gallery')
-    return;
+  //if (type == 'gallery')
+  //  return;
 
   var as = null;
   var cs = null;
@@ -158,6 +158,13 @@ function showImgInfo(arts, char, tags)
   $('body').append(d);
 
   let mnpos = posImgMenu;
+
+  if (mnpos == null) {
+    let v = $('.modemod').offset();
+
+    mnpos = {x: v.left, y: v.top};
+  }
+
   //$('#divImgInfo').css({top: 0 + 'px', left: 1024 + 'px', position:'absolute'});
   $('#divImgInfo').css({top: mnpos.y + 'px', left: mnpos.x + 'px', position:'absolute'});
 
@@ -899,6 +906,14 @@ function k_menuLightbox() {
     return;
 
   onLightbox(imgSlide.imgid);
+}
+
+function k_menuTags() {
+  //var imode = Cookies.get('image_list_mode');
+  //var imode = sessionStorage.getItem('image_list_mode');
+
+  onInfo(imgSlide.imgid);
+  //on(imgSlide.imgid);
 }
 
 function getRandomInt(max) {
