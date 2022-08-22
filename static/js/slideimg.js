@@ -6,6 +6,8 @@ var imgSlide = {
 		this.images = new Array();
 		this.gprev = gprev;
 		this.gnext = gnext;
+		//this.build = "col-sm-3";
+		this.build = "col-sm-4";
 
 		var sl =  '<div id="div_image_slider" class="container">';
 			  sl += ' <div id="div_image_slider_images" class="row"></div>';
@@ -15,7 +17,7 @@ var imgSlide = {
 		    sl += '<a id="a_image_slider_imgprev" class="imgprev" onclick="imgSlide.prev()">❮</a>';
 		    sl += '<a id="a_image_slider_imgnext" class="imgnext" onclick="imgSlide.next()">❯</a>';
 			  sl += '</div></div>';
-			  sl += '<div class="container"><div id="tr_image_slider_thumbs" class="row">';
+			  sl += '<div class="container"><div id="tr_image_slider_thumbs" class="row  d-flex justify-content-center text-center">';
 			  sl += '</div></div>';
 
 		$('#div_main').html('');
@@ -39,7 +41,7 @@ var imgSlide = {
 
 			this.images.push(d);
 
-    	var th = '<div class="col-sm-3"><a>';
+    	var th = '<div class="' + this.build + '"><a>';
             //th += '<img imgid="' + id + '" class="img-fluid thumb cursor" src="' + src + '" style="max-width: 150px; max-height: 200px;">';
 			if (ext == "mp4" || ext == "webm") {
        	th += '<img imgid="' + id + '" class="video thumb cursor" src="' + src + '" >';
@@ -150,7 +152,7 @@ var imgSlide = {
 		let i = this.index - 1;
 		let id = this.images[i].id;
 		let img = this.images[i].img;
-	
+
 		this.set(img, id);
 	},
 

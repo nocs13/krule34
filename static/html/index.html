@@ -127,6 +127,10 @@
         browser = 'firefox';
     }
 
+    $(window).on("orientationchange",function( event ){
+      onOrientationChange(screen.orientation.type);
+    });
+
     $(document.body).off('keypress', "#key");
     $(document.body).off('keyup', "#key");
 
@@ -142,10 +146,40 @@
       $("#keyauto").hide();
       onSelect(tag[0]);
     })
-    $('.dropdown-menu button').click(function () {           
+    $("#keyauto").on("click", "button", function(event){
+      try {
+        let par = $(this).parent();
+        let chl = $(par).children()[0];
+        let txt = chl.childNodes[0].data;
+        console.log("You clicked the drop downs", txt)
+
+        let v = $('#key').val();
+        let cpos = document.getElementById("key").selectionStart;
+
+        if (cpos > 0) {
+          let ss = v.substring(0, cpos);
+          let li = ss.lastIndexOf(" ");
+          v = v.substring(0, li + 1);
+        } else {
+          v = "";
+        }
+
+        v = v + txt.split(' ')[0] + " ";
+
+        $('#key').val(v);
+        $('#keyauto').hide();
+        $('#key').focus();
+      }
+      catch(e) {
+        console.error(e);
+      }
+
+      return false;
+    })
+    $('.dropdown-menu button').click(function () {
       alert($(this).text());
     });
-    $('div.k34tags').on("click", "button", function(e) { 
+    $('div.k34tags').on("click", "button", function(e) {
       onSelect($(this).text());
       $('#key').val($(this).text());
     });
@@ -335,10 +369,10 @@
     });
 
     $(document).click(function(e){
-      if($(e.target).closest('#keyauto').length == 0) 
+      if($(e.target).closest('#keyauto').length == 0)
         $('#keyauto').hide();
 
-      if((document.getElementById("divImgMenu") !== null) && 
+      if((document.getElementById("divImgMenu") !== null) &&
         ($('#divImgMenu').is(':visible') && ($(e.target).closest('#divImgMenu').length == 0)))
       {
         var date = new Date();
@@ -351,7 +385,7 @@
 
       if ($('#divImgInfo').is(':visible') && ($(e.target).closest('#divImgInfo').length == 0))
         hideImgInfo();
-      
+
       return true;
     });
 
@@ -377,7 +411,7 @@
       let dis = Math.abs(pos.x - touchPos.x);
 
       return;
-      
+
       if (mls > swap_time_ms && dis > swap_time_ds) {
         let side = pos.x - touchPos.x;
 
@@ -418,7 +452,7 @@
       if (!$target.hasClass('image') && !$target.hasId('div_container')) {
         is_swipe = false;
         return;
-      } 
+      }
 
       if (mls > swap_time_ms && dis > swap_time_ds) {
         let side = pos.x - touchPos.x;

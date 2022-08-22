@@ -174,7 +174,7 @@ table.scrollable {
   width: 100%;
   display: block;
   overflow-x: auto;
-  white-space: nowrap;  
+  white-space: nowrap;
 }
 
 table.scrollable thead,
@@ -207,7 +207,9 @@ table.scrollable td {
 }
 
 img.thumb {
-  border: 2px;
+  border: 5px;
+  padding: 10px;
+  border-width: 5px;
   border-color: gray;
   max-width: 150px;
   max-height: 200px;
@@ -215,7 +217,7 @@ img.thumb {
 
 img.image {
   border: 5px;
-  border-color: black;  
+  border-color: black;
 }
 
 img.lightbox {

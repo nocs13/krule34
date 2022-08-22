@@ -22,7 +22,7 @@ function resetPages()
   pages = 0;
 
   $('#pages').empty();
-  $('#pagesMax').text(0);  
+  $('#pagesMax').text(0);
   $('#pages').attr({ "max" : 0, "min" : 0 });
 }
 
@@ -132,8 +132,8 @@ function showImgInfo(arts, char, tags)
     cs = JSON.parse(char).characters.split(",");
 
   if (tags)
-    ts = tags.split(" "); 
-  
+    ts = tags.split(" ");
+
   var date = new Date();
 
   var d = '<div id="divImgInfo" class="dropdown-menu" aria-labelledby="dropdownMenuLink" birth="' + date.getTime() + '">';
@@ -147,7 +147,7 @@ function showImgInfo(arts, char, tags)
     if (cs[i].length > 0)
       d += '<a  class="k34imginfoitemcharacter dropdown-item" style="color: green">' + decodeURI(cs[i]) + '</a>';
   }
-  
+
   for (i in ts) {
         if (ts[i].length > 0)
           d += '<a  class="k34imginfoitemtag dropdown-item" style="color: blue">' + decodeURI(ts[i]) + '</a>';
@@ -180,21 +180,21 @@ function showImgInfo(arts, char, tags)
     hideImgInfo();
     if (tag != "") {
       window.open(window.location.origin + "/k34tag/" + tag, '_blank');
-    }  
+    }
   });
   $('.k34imginfoitemartist').on('click', function(i){
     let tag = i.target.text;
     hideImgInfo();
     if (tag != "") {
       window.open(window.location.origin + "/artist/" + tag, '_blank');
-    }  
+    }
   });
   $('.k34imginfoitemcharacter').on('click', function(i){
     let tag = i.target.text;
     hideImgInfo();
     if (tag != "") {
       window.open(window.location.origin + "/character/" + tag, '_blank');
-    }  
+    }
   });
 }
 
@@ -268,8 +268,8 @@ function showImages(images, ids)
     $(img).attr("alt", items[i].tags);
 
     if (img != null) {
-      img.onload = function() { 
-        //console.log("Height: " + this.height); 
+      img.onload = function() {
+        //console.log("Height: " + this.height);
       }
 
       if (d.indexOf(".mp4") > 0 || d.indexOf(".webm") > 0) {
@@ -388,7 +388,7 @@ function parseJSON(data)
     maxPages = 1000;
 
   $('#pagesMax').text(maxPages);
-  
+
   $('#pages').attr({ "max" : maxPages, "min" : 0 });
 
   if (items.length > 0) {
@@ -626,7 +626,7 @@ function onView(id) {
     ivideo = true;
   }
 
-  let modal = '<div id="modal" class="k34-modal">';  
+  let modal = '<div id="modal" class="k34-modal">';
 
   if (ivideo) {
     let d = item.image;
@@ -634,7 +634,7 @@ function onView(id) {
     modal += '  <source src=/getvideo?url=' + d + ' type="video/webm">';
     let d1 = d.replace(".webm", ".mp4")
     modal += '  <source src=/getvideo?url=' + d1 + ' type="video/mp4">';
-    modal += '</video>'; 
+    modal += '</video>';
   } else {
     modal += '<img class="k34-modal-content" src="/getimage?url=' + item.image + '">';
   }
@@ -664,7 +664,7 @@ function onView(id) {
         s += '  <source src="/getvideo?url=' + item.image + '" type="video/webm">';
         s += '  <source src="/getvideo?url=' + item.image + '" type="video/mp4">';
         s += '</video>';
-  
+
         $(div).empty();
         $(div).append(s);
         break;
@@ -685,14 +685,14 @@ function onInfo(id) {
 
   let item = null;
 
-  
+
    for (var i = 0; i < items.length; i++) {
     if (items[i].id == id) {
       item = items[i];
       break;
     }
-  } 
-  
+  }
+
   if (!item) {
     $('#busy').hide();
 
@@ -705,7 +705,7 @@ function onInfo(id) {
     char = data;
   })
   .done(function(){
-    $.get("/getartist", {id: id}, function(data){  
+    $.get("/getartist", {id: id}, function(data){
       arts = data;
     })
     .done(function(){
@@ -770,7 +770,7 @@ function checkArtist()
 
         a = a.replace("k34tag/", "");
         meta = "tag"
-  
+
       }
     } else {
       a = ar[0];
@@ -836,7 +836,7 @@ function onAutocompete(id) {
       for (i in items) {
         if (items[i].label[0] == '\\')
           continue;
-        $('#keyauto').append('<a class="dropdown-item" href="#">' + items[i].label + '</a>');
+        $('#keyauto').append('<div style="display: flex; justify-content: space-between;"><a class="dropdown-item" href="#">' + items[i].label + '</a> <button>&#187</button></div>');
         //tags.push(items[i].label);
       }
 
@@ -853,7 +853,15 @@ function onAutocompete(id) {
   .fail(function(){
   })
   .always(function() {
-  }); 
+  });
+}
+
+function onOrientationChange(type) {
+  var imode = sessionStorage.getItem('image_list_mode');
+
+  if (imode == null || imode != "gallery")
+    return;
+
 }
 
 function k_menuArtist() {
