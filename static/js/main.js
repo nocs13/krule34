@@ -836,7 +836,7 @@ function onAutocompete(id) {
       for (i in items) {
         if (items[i].label[0] == '\\')
           continue;
-        $('#keyauto').append('<div style="display: flex; justify-content: space-between;"><a class="dropdown-item" href="#">' + items[i].label + '</a> <button>&#187</button></div>');
+        $('#keyauto').append('<div style="display: flex; justify-content: space-between;"><a class="dropdown-item" href="#">' + items[i].label + '</a> <button class="btn btn-outline-primary btn-sm"">&#187</button></div>');
         //tags.push(items[i].label);
       }
 
