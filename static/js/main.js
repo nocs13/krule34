@@ -62,7 +62,7 @@ function showImgMenu(id)
 
   $('body').append(d);
 
-  posImgMenu = {x: 0, y: 0};
+  posImgMenu = {'x': 0, 'y': 0};
   posImgMenu.x = mspos.x;
   posImgMenu.y = mspos.y;
 
