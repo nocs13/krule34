@@ -5,6 +5,8 @@ var items  = null;
 var count  = 0;
 var offset = 0;
 
+var posImgMenu = {x: 0, y: 0};
+
 var mspos = new function() {
   this.x = 0;
   this.y = 0;
@@ -25,8 +27,6 @@ function resetPages()
   $('#pagesMax').text(0);
   $('#pages').attr({ "max" : 0, "min" : 0 });
 }
-
-let posImgMenu = null;
 
 function hideImgMenu()
 {
