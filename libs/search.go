@@ -535,6 +535,10 @@ func GetArtist(id string) string {
 			} else if tn.Data == "a" && atag == true {
 				href := GetTokenAttr(&tn, "a", "href")
 
+				if strings.Contains(href, "page=wiki") {
+					continue
+				}
+
 				atag = false
 
 				if href == "" {
@@ -566,6 +570,10 @@ func GetArtist(id string) string {
 
 	if len(artists) > 0 {
 		for _, s := range artists {
+			if s == "?" {
+				continue
+			}
+
 			r += s + ","
 		}
 
@@ -627,6 +635,11 @@ func GetCharacter(id string) string {
 				atag = true
 			} else if tn.Data == "a" && atag == true {
 				href := GetTokenAttr(&tn, "a", "href")
+
+				if strings.Contains(href, "page=wiki") {
+					continue
+				}
+
 				atag = false
 
 				if href == "" {
