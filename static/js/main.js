@@ -120,9 +120,6 @@ function showImgInfo(arts, char, tags)
 
   let type = sessionStorage.getItem('image_list_mode');
 
-  //if (type == 'gallery')
-  //  return;
-
   var as = null;
   var cs = null;
   var ts = null;
@@ -161,7 +158,15 @@ function showImgInfo(arts, char, tags)
 
   let mnpos = posImgMenu;
 
-  if (mnpos == null) {
+  if (type == 'gallery') {
+    try{
+      let o = $('.modemod').offset();
+      mnpos.x = o.left;
+      mnpos.y = o.top;
+    }catch(e){
+      console.log('Error: No found modemod ' + e.toString());
+    }
+  } else if (mnpos == null) {
     let v = $('.modemod').offset();
 
     mnpos = {x: v.left, y: v.top};
@@ -903,6 +908,18 @@ function k_menuInfo() {
     return;
 
   onInfo(imgSlide.imgid);
+}
+
+function k_menuView() {
+  var imode = sessionStorage.getItem('image_list_mode');
+
+  if (imode == null || imode != "gallery")
+    return;
+
+  if (imgSlide.imgid === undefined || imgSlide.imgid == "")
+    return;
+
+  onView(imgSlide.imgid);
 }
 
 function k_menuLightbox() {

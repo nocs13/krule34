@@ -139,11 +139,26 @@ img {vertical-align: middle;}
   padding: 2px;
 }
 
-.modemod {
+.modview {
   color: black;
   position: absolute;
   top: 10px;
   right: 95px;
+  font-size: 10px;
+  font-weight: bold;
+  background-color: #e66b14;
+  width: 14px;
+  height: 16px;
+  border: thin solid;
+  border-radius: 7px;
+  padding: 2px;
+}
+
+.modemod {
+  color: black;
+  position: absolute;
+  top: 10px;
+  right: 115px;
   font-size: 10px;
   font-weight: bold;
   background-color: #e66b14;
@@ -211,8 +226,8 @@ img.thumb {
   padding: 10px;
   border-width: 5px;
   border-color: gray;
-  max-width: 150px;
-  max-height: 200px;
+  max-width: 250px;
+  max-height: 300px;
 }
 
 img.image {
