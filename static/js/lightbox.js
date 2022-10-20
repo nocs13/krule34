@@ -21,6 +21,8 @@ var lightBox = {
 			sl += '   <img id="lightbox-image" class="lightbox" src="" onload="lightBox.onload(this)" onclick="lightBox.menu()">';
 			sl += '  </div>';
 			sl += '  <a class="prev" onclick="lightBox.prev()">❮</a>';
+			//need add down scroll to element function.
+			//sl += '  <a class="prev" onclick="lightBox.prev()">❮</a>';
 			sl += '  <a class="next" onclick="lightBox.next()">❯</a>';
 			sl += '</div></div>';
 
