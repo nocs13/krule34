@@ -77,7 +77,7 @@ var lightBox = {
       		$("#lightbox-content").html(s);
       	} else {
       		var s = "";
-      		
+
    			s += '<div>'
       		s += '<img id="lightbox-image" class="lightbox" src="" onload="lightBox.onload(this)" onclick="lightBox.menu()">';
    			s += '</div">'
@@ -113,7 +113,7 @@ var lightBox = {
 			$("#lightbox-image").css("width", "auto");
 		} else {
 			$("#lightbox-image").css("height", "auto");
-			$("#lightbox-image").css("width", dw + "px");			
+			$("#lightbox-image").css("width", dw + "px");
 		}
 	},
 

@@ -13,10 +13,11 @@ var imgSlide = {
 			  sl += ' <div id="div_image_slider_images" class="row"></div>';
 			  sl += '</div>';
 			  sl += '<div class="container"><div class="row"><br></div></div>';
-			  sl += '<div class="container"><div class="row">';
-		    sl += '<a id="a_image_slider_imgprev" class="imgprev" onclick="imgSlide.prev()">❮</a>';
-		    sl += '<a id="a_image_slider_imgnext" class="imgnext" onclick="imgSlide.next()">❯</a>';
-			  sl += '</div></div>';
+			  sl += '<div class="container"><div class="row"><table class="col-sm"><tr>';
+		    sl += '<td><a id="a_image_slider_imgprev" class="imgprev" onclick="imgSlide.prev()">❮</a></td>';
+		    sl += '<td><a id="a_image_slider_imgnext" class="imgnext" onclick="imgSlide.down()">&dArr;</a></td>';
+		    sl += '<td><a id="a_image_slider_imgnext" class="imgnext" onclick="imgSlide.next()">❯</a></td>';
+			  sl += '</tr></table></div></div><br>';
 			  sl += '<div class="container"><div id="tr_image_slider_thumbs" class="row  d-flex justify-content-center text-center">';
 			  sl += '</div></div>';
 
@@ -154,6 +155,17 @@ var imgSlide = {
 		let img = this.images[i].img;
 
 		this.set(img, id);
+	},
+
+	down: function() {
+		let id = this.images[i].id;
+
+		try {
+			const el = document.querySelector('[imgid="' + id + '"]');
+			el.scrollIntoView();
+		} catch (e) {
+			console.log('down function Error: ' + e.message);
+		}
 	},
 
 	onload: function() {
