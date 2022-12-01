@@ -14,7 +14,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-//Content is ...
+// Content is ...
 type Content struct {
 	ids    *list.List
 	tags   *list.List
@@ -24,7 +24,7 @@ type Content struct {
 	artist *list.List
 }
 
-//IsToken ...
+// IsToken ...
 func IsToken(tok *html.Token, tag string, class string) bool {
 	if tok == nil {
 		return false
@@ -49,7 +49,7 @@ func IsToken(tok *html.Token, tag string, class string) bool {
 	return false
 }
 
-//IsTokenAttr ...
+// IsTokenAttr ...
 func IsTokenAttr(tok *html.Token, tag string, key string, val string) bool {
 	if tok == nil {
 		return false
@@ -73,7 +73,7 @@ func IsTokenAttr(tok *html.Token, tag string, key string, val string) bool {
 	return false
 }
 
-//GetTokenAttr ...
+// GetTokenAttr ...
 func GetTokenAttr(tok *html.Token, tag string, key string) string {
 	if tok == nil {
 		return ""
@@ -92,7 +92,7 @@ func GetTokenAttr(tok *html.Token, tag string, key string) string {
 	return ""
 }
 
-//IsImage ...
+// IsImage ...
 func IsImage(uri string) bool {
 	LogInfo("Checking uri is image " + uri)
 
@@ -128,7 +128,7 @@ func IsImage(uri string) bool {
 	return true
 }
 
-//IsVideo ...
+// IsVideo ...
 func IsVideo(uri string) bool {
 	LogDebug("Checking uri is video " + uri)
 
@@ -440,7 +440,7 @@ func parseImageUS(url string) string {
 	return strings.Replace(r, "https://img2.rule34.us", "", -1)
 }
 
-//GetArtistUS ...
+// GetArtistUS ...
 func GetArtist(id string) string {
 	var r string
 
@@ -535,7 +535,13 @@ func GetArtist(id string) string {
 			} else if tn.Data == "a" && atag == true {
 				href := GetTokenAttr(&tn, "a", "href")
 
-				if strings.Contains(href, "page=wiki") {
+				if !strings.Contains(href, "&tags=") {
+					continue
+				}
+
+				click := GetTokenAttr(&tn, "a", "onclick")
+
+				if click != "" {
 					continue
 				}
 
@@ -587,7 +593,7 @@ func GetArtist(id string) string {
 	return r
 }
 
-//GetCharacter ...
+// GetCharacter ...
 func GetCharacter(id string) string {
 	var r string
 
@@ -637,6 +643,12 @@ func GetCharacter(id string) string {
 				href := GetTokenAttr(&tn, "a", "href")
 
 				if strings.Contains(href, "page=wiki") {
+					continue
+				}
+
+				click := GetTokenAttr(&tn, "a", "onclick")
+
+				if click != "" {
 					continue
 				}
 
@@ -766,7 +778,7 @@ type XPosts struct {
 	Posts   []XPost  `xml:"post"`
 }
 
-//Search is ...
+// Search is ...
 func Search(key string, pid string) string {
 	var r string
 
@@ -860,8 +872,8 @@ func Search(key string, pid string) string {
 	return r
 }
 
-//GetImage is ...
-//func GetImage(uri string) io.Reader {
+// GetImage is ...
+// func GetImage(uri string) io.Reader {
 func GetImage(uri string) *http.Response {
 	response, err := http.Get(uri)
 
@@ -882,8 +894,8 @@ func GetImage(uri string) *http.Response {
 	return response
 }
 
-//GetVideo is ...
-//func GetVideo(uri string) io.Reader {
+// GetVideo is ...
+// func GetVideo(uri string) io.Reader {
 func GetVideo(uri string) *http.Response {
 	response, err := http.Get(uri)
 
@@ -904,7 +916,7 @@ func GetVideo(uri string) *http.Response {
 	return response
 }
 
-//GetVideoUS is ...
+// GetVideoUS is ...
 func GetVideoUS(uri string) io.Reader {
 	if strings.Index(uri, "/video/") == -1 {
 		LogError("Invalid video url: " + uri)
