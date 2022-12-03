@@ -10,16 +10,16 @@ import (
 	"sync"
 )
 
-//FnRoute is ...
+// FnRoute is ...
 type FnRoute func(http.ResponseWriter, *http.Request)
 
-//WebRoute is ...
+// WebRoute is ...
 type WebRoute struct {
 	id     string
 	handle FnRoute
 }
 
-//WebHandler is ...
+// WebHandler is ...
 type WebHandler struct {
 	mu sync.Mutex // guards n
 	n  int
@@ -73,7 +73,7 @@ func (h *WebHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	//defer h.mu.Unlock()
 }
 
-//Add is ...
+// Add is ...
 func (h *WebHandler) Add(id string, handle FnRoute) {
 	var p = new(WebRoute)
 
@@ -127,6 +127,14 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 	t.Init("index.html")
 
 	io.WriteString(w, t.Content)
+}
+
+func handleFavicon(w http.ResponseWriter, r *http.Request) {
+	libs.LogDebug("run handler favicon " + r.URL.Path)
+
+	data := libs.ReadFile("static/img/favicon.ico")
+
+	io.WriteString(w, data)
 }
 
 func handleSearch(w http.ResponseWriter, r *http.Request) {
@@ -360,6 +368,8 @@ func main() {
 	h.Add("/sitemap.xml", handleSitemap)
 	h.Add("/BingSiteAuth.xml", handleBingSiteAuth)
 	h.Add("/googleb295dd6d4113b434.html", handleGoogleSiteAuth)
+
+	h.Add("/favicon.ico", handleFavicon)
 
 	http.Handle("/", h)
 	http.ListenAndServe(":"+port, nil)
