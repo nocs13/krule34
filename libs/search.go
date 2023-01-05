@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"unicode"
 
 	"golang.org/x/net/html"
 )
@@ -22,6 +23,16 @@ type Content struct {
 	thumbs *list.List
 	pages  *list.List
 	artist *list.List
+}
+
+func IsPrintable(s string) bool {
+	for i := 0; i < len(s); i++ {
+		if !unicode.IsPrint(rune(s[i])) {
+			return false
+		}
+	}
+
+	return true
 }
 
 // IsToken ...
@@ -829,12 +840,26 @@ func Search(key string, pid string) string {
 	//LogInfo("Elements count is " + string(len(nodes)))
 
 	r = "["
-
+	//xxx_row := 1
 	for _, n := range posts.Posts {
 		t := n.Tags
 
 		if string(t[0:1]) == "\\" {
 			continue
+		}
+
+		//LogInfo("Tags " + strconv.Itoa(xxx_row) + " " + t)
+		//fmt.Printf("%x.\n", t)
+		//xxx_row++
+
+		if IsPrintable(t) == false {
+			fmt.Printf("Non printable should correct.\n")
+			t = strings.Map(func(r rune) rune {
+				if unicode.IsPrint(r) {
+					return r
+				}
+				return -1
+			}, t)
 		}
 
 		//LogInfo("Element " + n.Hash)
@@ -867,7 +892,7 @@ func Search(key string, pid string) string {
 
 	r += "]"
 
-	LogInfo("JSON: " + r)
+	//LogInfo("JSON: " + r)
 
 	return r
 }
