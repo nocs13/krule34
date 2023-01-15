@@ -191,6 +191,10 @@ func handleGetArtist(w http.ResponseWriter, r *http.Request) {
 
 	var id = getValue(r, "id")
 
+	if id == "" {
+		id = "none"
+	}
+
 	libs.LogDebug("run handler getartist " + id)
 
 	str := libs.GetArtist(id)
@@ -202,6 +206,10 @@ func handleGetCharacter(w http.ResponseWriter, r *http.Request) {
 	libs.LogDebug("run handler get character " + r.URL.Path)
 
 	var id = getValue(r, "id")
+
+	if id == "" {
+		id = "none"
+	}
 
 	libs.LogDebug("run handler getcharacter " + id)
 
