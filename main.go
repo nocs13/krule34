@@ -42,13 +42,13 @@ func (h *WebHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if len(url) > len("/static/") && url[0:8] == "/static/" {
 		libs.LogDebug("Handle static")
 		handleStatic(w, r)
-	} else if len(url) > len("/artist/") && url[0:8] == "/artist/" {
+	} else if len(url) >= len("/artist/") && url[0:8] == "/artist/" {
 		libs.LogDebug("Handle artist")
 		handleArtist(w, r)
-	} else if len(url) > len("/character/") && url[0:11] == "/character/" {
+	} else if len(url) >= len("/character/") && url[0:11] == "/character/" {
 		libs.LogDebug("Handle artist")
 		handleCharacter(w, r)
-	} else if len(url) > len("/k34tag/") && url[0:8] == "/k34tag/" {
+	} else if len(url) >= len("/k34tag/") && url[0:8] == "/k34tag/" {
 		libs.LogDebug("Handle artist")
 		handleCharacter(w, r)
 	} else if len(url) > len("/images/") && url[0:8] == "/images/" {
