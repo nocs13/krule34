@@ -299,33 +299,39 @@ func handleGetVideo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	farr := strings.Split(url, "/")
+	http.Redirect(w, r, url, http.StatusFound)
 
-	fname := farr[len(farr)-1]
+	return
 
-	var contentType string = ""
+	/*
+		farr := strings.Split(url, "/")
 
-	if strings.HasSuffix(url, ".mp4") {
-		contentType = "video/mp4"
-	} else if strings.HasSuffix(url, ".webm") {
-		contentType = "video/webm"
-	}
+		fname := farr[len(farr)-1]
 
-	contentSize := strconv.FormatInt(ri.ContentLength, 10)
-	s64, _ := strconv.ParseInt(contentSize, 10, 32)
-	s64--
+		var contentType string = ""
 
-	w.Header().Set("Content-Type", contentType)
-	w.Header().Add("Accept-Ranges", "bytes")
-	w.Header().Add("Content-Length", contentSize)
-	w.Header().Add("Content-Disposition", "inline; filename="+fname+"")
+		if strings.HasSuffix(url, ".mp4") {
+			contentType = "video/mp4"
+		} else if strings.HasSuffix(url, ".webm") {
+			contentType = "video/webm"
+		}
 
-	//requestedBytes := r.Header.Get("Range")
-	//w.Header().Add("Content-Range", "bytes "+requestedBytes[6:len(requestedBytes)]+
-	//	s32+"/"+contentSize)
-	w.Header().Add("Content-Range", "bytes 0 "+contentSize+"/"+contentSize)
+		contentSize := strconv.FormatInt(ri.ContentLength, 10)
+		s64, _ := strconv.ParseInt(contentSize, 10, 32)
+		s64--
 
-	io.Copy(w, ri.Body)
+		w.Header().Set("Content-Type", contentType)
+		w.Header().Add("Accept-Ranges", "bytes")
+		w.Header().Add("Content-Length", contentSize)
+		w.Header().Add("Content-Disposition", "inline; filename="+fname+"")
+
+		//requestedBytes := r.Header.Get("Range")
+		//w.Header().Add("Content-Range", "bytes "+requestedBytes[6:len(requestedBytes)]+
+		//	s32+"/"+contentSize)
+		w.Header().Add("Content-Range", "bytes 0 "+contentSize+"/"+contentSize)
+
+		io.Copy(w, ri.Body)
+	*/
 }
 
 func handleGetThumbnail(w http.ResponseWriter, r *http.Request) {
