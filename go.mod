@@ -1,6 +1,6 @@
 module krule34
 
-go 1.20
+go 1.14
 
 require (
 	golang.org/x/crypto v0.10.0
