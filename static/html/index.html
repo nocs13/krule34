@@ -498,10 +498,8 @@
       is_swipe = false;
     });
 
-    //$( "#kdialog_message" ).dialog({ autoOpen: false, });
-
     if (localStorage.getItem("sid") != null && localStorage.getItem("sid") != "") {
-      UserInfo = { Sid: localStorage.getItem("sid") };
+      doSidValid(localStorage.getItem("sid"));
     }
 
   </script>

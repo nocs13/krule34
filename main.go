@@ -16,11 +16,8 @@ import (
 	"time"
 
 	uuid "github.com/google/uuid"
-	ksqlttp "gitlab.com/ggvaberi/ksqlttp"
 	"golang.org/x/crypto/bcrypt"
 )
-
-//"krule34/ksqlttp"
 
 // FnRoute is ...
 type FnRoute func(http.ResponseWriter, *http.Request)
@@ -61,43 +58,43 @@ var dbuser string
 var dbpass string
 var dbaddr string
 
-var dbrequest *ksqlttp.DbRequest = nil
+var dbrequest *libs.DbRequest = nil
 
 func (h *WebHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	//h.mu.Lock()
 
-	libs.LogDebug("Run web handler " + r.URL.Path)
+	log.Println("Run web handler " + r.URL.Path)
 
 	var url = r.URL.Path
 
 	if len(url) > 7 {
-		libs.LogDebug("Run web  " + r.URL.Path[0:8])
+		log.Println("Run web  " + r.URL.Path[0:8])
 	}
 
 	if len(url) > len("/static/") && url[0:8] == "/static/" {
-		libs.LogDebug("Handle static")
+		log.Println("Handle static")
 		handleStatic(w, r)
 	} else if len(url) >= len("/artist/") && url[0:8] == "/artist/" {
-		libs.LogDebug("Handle artist")
+		log.Println("Handle artist")
 		handleArtist(w, r)
 	} else if len(url) >= len("/character/") && url[0:11] == "/character/" {
-		libs.LogDebug("Handle artist")
+		log.Println("Handle artist")
 		handleCharacter(w, r)
 	} else if len(url) >= len("/k34tag/") && url[0:8] == "/k34tag/" {
-		libs.LogDebug("Handle artist")
+		log.Println("Handle artist")
 		handleCharacter(w, r)
 	} else if len(url) > len("/images/") && url[0:8] == "/images/" {
-		libs.LogDebug("Handle images")
+		log.Println("Handle images")
 		handleGetImage(w, r)
 	} else if len(url) > len("/video/") && url[0:7] == "/video/" {
-		libs.LogDebug("Handle video")
+		log.Println("Handle video")
 		handleGetVideo(w, r)
 	} else if len(url) > len("/thumbnails/") && url[0:12] == "/thumbnails/" {
-		libs.LogDebug("Handle thumbnails")
+		log.Println("Handle thumbnails")
 		handleGetImage(w, r)
 	} else {
-		libs.LogDebug("routes count " + strconv.Itoa(len(h.routes)))
+		log.Println("routes count " + strconv.Itoa(len(h.routes)))
 
 		for _, rt := range h.routes {
 			if rt.id == url {
@@ -122,12 +119,12 @@ func getValue(r *http.Request, key string) string {
 	keys, ok := r.URL.Query()[key]
 
 	if !ok || len(keys[0]) < 1 {
-		libs.LogDebug("Url query key " + key + " is missing.")
+		log.Println("Url query key " + key + " is missing.")
 
 		return ""
 	}
 
-	libs.LogDebug("Url query key " + key + " value is " + keys[0])
+	log.Println("Url query key " + key + " value is " + keys[0])
 
 	return keys[0]
 }
@@ -175,7 +172,7 @@ func handleSitemap(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleIndex(w http.ResponseWriter, r *http.Request) {
-	libs.LogDebug("run handler hello " + r.URL.Path)
+	log.Println("run handler hello " + r.URL.Path)
 
 	t := libs.NewPage()
 
@@ -185,7 +182,7 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleFavicon(w http.ResponseWriter, r *http.Request) {
-	libs.LogDebug("run handler favicon " + r.URL.Path)
+	log.Println("run handler favicon " + r.URL.Path)
 
 	data := libs.ReadFile("static/img/favicon.ico")
 
@@ -193,11 +190,11 @@ func handleFavicon(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleSearch(w http.ResponseWriter, r *http.Request) {
-	libs.LogDebug("run handler search " + r.URL.Path)
+	log.Println("run handler search " + r.URL.Path)
 
 	var key = getValue(r, "key")
 
-	libs.LogDebug("run handler search " + key)
+	log.Println("run handler search " + key)
 
 	var content = libs.Search(key, "")
 
@@ -213,12 +210,12 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 }
 
 func handlePage(w http.ResponseWriter, r *http.Request) {
-	libs.LogDebug("run handler page " + r.URL.Path)
+	log.Println("run handler page " + r.URL.Path)
 
 	var tag = getValue(r, "tag")
 	var pid = getValue(r, "pid")
 
-	libs.LogDebug("run handler search " + tag + " " + pid)
+	log.Println("run handler search " + tag + " " + pid)
 
 	var content = libs.Search(tag, pid)
 
@@ -228,11 +225,11 @@ func handlePage(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleTag(w http.ResponseWriter, r *http.Request) {
-	libs.LogDebug("run handler tag " + r.URL.Path)
+	log.Println("run handler tag " + r.URL.Path)
 
 	var tag = getValue(r, "tag")
 
-	libs.LogDebug("run handler tag " + tag)
+	log.Println("run handler tag " + tag)
 
 	var content = libs.Search(tag, "")
 
@@ -242,7 +239,7 @@ func handleTag(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGetArtist(w http.ResponseWriter, r *http.Request) {
-	libs.LogDebug("run handler get artist " + r.URL.Path)
+	log.Println("run handler get artist " + r.URL.Path)
 
 	var id = getValue(r, "id")
 
@@ -250,7 +247,7 @@ func handleGetArtist(w http.ResponseWriter, r *http.Request) {
 		id = "none"
 	}
 
-	libs.LogDebug("run handler getartist " + id)
+	log.Println("run handler getartist " + id)
 
 	str := libs.GetArtist(id)
 
@@ -258,7 +255,7 @@ func handleGetArtist(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGetCharacter(w http.ResponseWriter, r *http.Request) {
-	libs.LogDebug("run handler get character " + r.URL.Path)
+	log.Println("run handler get character " + r.URL.Path)
 
 	var id = getValue(r, "id")
 
@@ -266,7 +263,7 @@ func handleGetCharacter(w http.ResponseWriter, r *http.Request) {
 		id = "none"
 	}
 
-	libs.LogDebug("run handler getcharacter " + id)
+	log.Println("run handler getcharacter " + id)
 
 	str := libs.GetCharacter(id)
 
@@ -278,7 +275,7 @@ func handleGetCharacter(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleArtist(w http.ResponseWriter, r *http.Request) {
-	libs.LogDebug("run handler artist " + r.URL.Path)
+	log.Println("run handler artist " + r.URL.Path)
 
 	t := libs.NewPage()
 
@@ -288,7 +285,7 @@ func handleArtist(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleCharacter(w http.ResponseWriter, r *http.Request) {
-	libs.LogDebug("run handler character " + r.URL.Path)
+	log.Println("run handler character " + r.URL.Path)
 
 	t := libs.NewPage()
 
@@ -298,14 +295,14 @@ func handleCharacter(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGetImage(w http.ResponseWriter, r *http.Request) {
-	libs.LogDebug("run handler get image " + r.URL.Path)
+	log.Println("run handler get image " + r.URL.Path)
 
 	var url = getValue(r, "url")
 
 	ri := libs.GetImage(url)
 
 	if ri == nil {
-		libs.LogError("while handle get image " + r.URL.Path)
+		log.Println("while handle get image " + r.URL.Path)
 
 		return
 	}
@@ -340,16 +337,16 @@ func handleGetImage(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGetVideo(w http.ResponseWriter, r *http.Request) {
-	libs.LogDebug("run handler get video.")
+	log.Println("run handler get video.")
 
 	var url = getValue(r, "url")
 
-	libs.LogDebug("video url is " + url)
+	log.Println("video url is " + url)
 
 	ri := libs.GetVideo(url)
 
 	if ri == nil {
-		libs.LogError("while handle get video " + r.URL.Path)
+		log.Println("while handle get video " + r.URL.Path)
 
 		return
 	}
@@ -390,7 +387,7 @@ func handleGetVideo(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGetThumbnail(w http.ResponseWriter, r *http.Request) {
-	libs.LogDebug("run handler character " + r.URL.Path)
+	log.Println("run handler character " + r.URL.Path)
 
 	t := libs.NewPage()
 
@@ -400,11 +397,11 @@ func handleGetThumbnail(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGetAutocomplete(w http.ResponseWriter, r *http.Request) {
-	libs.LogDebug("run handler get autocomplete " + r.URL.Path)
+	log.Println("run handler get autocomplete " + r.URL.Path)
 
 	var id = getValue(r, "id")
 
-	libs.LogDebug("run handler get autocomplete " + id)
+	log.Println("run handler get autocomplete " + id)
 
 	str := libs.GetAutocomplete(id)
 
@@ -426,7 +423,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	v = dbrequest.GetValues("db_users", v, k)
 
 	if v == nil || len(v) < 1 {
-		libs.LogDebug("Login user failed. No user in db.")
+		log.Println("Login user failed. No user in db.")
 		w.WriteHeader(http.StatusBadRequest)
 		w.Header().Set("Content-Type", "application/json")
 		io.WriteString(w, "{'Sid' : ''}\n")
@@ -436,7 +433,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	uid := v[0]
 
 	if uid == "" || v[1] != "1" {
-		libs.LogDebug("Login user failed. Invalid user id in db.")
+		log.Println("Login user failed. Invalid user id in db.")
 		w.WriteHeader(http.StatusBadRequest)
 		w.Header().Set("Content-Type", "application/json")
 		io.WriteString(w, "{'Sid' : ''}\n")
@@ -446,7 +443,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	err := bcrypt.CompareHashAndPassword([]byte(v[2]), []byte(pass))
 
 	if err != nil {
-		libs.LogDebug("Login user failed. Invalid password.")
+		log.Println("Login user failed. Invalid password.")
 		w.WriteHeader(http.StatusBadRequest)
 		w.Header().Set("Content-Type", "application/json")
 		io.WriteString(w, "{'Sid' : ''}\n")
@@ -472,12 +469,12 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	json := "{\"Sid\" : \""
 
 	if res != true {
-		libs.LogDebug("Login user failed.")
+		log.Println("Login user failed.")
 		w.WriteHeader(http.StatusBadRequest)
 		w.Header().Set("Content-Type", "application/json")
 		json += ""
 	} else {
-		libs.LogDebug("Login user success.")
+		log.Println("Login user success.")
 		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "application/json")
 		json += sid
@@ -517,7 +514,7 @@ func handleLogout(w http.ResponseWriter, r *http.Request) {
 	json := "{\"Result\" : \""
 
 	if res != true {
-		libs.LogDebug("Logout user failed.")
+		log.Println("Logout user failed.")
 		w.WriteHeader(http.StatusBadRequest)
 		w.Header().Set("Content-Type", "application/json")
 		json += "False"
@@ -541,7 +538,7 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(pass), 16)
 
 	if err != nil {
-		libs.LogDebug("Register user failed " + err.Error())
+		log.Println("Register user failed " + err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		w.Header().Set("Content-Type", "application/json")
 		io.WriteString(w, "{\"Result\":\"False\"}\n")
@@ -550,16 +547,16 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 
 	var k map[string]string = map[string]string{"email": email, "username": uname, "valid": "1", "password": string(hash)}
 
-	libs.LogDebug("pass hash " + string(hash))
+	log.Println("pass hash " + string(hash))
 
 	res := dbrequest.SetValues("db_users", k, nil)
 
-	libs.LogDebug("register result " + strconv.FormatBool(res))
+	log.Println("register result " + strconv.FormatBool(res))
 
 	json := "{\"Result\" : \""
 
 	if res != true {
-		libs.LogDebug("Register user failed.")
+		log.Println("Register user failed.")
 		w.WriteHeader(http.StatusBadRequest)
 		json += "False"
 	} else {
@@ -576,7 +573,7 @@ func handleCommand(w http.ResponseWriter, r *http.Request) {
 	cmd := getFormValue(r, "cmd")
 	sid := getFormValue(r, "sid")
 
-	libs.LogInfo("handleCommand " + cmd + " " + sid)
+	log.Println("handleCommand " + cmd + " " + sid)
 
 	var result string
 	var content string
@@ -643,7 +640,7 @@ func handleCommand(w http.ResponseWriter, r *http.Request) {
 	json := "{\"" + result + "\" : " + content + "}"
 
 	if res != true {
-		libs.LogDebug("Command failed " + content)
+		log.Println("Command failed " + content)
 		w.WriteHeader(http.StatusBadRequest)
 	} else {
 		w.WriteHeader(http.StatusOK)
@@ -654,36 +651,7 @@ func handleCommand(w http.ResponseWriter, r *http.Request) {
 }
 
 func cmdSidValid(sid string, host string) bool {
-
 	return dbrequest.HasValues("db_session", nil, map[string]string{"sid": sid, "closed": "0", "remote": host})
-	/*
-	   sid := getValue(r, "sid")
-
-	   libs.LogDebug("Check session " + sid)
-	   var k map[string]string
-
-	   k["sid"] = sid
-	   k["closed"] = "0"
-
-	   res := dbrequest.HasValues("db_session", nil, k)
-
-	   json := "{'Valid' : '"
-
-	   	if res != true {
-	   		libs.LogDebug("Check session failed.")
-	   		w.WriteHeader(http.StatusBadRequest)
-	   		w.Header().Set("Content-Type", "application/json")
-	   		json += "False"
-	   	} else {
-
-	   		w.WriteHeader(http.StatusOK)
-	   		w.Header().Set("Content-Type", "application/json")
-	   		json += "True"
-	   	}
-
-	   json += "'}"
-	   io.WriteString(w, json+"\n")
-	*/
 }
 
 func cmdUserInfo(sid string) (map[string]string, bool) {
@@ -874,17 +842,14 @@ func main() {
 	dbhost := os.Getenv("dbhost")
 	dbport, _ := strconv.Atoi(os.Getenv("dbport"))
 
-	libs.SetLogLevel(5)
+	log.Println("Using port: " + port)
 
-	libs.LogInfo("Using port: " + port)
+	dbrequest = &libs.DbRequest{}
 
-	dbrequest = &ksqlttp.DbRequest{}
-
-	//r := dbrequest.OpenSession("192.168.0.2", 5100, "dbadmin", "K0tqU3ZZUzVYdWlRRnVhR3lqWDYzYklzNC9ZVGo0ZGJOcWVHajk2ZC9GM3dxMzBnWDhJRWplWWsyTXU4TWw3Vw==")
 	r := dbrequest.OpenSession(dbhost, int32(dbport), dbuser, dbpass)
 
 	if r != true {
-		libs.LogDebug("Unable open database session.")
+		log.Println("Unable open database session.")
 	} else {
 		go dbmonitor()
 	}

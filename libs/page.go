@@ -3,6 +3,7 @@ package libs
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 )
 
 type Page struct {
@@ -21,7 +22,7 @@ func (t *Page) Init(id string) {
 	content, err := ioutil.ReadFile("static/html/" + id)
 
 	if err != nil {
-		LogError("Cannot read file " + id)
+		log.Println("Cannot read file " + id)
 	}
 
 	txt := string(content)
@@ -33,7 +34,7 @@ func ReadFile(path string) string {
 	content, err := ioutil.ReadFile(path)
 
 	if err != nil {
-		LogError("Cannot read file " + path)
+		log.Println("Cannot read file " + path)
 
 		return ""
 	}

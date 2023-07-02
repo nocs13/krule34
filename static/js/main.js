@@ -1313,6 +1313,29 @@ function doRemFavor() {
   $('#div_profile').remove();
 }
 
+function doSidValid(sid) {
+  try {
+    $.post("/command", {'cmd':'sidvalid','sid': sid}, function(data){
+    })
+    .done(function(data){
+        console.log("do user favor remove: " + data);
+        let jsbody = data.replace("\n", "")
+        let res = JSON.parse(jsbody);
+        if (res.Result == true) {
+          UserInfo = { Sid: sid };
+        }
+    })
+    .fail(function(data){
+      console.log('Sid: ' + sid + 'is invalid.');
+      UserInfo = null;
+      localStorage.removeItem("sid")
+    })
+  } catch (e) {
+    console.log('Sid: ' + sid + 'is invalid.');
+    localStorage.removeItem("sid")
+  }
+}
+
 function k_menuArtist() {
   //var imode = Cookies.get('image_list_mode');
   var imode = sessionStorage.getItem('image_list_mode');

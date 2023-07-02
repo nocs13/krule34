@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -41,16 +42,16 @@ func IsToken(tok *html.Token, tag string, class string) bool {
 		return false
 	}
 
-	//LogDebug("Is Token: tk is " + tok.Data)
+	//log.Println("Is Token: tk is " + tok.Data)
 
 	if tok.Data != tag {
 		return false
 	}
 
-	//LogDebug("Is Token: tag passed")
+	//log.Println("Is Token: tag passed")
 
 	for _, a := range tok.Attr {
-		//LogDebug("Is Token: Attr is " + a.Key + "/" + a.Val)
+		//log.Println("Is Token: Attr is " + a.Key + "/" + a.Val)
 
 		if a.Key == "class" && a.Val == class {
 			return true
@@ -66,17 +67,17 @@ func IsTokenAttr(tok *html.Token, tag string, key string, val string) bool {
 		return false
 	}
 
-	//LogDebug("IsTokenAttr: tk is " + tok.Data)
+	//log.Println("IsTokenAttr: tk is " + tok.Data)
 
 	if tok.Data != tag {
 		return false
 	}
 
 	for _, a := range tok.Attr {
-		//LogDebug("IsTokenArrt: Current attribute is " + a.Key + "/" + a.Val)
+		//log.Println("IsTokenArrt: Current attribute is " + a.Key + "/" + a.Val)
 
 		if a.Key == key && a.Val == val {
-			//LogDebug("IsTokenArrt: Found XXXXXX")
+			//log.Println("IsTokenArrt: Found XXXXXX")
 			return true
 		}
 	}
@@ -105,33 +106,33 @@ func GetTokenAttr(tok *html.Token, tag string, key string) string {
 
 // IsImage ...
 func IsImage(uri string) bool {
-	LogInfo("Checking uri is image " + uri)
+	log.Println("Checking uri is image " + uri)
 
 	res, err := http.Head(uri)
 
 	if err != nil {
-		LogDebug("Failed HEAD request.")
+		log.Println("Failed HEAD request.")
 
 		return false
 	}
 
-	LogDebug("Checking uri content type.")
+	log.Println("Checking uri content type.")
 
 	contentType := res.Header.Get("Content-type")
 
-	LogInfo("Uri content type is " + contentType)
+	log.Println("Uri content type is " + contentType)
 
 	if contentType == "" || strings.Contains(contentType, "image/") == false {
-		LogDebug("URI [" + uri + "] is not image type it is [" + contentType + "] content type.")
+		log.Println("URI [" + uri + "] is not image type it is [" + contentType + "] content type.")
 
 		return false
 	}
 
-	LogDebug("Checking uri content length")
+	log.Println("Checking uri content length")
 
 	if res.ContentLength < 1 {
-		LogInfo("URI [" + uri + "] content length is too small.")
-		LogDebug("Content-length: " + fmt.Sprintf("%v", res.ContentLength))
+		log.Println("URI [" + uri + "] content length is too small.")
+		log.Println("Content-length: " + fmt.Sprintf("%v", res.ContentLength))
 
 		return false
 	}
@@ -141,7 +142,7 @@ func IsImage(uri string) bool {
 
 // IsVideo ...
 func IsVideo(uri string) bool {
-	LogDebug("Checking uri is video " + uri)
+	log.Println("Checking uri is video " + uri)
 
 	res, err := http.Head(uri)
 
@@ -149,19 +150,19 @@ func IsVideo(uri string) bool {
 		return false
 	}
 
-	LogDebug("Checking uri content length")
+	log.Println("Checking uri content length")
 
 	if res.ContentLength < 1 {
-		LogInfo("Content-length: " + fmt.Sprintf("%v", res.ContentLength))
+		log.Println("Content-length: " + fmt.Sprintf("%v", res.ContentLength))
 
 		return false
 	}
 
-	LogDebug("Checking uri content type")
+	log.Println("Checking uri content type")
 
 	contentType := res.Header.Get("Content-type")
 
-	LogDebug("Checking uri content type is " + contentType)
+	log.Println("Checking uri content type is " + contentType)
 
 	if contentType == "" || strings.Contains(contentType, "video") == false {
 		return false
@@ -175,10 +176,10 @@ func convertThumb(src string, anim bool) string {
 
 	r = ""
 
-	LogInfo("Parsing thumb: " + src)
+	log.Println("Parsing thumb: " + src)
 
 	if src != "" {
-		LogDebug("Token image preview source: " + src)
+		log.Println("Token image preview source: " + src)
 
 		if strings.Contains(src, "?") {
 			//src = strings.Split(src, "?")[0]
@@ -190,7 +191,7 @@ func convertThumb(src string, anim bool) string {
 
 		src = strings.Replace(src, "thumbnail_", "sample_", 1)
 		src = strings.Replace(src, "thumbnails", "samples", 1)
-		LogDebug("Token image preview source: " + src)
+		log.Println("Token image preview source: " + src)
 
 		if IsImage(src) == false {
 			src = tmp
@@ -247,11 +248,11 @@ func convertThumb(src string, anim bool) string {
 		if src != "" {
 			r = src
 		} else {
-			LogInfo("thumb [" + tmp + "] not parsed correct.")
+			log.Println("thumb [" + tmp + "] not parsed correct.")
 		}
 	}
 
-	LogInfo("convertThumb result is " + r)
+	log.Println("convertThumb result is " + r)
 
 	return r
 }
@@ -259,10 +260,10 @@ func convertThumb(src string, anim bool) string {
 func parseImage(url string) string {
 	var r string
 
-	LogInfo("Parsing rul: " + url)
+	log.Println("Parsing rul: " + url)
 
 	if url == "" {
-		LogError("Wrong url.")
+		log.Println("Wrong url.")
 
 		return ""
 	}
@@ -276,7 +277,7 @@ func parseImage(url string) string {
 	res, err := client.Do(req)
 
 	if err != nil || res == nil {
-		LogError("Failed GET request.")
+		log.Println("Failed GET request.")
 
 		return ""
 	}
@@ -293,20 +294,20 @@ wloop:
 
 		switch {
 		case stat == html.ErrorToken:
-			LogDebug("Tokenizer error.")
+			log.Println("Tokenizer error.")
 			break wloop
 		case stat == html.StartTagToken:
 			tn := tok.Token()
 
 			if IsTokenAttr(&tn, "video", "id", "gelcomVideoPlayer") {
 				avideo = true
-				LogInfo("Video tag opened")
+				log.Println("Video tag opened")
 			}
 		case stat == html.EndTagToken:
 			tn := tok.Token()
 
 			if IsTokenAttr(&tn, "video", "id", "gelcomVideoPlayer") {
-				LogInfo("Video tag closed")
+				log.Println("Video tag closed")
 				avideo = false
 			}
 		case stat == html.SelfClosingTagToken:
@@ -323,10 +324,10 @@ wloop:
 	}
 
 	if err != nil {
-		LogError("Parse page error: " + fmt.Sprintf("%v", err))
+		log.Println("Parse page error: " + fmt.Sprintf("%v", err))
 	}
 
-	LogInfo("Parsing result is: " + r)
+	log.Println("Parsing result is: " + r)
 
 	return r
 }
@@ -334,10 +335,10 @@ wloop:
 func parseImageUS(url string) string {
 	var r string
 
-	LogInfo("Parsing url: " + url)
+	log.Println("Parsing url: " + url)
 
 	if url == "" {
-		LogError("Wrong url.")
+		log.Println("Wrong url.")
 
 		return ""
 	}
@@ -351,7 +352,7 @@ func parseImageUS(url string) string {
 	res, err := client.Do(req)
 
 	if err != nil || res == nil {
-		LogError("Failed GET request.")
+		log.Println("Failed GET request.")
 
 		return ""
 	}
@@ -381,17 +382,17 @@ func parseImageUS(url string) string {
 
 		if tn.Data == "img" {
 			ss := GetTokenAttr(&tn, "img", "src")
-			LogDebug("Actual image sourceis: " + ss)
+			log.Println("Actual image sourceis: " + ss)
 		}
 
 		if stat == html.ErrorToken {
-			LogDebug("Tokenizer error " + fmt.Sprintf("%v", tok.Err()))
+			log.Println("Tokenizer error " + fmt.Sprintf("%v", tok.Err()))
 			divPushContent = false
 			break
 		} else if stat == html.StartTagToken {
 			if tn.Data == "img" {
 				ss := GetTokenAttr(&tn, "img", "src")
-				LogInfo("Img is open id " + fmt.Sprintf("%v", count))
+				log.Println("Img is open id " + fmt.Sprintf("%v", count))
 
 				if divPushContent == true && r == "" {
 					r = ss
@@ -410,21 +411,21 @@ func parseImageUS(url string) string {
 
 			if IsToken(&tn, "div", "content_push") {
 				xst := GetTokenAttr(&tn, "div", "class")
-				LogInfo("Open div class is: " + xst)
+				log.Println("Open div class is: " + xst)
 
 				divPushContent = true
-				LogInfo("Push content set.")
+				log.Println("Push content set.")
 			}
 		} else if stat == html.EndTagToken {
 			if tn.Data == "img" {
-				LogInfo("Img is close id " + fmt.Sprintf("%v", count))
+				log.Println("Img is close id " + fmt.Sprintf("%v", count))
 			} else if tn.Data == "video" {
 				avideo = false
 			}
 
 			if IsToken(&tn, "div", "content_push") {
 				divPushContent = false
-				LogInfo("Push content unset.")
+				log.Println("Push content unset.")
 			}
 		} else if stat == html.SelfClosingTagToken {
 			if tn.Data == "source" && avideo == true && divPushContent == true {
@@ -438,10 +439,10 @@ func parseImageUS(url string) string {
 	}
 
 	if err != nil {
-		LogError("Parse page error: " + fmt.Sprintf("%v", err))
+		log.Println("Parse page error: " + fmt.Sprintf("%v", err))
 	}
 
-	LogInfo("Parsing result is: " + r)
+	log.Println("Parsing result is: " + r)
 
 	//return r
 	if strings.Index(r, "https://video.rule34.us/") != -1 {
@@ -455,10 +456,10 @@ func parseImageUS(url string) string {
 func GetArtist(id string) string {
 	var r string
 
-	LogInfo("Parsing post id: " + id)
+	log.Println("Parsing post id: " + id)
 
 	if id == "" {
-		LogError("Wrong post id.")
+		log.Println("Wrong post id.")
 
 		return ""
 	}
@@ -476,7 +477,7 @@ func GetArtist(id string) string {
 		//res, err := client.Get("https://www.google.com/search?q=" + s)
 
 		if err != nil || res == nil {
-			LogError("Search failed. Id: " + id)
+			log.Println("Search failed. Id: " + id)
 		}
 
 		defer res.Body.Close()
@@ -484,19 +485,19 @@ func GetArtist(id string) string {
 		responseData, err := ioutil.ReadAll(res.Body)
 
 		if err != nil {
-			LogError("Read body data error:" + err.Error())
+			log.Println("Read body data error:" + err.Error())
 
 			return ""
 		}
 
 		final := string(responseData)
 
-		LogInfo(final)
+		log.Println(final)
 
 		err = xml.Unmarshal([]byte(final), &posts)
 
 		if err != nil {
-			LogError("Parse error " + err.Error())
+			log.Println("Parse error " + err.Error())
 
 			return ""
 		}
@@ -519,7 +520,7 @@ func GetArtist(id string) string {
 	res, err := client.Do(req)
 
 	if err != nil || res == nil {
-		LogError("Failed GET request.")
+		log.Println("Failed GET request.")
 
 		return ""
 	}
@@ -542,7 +543,7 @@ func GetArtist(id string) string {
 		} else if stat == html.StartTagToken {
 			if IsTokenAttr(&tn, "li", "class", "tag-type-artist tag") {
 				atag = true
-				LogInfo("Open artist tag")
+				log.Println("Open artist tag")
 			} else if tn.Data == "a" && atag == true {
 				href := GetTokenAttr(&tn, "a", "href")
 
@@ -573,14 +574,14 @@ func GetArtist(id string) string {
 		} else if stat == html.EndTagToken {
 			if IsTokenAttr(&tn, "li", "class", "tag-type-artist tag") {
 				atag = false
-				LogInfo("Close artist tag")
+				log.Println("Close artist tag")
 			}
 		} else if stat == html.SelfClosingTagToken {
 		}
 	}
 
 	if err != nil {
-		LogError("Parse page error: " + fmt.Sprintf("%v", err))
+		log.Println("Parse page error: " + fmt.Sprintf("%v", err))
 	}
 
 	r = "{\"artists\":\""
@@ -599,7 +600,7 @@ func GetArtist(id string) string {
 
 	r += "\"}"
 
-	LogInfo("Parsing result is: " + r)
+	log.Println("Parsing result is: " + r)
 
 	return r
 }
@@ -608,10 +609,10 @@ func GetArtist(id string) string {
 func GetCharacter(id string) string {
 	var r string
 
-	LogInfo("Parsing post id: " + id)
+	log.Println("Parsing post id: " + id)
 
 	if id == "" {
-		LogError("Wrong post id.")
+		log.Println("Wrong post id.")
 
 		return ""
 	}
@@ -627,7 +628,7 @@ func GetCharacter(id string) string {
 	res, err := client.Do(req)
 
 	if err != nil || res == nil {
-		LogError("Failed GET request.")
+		log.Println("Failed GET request.")
 
 		return ""
 	}
@@ -686,7 +687,7 @@ func GetCharacter(id string) string {
 	}
 
 	if err != nil {
-		LogError("Parse page error: " + fmt.Sprintf("%v", err))
+		log.Println("Parse page error: " + fmt.Sprintf("%v", err))
 	}
 
 	r = "{\"characters\":\""
@@ -701,7 +702,7 @@ func GetCharacter(id string) string {
 
 	r += "\"}"
 
-	LogInfo("Parsing result is: " + r)
+	log.Println("Parsing result is: " + r)
 
 	return r
 }
@@ -716,7 +717,7 @@ func GetAutocomplete(id string) string {
 	res, err := client.Do(req)
 
 	if err != nil || res == nil {
-		LogError("Failed GET request.")
+		log.Println("Failed GET request.")
 
 		return ""
 	}
@@ -726,14 +727,14 @@ func GetAutocomplete(id string) string {
 	responseData, err := ioutil.ReadAll(res.Body)
 
 	if err != nil {
-		LogError("Read body data error:" + err.Error())
+		log.Println("Read body data error:" + err.Error())
 
 		return ""
 	}
 
 	final := string(responseData)
 
-	LogDebug("Autocomplete: " + final)
+	log.Println("Autocomplete: " + final)
 
 	return final
 }
@@ -811,7 +812,7 @@ func Search(key string, pid string) string {
 	//res, err := client.Get("https://www.google.com/search?q=" + s)
 
 	if err != nil || res == nil {
-		LogError("Search failed. Tag: " + key)
+		log.Println("Search failed. Tag: " + key)
 	}
 
 	defer res.Body.Close()
@@ -819,25 +820,25 @@ func Search(key string, pid string) string {
 	responseData, err := ioutil.ReadAll(res.Body)
 
 	if err != nil {
-		LogError("Read body data error:" + err.Error())
+		log.Println("Read body data error:" + err.Error())
 	}
 
 	final := string(responseData)
 
-	//LogInfo(final)
+	//log.Println(final)
 
 	err = xml.Unmarshal([]byte(final), &posts)
 
 	//err = json.Unmarshal([]byte(final), &nodes)
 
 	if err != nil {
-		LogError("Parse error " + err.Error())
+		log.Println("Parse error " + err.Error())
 	}
 
 	fmt.Printf("Count : %+v \n", posts.Count)
 	fmt.Printf("Offset : %+v \n", posts.Offset)
 
-	//LogInfo("Elements count is " + string(len(nodes)))
+	//log.Println("Elements count is " + string(len(nodes)))
 
 	r = "["
 	//xxx_row := 1
@@ -848,7 +849,7 @@ func Search(key string, pid string) string {
 			continue
 		}
 
-		//LogInfo("Tags " + strconv.Itoa(xxx_row) + " " + t)
+		//log.Println("Tags " + strconv.Itoa(xxx_row) + " " + t)
 		//fmt.Printf("%x.\n", t)
 		//xxx_row++
 
@@ -862,7 +863,7 @@ func Search(key string, pid string) string {
 			}, t)
 		}
 
-		//LogInfo("Element " + n.Hash)
+		//log.Println("Element " + n.Hash)
 		r += "{"
 		r += `"id":`
 		r += `"` + strconv.Itoa(n.Id) + `",`
@@ -892,7 +893,7 @@ func Search(key string, pid string) string {
 
 	r += "]"
 
-	//LogInfo("JSON: " + r)
+	//log.Println("JSON: " + r)
 
 	return r
 }
@@ -902,16 +903,16 @@ func Search(key string, pid string) string {
 func GetImage(uri string) *http.Response {
 	response, err := http.Get(uri)
 
-	LogDebug("GetImage: " + uri)
+	log.Println("GetImage: " + uri)
 
 	if err != nil {
-		LogError("Cannot get image from url: " + uri)
+		log.Println("Cannot get image from url: " + uri)
 
 		return nil
 	}
 
 	if response.StatusCode != 200 {
-		LogError("Received non 200 response code")
+		log.Println("Received non 200 response code")
 
 		return nil
 	}
@@ -924,16 +925,16 @@ func GetImage(uri string) *http.Response {
 func GetVideo(uri string) *http.Response {
 	response, err := http.Get(uri)
 
-	LogDebug("GetVideo: " + uri)
+	log.Println("GetVideo: " + uri)
 
 	if err != nil {
-		LogError("Cannot get video as: " + err.Error())
+		log.Println("Cannot get video as: " + err.Error())
 
 		return nil
 	}
 
 	if response.StatusCode != 200 {
-		LogError("Received non 200 response code")
+		log.Println("Received non 200 response code")
 
 		return nil
 	}
@@ -944,7 +945,7 @@ func GetVideo(uri string) *http.Response {
 // GetVideoUS is ...
 func GetVideoUS(uri string) io.Reader {
 	if strings.Index(uri, "/video/") == -1 {
-		LogError("Invalid video url: " + uri)
+		log.Println("Invalid video url: " + uri)
 
 		return nil
 	}
@@ -955,13 +956,13 @@ func GetVideoUS(uri string) io.Reader {
 	response, err := http.Get(url)
 
 	if err != nil {
-		LogError("Cannot get video from url: " + url)
+		log.Println("Cannot get video from url: " + url)
 
 		return nil
 	}
 
 	if response.StatusCode != 200 {
-		LogError("Received non 200 response code")
+		log.Println("Received non 200 response code")
 
 		return nil
 	}

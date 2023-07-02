@@ -1,12 +1,6 @@
 # github.com/google/uuid v1.3.0
 ## explicit
 github.com/google/uuid
-# github.com/mattn/go-sqlite3 v1.14.17
-## explicit; go 1.16
-github.com/mattn/go-sqlite3
-# gitlab.com/ggvaberi/ksqlttp v0.0.0-20230702112358-1a26223e9f34
-## explicit; go 1.19
-gitlab.com/ggvaberi/ksqlttp
 # golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
 ## explicit
 golang.org/x/crypto/bcrypt
