@@ -42,6 +42,11 @@ func (self *DbRequest) OpenSession(addr string, port int32, uname string, pass s
 
 	log.Print("Open database session: ", url)
 
+	self.Addr = addr
+	self.Port = port
+	self.user = uname
+	self.pass = pass
+
 	creds := map[string]string{"Name": uname, "Pass": pass}
 
 	jsonBody, err := json.Marshal(creds)
@@ -91,12 +96,7 @@ func (self *DbRequest) OpenSession(addr string, port int32, uname string, pass s
 	}
 
 	self.Sid = sid
-	self.Addr = addr
-	self.Port = port
 	self.Cck = http.Cookie{Name: "dbsid", Value: sid, MaxAge: 100000}
-
-	self.user = uname
-	self.pass = pass
 
 	return true
 }
