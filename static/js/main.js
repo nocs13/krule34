@@ -907,18 +907,18 @@ function showLogin()
 {
   var con = `
   <div id="div_login" class="alert alert-info" style="visibility: visible; position: absolute;">
-    <form id="form_login" onsubmit="return false" >
-      <br><input id="inp_log_email" class="form-control ds-input" type="text" placeholder="email" value=""/>
-      <br><input id="inp_log_pass" class="form-control ds-input" type="password" placeholder="password" value=""/>
+    <form id="form_login" onsubmit="onLogin();" autocomplete="on">
+      <br><input id="inp_log_email" class="form-control ds-input" type="text" placeholder="email" autocomplete="on"/>
+      <br><input id="inp_log_pass" class="form-control ds-input" type="password" placeholder="password" autocomplete="on"/>
       <br>
       <table> <tr>
-      <td> <button id="btn_login" class="btn btn-primary">Login</button> </td>
+      <td> <input type="submit" id="btn_log_submit" class="btn btn-primary" value="Login"></input> </td>
       <td> <button  id="btn_register" class="btn btn-primary">Register</button> </td>
       </tr> </table>
     </form>
   </div>
   `;
-
+  //placeholder="password"
   if ($("#div_login").length) {
     return;
   }
@@ -942,6 +942,7 @@ function showLogin()
     $("#div_login").css({left: (ww - lw)});
   }
 
+  /*
   $('#btn_login').click(function () {
     var email = $("#inp_log_email").val();
     var pass =  $("#inp_log_pass").val();
@@ -958,10 +959,34 @@ function showLogin()
 
     doLogin(email, pass);
   });
+  */
   $('#btn_register').click(function () {
     $('#div_login').remove();
     showRegister();
   });
+}
+
+function onLogin () {
+  var email = $("#inp_log_email").val();
+  var pass =  $("#inp_log_pass").val();
+
+  console.log("email: ", email);
+
+  if (!isEmail(email)) {
+    alert("Invalid email format.");
+    return false;
+  }
+
+  if (pass.length < 4) {
+    alert("Small password.");
+    return false;
+  }
+
+  $('#div_login').remove();
+
+  doLogin(email, pass);
+
+  return true;
 }
 
 function doLogin(email, pass)
