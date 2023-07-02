@@ -730,6 +730,21 @@ func cmdUserFavorAdd(sid string, favor string) bool {
 
 	uid := vs[0]
 
+	has := dbrequest.HasValues("db_datas", []string{"value"}, map[string]string{"uid": vs[0], "key": "favors"})
+
+	if !has {
+		log.Println("Add user favor: No favor as key for user.")
+
+		rs := dbrequest.SetValues("db_datas", map[string]string{"key": "favors", "value": favor, "uid": uid}, nil)
+
+		if !rs {
+			log.Println("Add user favor: Unable open user favors.")
+			return false
+		}
+
+		return true
+	}
+
 	vs = dbrequest.GetValues("db_datas", []string{"value"}, map[string]string{"uid": vs[0], "key": "favors"})
 
 	if vs == nil {
