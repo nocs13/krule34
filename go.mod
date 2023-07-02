@@ -7,4 +7,4 @@ require (
 	golang.org/x/net v0.10.0
 )
 
-require github.com/google/uuid v1.3.0
+require github.com/google/uuid v1.1.5
