@@ -15,7 +15,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/google/uuid"
+	uuid "github.com/google/uuid"
 	ksqlttp "gitlab.com/ggvaberi/ksqlttp"
 	"golang.org/x/crypto/bcrypt"
 )
