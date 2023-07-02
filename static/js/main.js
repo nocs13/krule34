@@ -5,6 +5,9 @@ var items  = null;
 var count  = 0;
 var offset = 0;
 
+var UserInfo = null;
+var lock_profile = false;
+
 var posImgMenu = {x: 0, y: 0};
 
 var mspos = new function() {
@@ -17,6 +20,13 @@ class kSearch extends React.Component {
     return (React.createElement('div', {className: 'kSearch'},
             React.createElement('h1', null, "Big lol")));
   }
+}
+
+function isEmail(email)
+{
+  //var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+  var regex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+  return regex.test(email);
 }
 
 function resetPages()
@@ -871,6 +881,438 @@ function onOrientationChange(type) {
 
 }
 
+function onProfile()
+{
+  let sid = localStorage.getItem("sid");
+
+  if ($("#div_login").length || $("#div_register").length || $("#div_profile").length) {
+    $('#div_login').remove();
+    $('#div_register').remove();
+    $('#div_profile').remove();
+    return;
+  }
+
+  if (lock_profile)
+    return;
+
+  if (sid == null || sid == "") {
+    showLogin();
+    return
+  }
+
+  showProfile();
+}
+
+function showLogin()
+{
+  var con = `
+  <div id="div_login" class="alert alert-info" style="visibility: visible; position: absolute;">
+    <form id="form_login" onsubmit="return false" >
+      <br><input id="inp_log_email" class="form-control ds-input" type="text" placeholder="email" value="user@mail.com"/>
+      <br><input id="inp_log_pass" class="form-control ds-input" type="password" placeholder="password" value="1234567"/>
+      <br>
+      <table> <tr>
+      <td> <button id="btn_login" class="btn btn-primary">Login</button> </td>
+      <td> <button  id="btn_register" class="btn btn-primary">Register</button> </td>
+      </tr> </table>
+    </form>
+  </div>
+  `;
+
+  if ($("#div_login").length) {
+    return;
+  }
+
+  let sid = localStorage.getItem("sid");
+
+  if (sid != null && sid != "") {
+    return;
+  }
+
+  $('body').append(con);
+
+  var pos = $("#btn_profile").offset();
+
+  $("#div_login").css({top: pos.top + 50, left: pos.left, position:'absolute'});
+
+  let ww = $(window).width();
+  let lw = 200;
+
+  if ((pos.left + lw) > ww) {
+    $("#div_login").css({left: (ww - lw)});
+  }
+
+  $('#btn_login').click(function () {
+    var email = $("#inp_log_email").val();
+    var pass =  $("#inp_log_pass").val();
+
+    console.log("email: ", email);
+
+    if (!isEmail(email))
+      alert("Invalid email format.");
+
+    if (pass.length < 4)
+      alert("Small password.");
+
+    $('#div_login').remove();
+
+    doLogin(email, pass);
+  });
+  $('#btn_register').click(function () {
+    $('#div_login').remove();
+    showRegister();
+  });
+}
+
+function doLogin(email, pass)
+{
+  lock_profile = true;
+
+  $.post("/login", {'email': email, 'pass' : pass}, function(data){
+  })
+  .done(function(data){
+    try {
+      let jsbody = data.replace("\n", "")
+      let res = JSON.parse(jsbody);
+      localStorage.setItem("sid", res.Sid)
+
+      UserInfo = {Sid:res.Sid};
+    } catch(e) {
+      console.log(e)
+      showMessage('Error', 'Login failed.');
+    }
+  })
+  .fail(function(data){
+    console.log(data.responseText)
+    showMessage('Error', 'Login failed.');
+  })
+  .always(function(){
+    lock_profile = false;
+  })
+}
+
+function doLogout()
+{
+  let sid = localStorage.getItem("sid");
+
+  if (sid == null || sid == "") {
+    UserInfo = null;
+    return;
+  }
+
+  $.get("/logout", {'sid': sid}, function(data){
+  })
+  .done(function(data){
+    try {
+      let jsbody = data.replace("\n", "")
+      let res = JSON.parse(jsbody);
+      localStorage.removeItem("sid")
+      UserInfo = null;
+    } catch(e) {
+      console.log(e)
+      showMessage('Error', 'Failed logout.');
+    }
+  })
+  .fail(function(data){
+    console.log(data)
+    showMessage('Error', 'Failed logout.');
+  })
+}
+
+function showRegister()
+{
+  var con = `
+  <div id="div_register" class="alert alert-info" style="visibility: visible; position: absolute;">
+    <form id="form_register">
+      <br><input id="inp_reg_email" class="form-control ds-input" type="text" placeholder="email" value="user@mail.com"/>
+      <br><input id="inp_reg_uname" class="form-control ds-input" type="text" placeholder="username" value="user123"/>
+      <br><input id="inp_reg_pass" class="form-control ds-input" type="password" placeholder="password" value="1234567"/>
+      <br><input id="inp_reg_cpass" class="form-control ds-input" type="password" placeholder="password" value="1234567"/>
+      <br><button  id="btn_register" class="btn btn-primary">Register</button>
+    </form>
+  </div>
+  `;
+
+  if ($("#div_register").length) {
+    return;
+  }
+
+  $('body').append(con);
+
+  var pos = $("#btn_profile").offset();
+
+  $("#div_register").css({top: pos.top + 50, left: pos.left, position:'absolute'});
+
+  let ww = $(window).width();
+  let lw = 200;
+
+  if ((pos.left + lw) > ww) {
+    $("#div_register").css({left: (ww - lw)});
+  }
+
+  $('#btn_register').click(function () {
+    var email = $("#inp_reg_email").val();
+    var uname = $("#inp_reg_uname").val();
+    var pass =  $("#inp_reg_pass").val();
+
+    console.log("email: ", email);
+    console.log("uname: ", uname);
+
+    $('#div_register').remove();
+    doRegister(email, uname, pass);
+  });
+}
+
+function doRegister(email, uname, pass)
+{
+  lock_profile = true;
+  $.post("/register", {'email': email, 'uname' : uname, 'pass' : pass}, function(data){
+  })
+  .done(function(data){
+    try {
+      let res = JSON.parse(data);
+      if (res.Result == true) {
+        console.log('Registration success.');
+      }
+    } catch(e) {
+      console.log('Registration failed. ' + data);
+      showMessage('Error', 'Registration failed.');
+    }
+  })
+  .fail(function(data){
+    console.log('Registration failed. ' + data);
+    showMessage('Error', 'Registration failed.');
+  })
+  .always(function(data){
+    lock_profile = false;
+  })
+}
+
+function showProfile()
+{
+  var con = `
+  <div id="div_profile" class="alert alert-info rounded float-left" style="visibility: visible; position: absolute;">
+    <div class="row">
+      <div class="col"><button id="b_pr_favor" type="button" class="btn btn-secondary"><img src="static/img/fav.png" width="24" height="24"></button></div>
+      <div class="col"><button id="b_pr_block" type="button" class="btn btn-secondary"><img src="static/img/blk.png" width="24" height="24"></button></div>
+      <div class="col"><button id="b_pr_setts" type="button" class="btn btn-info"><img src="static/img/stg.png" width="24" height="24"></button></div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div id = "d_pr_cont" class="tab-content"></div>
+      </div>
+    </div>
+  </div>
+  `;
+
+  $('body').append(con);
+
+  var pos = $("#btn_profile").offset();
+
+  $("#div_profile").css({top: pos.top + 50, left: pos.left, position:'absolute'});
+
+  let ww = $(window).width();
+  let lw = 260;
+
+  if ((pos.left + lw) > ww) {
+    $("#div_profile").css({left: (ww - lw)});
+  }
+
+  $('#b_pr_setts').click(function () {
+    $('#d_pr_cont').html("");
+    doUserInfo(function(email, firstname, lastname, username){
+      let cont = `
+      <table class="table">
+      <thead>
+        <tr>
+          <th>Info</th>
+          <th>Data</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Username</td>
+          <td>${username}</td>
+        </tr>`;
+
+        if (firstname != "") {
+          cont += `
+          <tr>
+            <td>Firstname</td>
+            <td>${firstname}</td>
+          </tr>`;
+        }
+
+        if (lastname != "") {
+          cont += `
+          <tr>
+          <td>Lastname</td>
+          <td>${lastname}</td>
+          </tr>`;
+        }
+
+        cont += `<tr>
+          <td>Email</td>
+          <td>${email}</td>
+        </tr>
+      </tbody>
+      </table>
+      <button  id="btn_logout" class="btn btn-primary btn-sm">Logout</button>
+      `;
+      $('#d_pr_cont').html(cont);
+
+      $('#btn_logout').click(function () {
+        $('#div_profile').remove();
+        doLogout();
+      });
+    });
+  });
+  $('#b_pr_block').click(function () {
+    $('#d_pr_cont').html("");
+  });
+  $('#b_pr_favor').click(function () {
+    $('#d_pr_cont').html("");
+    doListFavors(function(favors){
+      let cont = '';
+
+      console.log("Favors: " + toString(favors))
+
+      cont += "<table style='width: 100%'> <tr style='width: 100%'> <td> "
+      cont += '<button  id="btn_favor_add" class="btn btn-secondary btn-sm" onclick="doAddFavor(this);"><img src="static/img/add.png" width="24" height="24"></button>';
+      cont += '</td> <td> '
+      cont += "<select id='sel_list_favor' class='list-group' style='width: 100px' onchange='doSelFavor(this)'>";
+      if (favors != null) {
+        favors = favors.split(",")
+
+        for (v in favors) {
+          if (favors[v] == "")
+            continue;
+          cont += `<option> ${favors[v]}`
+        }
+      }
+      cont += "</select>";
+      cont += '</td> <td style="display: grid;"> '
+      cont += '<button  id="btn_favor_rem" class="btn btn-secondary btn-sm" onclick="doRemFavor(this);"><img src="static/img/rem.png" width="24" height="24"></button>';
+      cont += '</td>'
+      cont += "</tr> </table>"
+      $('#d_pr_cont').html(cont);
+    });
+  });
+}
+
+function doUserInfo(fn){
+  if (localStorage.getItem("sid") != null && UserInfo != null) {
+    if (UserInfo.hasOwnProperty("Sid") && (UserInfo.Sid == localStorage.getItem("sid")) && UserInfo.hasOwnProperty('email')) {
+      fn(UserInfo.email, UserInfo.firstname, UserInfo.lastname, UserInfo.username);
+      return
+    }
+  }
+  $.post("/command", {'cmd':'userinfo','sid': localStorage.getItem("sid")}, function(data){
+  })
+  .done(function(data){
+    try {
+      console.log("do user info: " + data);
+      let jsbody = data.replace("\n", "")
+      let res = JSON.parse(jsbody);
+      console.log("do user info: " + JSON.stringify(res));
+      console.log("do user info: " + JSON.stringify(res.UserInfo));
+      let ui = res.UserInfo;
+      console.log("do user info: " + ui);
+      fn(ui.email, ui.firstname, ui.lastname, ui.username);
+
+      UserInfo.email = ui.email;
+      UserInfo.firstname = ui.firstname;
+      UserInfo.lastname = ui.lastname;
+      UserInfo.username = ui.username;
+    } catch(e) {
+      alert('Get user info failed. ' + e);
+    }
+  })
+  .fail(function(data){
+    alert('Unable get user info.');
+  })
+  .always(function() {
+  });
+}
+
+function doListFavors(fn){
+  $.post("/command", {'cmd':'userfavors','sid': localStorage.getItem("sid")}, function(data){
+  })
+  .done(function(data){
+    try {
+      console.log("do user favors: " + data);
+      let jsbody = data.replace("\n", "")
+      let res = JSON.parse(jsbody);
+      console.log("do user favors: " + JSON.stringify(res));
+      fn(res.Favors);
+    } catch(e) {
+      console.log('Get user favors failed. ' + e);
+      fn(null);
+    }
+  })
+  .fail(function(data){
+    console.log('Unable get user favors.');
+    fn(null);
+  })
+}
+
+function doAddFavor() {
+  let k = $("#key").val()
+  console.log("Adding user favor : " + k);
+  $.post("/command", {'cmd':'userfavoradd','sid': localStorage.getItem("sid"), 'favor':k}, function(data){
+  })
+  .done(function(data){
+    try {
+      console.log("do user favor add: " + data);
+      let jsbody = data.replace("\n", "")
+      let res = JSON.parse(jsbody);
+      if (res.Result != null) {
+
+      }
+      console.log("do user favor add: " + JSON.stringify(res));
+    } catch(e) {
+      console.log('Add user favor failed. ' + e);
+    }
+  })
+  .fail(function(data){
+    console.log('Unable add user favor.');
+  })
+
+  $('#div_profile').remove();
+}
+
+function doSelFavor(data) {
+  try {
+    onSelect(data.value);
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+function doRemFavor() {
+  try {
+    let fav = $('#sel_list_favor').val();
+
+    $.post("/command", {'cmd':'userfavorrem','sid': localStorage.getItem("sid"), 'favor':fav}, function(data){
+    })
+    .done(function(data){
+        console.log("do user favor remove: " + data);
+        let jsbody = data.replace("\n", "")
+        let res = JSON.parse(jsbody);
+        if (res.Result != null) {
+        }
+        console.log("do user favor add: " + JSON.stringify(res));
+    })
+    .fail(function(data){
+      alert('Unable remove user favor.');
+    })
+  } catch (e) {
+    console.log(e);
+  }
+
+  $('#div_profile').remove();
+}
+
 function k_menuArtist() {
   //var imode = Cookies.get('image_list_mode');
   var imode = sessionStorage.getItem('image_list_mode');
@@ -953,4 +1395,14 @@ function getPagesMinMax() {
   v.max = parseInt(count / thpp, 10);
 
   return v;
+}
+
+function showMessage(title, content) {
+  let cont = `<div id="kdialog_message"></div>`;
+
+  $('body').append(cont);
+  $("#kdialog_message").html("<p>" + content + "</p>");
+  $("#kdialog_message").dialog({ autoOpen: false, modal: true, title: title,
+    close: function(){ $(this).dialog('close'); $("#kdialog_message").remove();} });
+  $("#kdialog_message").dialog("open");
 }

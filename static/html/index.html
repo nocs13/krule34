@@ -1,6 +1,6 @@
 <html lang="en" dir="ltr">
 <head>
-    <title>Krule34 provide nude arts - If it exists.</title>
+    <title>Krule34 provide paint nude arts - If it exists.</title>
 
     <meta name="description" content="Krule34 provide the best hentai or porn arts.">
 
@@ -16,6 +16,7 @@
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
     <link href="https://fonts.googleapis.com/css?family=Poppins" rel="stylesheet" />
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
     <link href="/static/css/slider.css" rel="stylesheet" />
     <link href="/static/css/main.css" rel="stylesheet" />
 
@@ -35,9 +36,23 @@
 </head>
 
 <body>
-  <div id="k_header" class="jumbotron text-center"
-       style="height: 1px; padding-top: 1px; padding-bottom: 60px;">
-    <h1 style="font-size:medium"><a id="ntab" href="#">Krule34</a> provide adult paint art, illustration and 3D modeling collection.</h1>
+  <div id="k_header" class="jumbotron text-center" style="height: 1px; padding-top: 1px; padding-bottom: 60px;">
+    <div class="row">
+      <div class="col-" style="width: 50%;">
+        <span  class="float-left">
+          <button id="btn_krule34" class="btn btn-primary" type="button" stype="text-align: left;">
+            Krule34
+          </button>
+        </span>
+      </div>
+      <div class="col-" style="width: 50%;">
+        <span  class="float-right">
+          <button id="btn_profile" class="btn btn-secondary" type="button" stype="text-align: right;">
+            Profile
+          </button>
+        </span>
+      </div>
+    </div>
   </div>
 
   <div id="k_panel" class="container">
@@ -115,6 +130,8 @@
     <img src="/static/img/loading.gif" width="150px" height="150px"
          style="left: 50%; top: 50%; position: fixed;">
   </div>
+
+  <!--<div id="kdialog_message"></div>-->
 
   <div id="info">
     Adult art and images. 3D and 2D xxx paint art or modeling art.
@@ -292,7 +309,7 @@
 
       return false;
     });
-    $('#ntab').on("click", function() {
+    $('#btn_krule34').on("click", function() {
       window.open(window.location.origin, '_blank');
     });
     $('#mode_gallery').on("change", function(){
@@ -308,6 +325,9 @@
         $('#k_menu').css('display', 'none');
         onPage(p, k);
       }
+    });
+    $('#btn_profile').click(function () {
+      onProfile();
     });
     $(document).on('click','img',function(e) {
       mspos.x = e.pageX;
@@ -353,11 +373,14 @@
       var res = checkArtist();
 
       if (!res) {
-        var base_tags = ["incase", "zheng", "rino99", "shadikbitardik", "kurohardt", "aiue_oka",
-                         "yakimi_27", "tsukasawa_takamatsu", "nemesis_3d", "houtengeki", "lunasanguinis", "luminyu",
-                         "sakimichan", "kelvin_hiu", "potchi", "liquidn", "vgerotica", "coffeeslice", "Real_XXIII",
-                         "dress", "lingerie", "thong", "knee_highs", "knee_highs", "bra", "thighhighs", "thick_thighs"];
-        var base_tag  = base_tags[getRandomInt(27)];
+//        var base_tags = ["incase", "zheng", "rino99", "shadikbitardik", "kurohardt", "aiue_oka",
+//                         "yakimi_27", "tsukasawa_takamatsu", "nemesis_3d", "houtengeki", "lunasanguinis", "luminyu",
+//                         "sakimichan", "kelvin_hiu", "potchi", "liquidn", "vgerotica", "coffeeslice", "Real_XXIII",
+//                         "dress", "lingerie", "thong", "knee_highs", "knee_highs", "bra", "thighhighs", "thick_thighs"];
+        var base_tags = ["female", "skirt", "skirt_lift", "skirt_up", "skirt_pull", "skirt_down", "dress",
+                         "thighs", "thigh_strap", "thigh_sex", "thick_thighs", "thighhighs", "knee_highs",
+                          "lingerie", "thong", "panties_down", "panties ", "bra", "high_heels", ""];
+        var base_tag  = base_tags[getRandomInt(base_tags.length)];
         //base_tag = 'nonude';
         //base_tag = 'mixplin';
         $('#key').val(base_tag);
@@ -444,7 +467,13 @@
       let pos = touchEnd;
       let mls = date.getTime() - touchDate.getTime();
 
-      let dis = Math.abs(pos.x - touchPos.x);
+      let dis = 0;
+
+      try {
+        Math.abs(pos.x - touchPos.x);
+      } catch(e){
+
+      }
 
       if (!is_swipe)
         return;
@@ -468,6 +497,12 @@
 
       is_swipe = false;
     });
+
+    //$( "#kdialog_message" ).dialog({ autoOpen: false, });
+
+    if (localStorage.getItem("sid") != null && localStorage.getItem("sid") != "") {
+      UserInfo = { Sid: localStorage.getItem("sid") };
+    }
 
   </script>
 </body>
