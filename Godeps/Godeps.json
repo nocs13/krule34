@@ -1,6 +1,6 @@
 {
 	"ImportPath": "krule34",
-	"GoVersion": "go1.13",
+	"GoVersion": "go1.20",
 	"GodepVersion": "v80",
 	"Packages": [
 		"./..."
