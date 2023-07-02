@@ -908,8 +908,8 @@ function showLogin()
   var con = `
   <div id="div_login" class="alert alert-info" style="visibility: visible; position: absolute;">
     <form id="form_login" onsubmit="return false" >
-      <br><input id="inp_log_email" class="form-control ds-input" type="text" placeholder="email" value="user@mail.com"/>
-      <br><input id="inp_log_pass" class="form-control ds-input" type="password" placeholder="password" value="1234567"/>
+      <br><input id="inp_log_email" class="form-control ds-input" type="text" placeholder="email" value=""/>
+      <br><input id="inp_log_pass" class="form-control ds-input" type="password" placeholder="password" value=""/>
       <br>
       <table> <tr>
       <td> <button id="btn_login" class="btn btn-primary">Login</button> </td>
@@ -1024,10 +1024,10 @@ function showRegister()
   var con = `
   <div id="div_register" class="alert alert-info" style="visibility: visible; position: absolute;">
     <form id="form_register">
-      <br><input id="inp_reg_email" class="form-control ds-input" type="text" placeholder="email" value="user@mail.com"/>
-      <br><input id="inp_reg_uname" class="form-control ds-input" type="text" placeholder="username" value="user123"/>
-      <br><input id="inp_reg_pass" class="form-control ds-input" type="password" placeholder="password" value="1234567"/>
-      <br><input id="inp_reg_cpass" class="form-control ds-input" type="password" placeholder="password" value="1234567"/>
+      <br><input id="inp_reg_email" class="form-control ds-input" type="text" placeholder="email" value=""/>
+      <br><input id="inp_reg_uname" class="form-control ds-input" type="text" placeholder="username" value=""/>
+      <br><input id="inp_reg_pass" class="form-control ds-input" type="password" placeholder="password" value=""/>
+      <br><input id="inp_reg_cpass" class="form-control ds-input" type="password" placeholder="password" value=""/>
       <br><button  id="btn_register" class="btn btn-primary">Register</button>
     </form>
   </div>

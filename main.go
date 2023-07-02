@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 
-	//	"krule34/ksqlttp"
 	"krule34/libs"
 	"log"
 	"net"
@@ -20,6 +19,8 @@ import (
 	ksqlttp "gitlab.com/ggvaberi/ksqlttp"
 	"golang.org/x/crypto/bcrypt"
 )
+
+//"krule34/ksqlttp"
 
 // FnRoute is ...
 type FnRoute func(http.ResponseWriter, *http.Request)
