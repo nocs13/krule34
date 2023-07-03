@@ -1118,10 +1118,11 @@ function showProfile()
   var con = `
   <div id="div_profile" class="alert alert-info rounded float-left" style="visibility: visible; position: absolute;">
     <div class="row">
-      <div class="col"><button id="b_pr_favor" type="button" class="btn btn-secondary"><img src="static/img/fav.png" width="24" height="24"></button></div>
-      <div class="col"><button id="b_pr_block" type="button" class="btn btn-secondary"><img src="static/img/blk.png" width="24" height="24"></button></div>
-      <div class="col"><button id="b_pr_setts" type="button" class="btn btn-info"><img src="static/img/stg.png" width="24" height="24"></button></div>
+      <div class="col"><button id="b_pr_favor" type="button" class="btn btn-secondary">&#127892;</button></div>
+      <div class="col"><button id="b_pr_block" type="button" class="btn btn-secondary">&#128444;</button></div>
+      <div class="col"><button id="b_pr_setts" type="button" class="btn btn-info">&#128421;</button></div>
     </div>
+    <p> </p>
     <div class="row">
       <div class="col">
         <div id = "d_pr_cont" class="tab-content"></div>
@@ -1203,7 +1204,7 @@ function showProfile()
       console.log("Favors: " + toString(favors))
 
       cont += "<table style='width: 100%'> <tr style='width: 100%'> <td> "
-      cont += '<button  id="btn_favor_add" class="btn btn-secondary btn-sm" onclick="doAddFavor(this);"><img src="static/img/add.png" width="24" height="24"></button>';
+      cont += '<button  id="btn_favor_add" class="btn btn-sm" style="background-color: #7cc;" onclick="doAddFavor(this);">&#10133;</button>';
       cont += '</td> <td> '
       cont += "<select id='sel_list_favor' class='list-group' style='width: 100px' onchange='doSelFavor(this)'>";
       if (favors != null) {
@@ -1217,7 +1218,7 @@ function showProfile()
       }
       cont += "</select>";
       cont += '</td> <td style="display: grid;"> '
-      cont += '<button  id="btn_favor_rem" class="btn btn-secondary btn-sm" onclick="doRemFavor(this);"><img src="static/img/rem.png" width="24" height="24"></button>';
+      cont += '<button  id="btn_favor_rem" class="btn btn-sm" style="background-color: #cf8987;" onclick="doRemFavor(this);">&#10134;</button>';
       cont += '</td>'
       cont += "</tr> </table>"
       $('#d_pr_cont').html(cont);
