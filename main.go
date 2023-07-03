@@ -679,11 +679,21 @@ func cmdUserFavors(sid string) (string, bool) {
 
 	vs = dbrequest.GetValues("db_datas", []string{"value"}, map[string]string{"uid": vs[0], "key": "favors"})
 
-	if vs == nil || vs[0] == "" {
+	if vs == nil || len(vs) < 1 || vs[0] == "" {
 		return "", false
 	}
 
-	return vs[0], true
+	var vr string
+
+	for _, v := range vs {
+		vr += (v + ",")
+	}
+
+	if strings.HasSuffix(vr, ",") {
+		vr = vr[:len(vr)-1]
+	}
+
+	return vr, true
 }
 
 func cmdUserFavorAdd(sid string, favor string) bool {
@@ -698,7 +708,7 @@ func cmdUserFavorAdd(sid string, favor string) bool {
 
 	uid := vs[0]
 
-	has := dbrequest.HasValues("db_datas", []string{"value"}, map[string]string{"uid": vs[0], "key": "favors"})
+	has := dbrequest.HasValues("db_datas", []string{"value"}, map[string]string{"uid": vs[0], "key": "favors", "value": favor})
 
 	if !has {
 		log.Println("Add user favor: No favor as key for user.")
@@ -706,46 +716,9 @@ func cmdUserFavorAdd(sid string, favor string) bool {
 		rs := dbrequest.SetValues("db_datas", map[string]string{"key": "favors", "value": favor, "uid": uid}, nil)
 
 		if !rs {
-			log.Println("Add user favor: Unable open user favors.")
+			log.Println("Add user favor: Unable add user favors.")
 			return false
 		}
-
-		return true
-	}
-
-	vs = dbrequest.GetValues("db_datas", []string{"value"}, map[string]string{"uid": vs[0], "key": "favors"})
-
-	if vs == nil {
-		log.Println("Add user favor: No favor for user.")
-		return false
-	} else if vs[0] == "" || len(vs) < 1 {
-		rs := dbrequest.SetValues("db_datas", map[string]string{"key": "favors", "value": favor, "uid": uid}, nil)
-
-		if !rs {
-			log.Println("Add user favor: Unable set user favors.")
-			return false
-		}
-	}
-
-	log.Println("Add user favor: Income data", vs[0])
-
-	var arr []string = strings.Split(vs[0], ",")
-
-	for _, v := range arr {
-		if favor == v {
-			log.Println("Add user favor: Favor exists.")
-			return false
-		}
-	}
-
-	arr = append(arr, favor)
-
-	fvs := strings.Join(arr[:], ",")
-
-	rs := dbrequest.SetValues("db_datas", map[string]string{"value": fvs}, map[string]string{"key": "favors", "uid": uid})
-
-	if !rs {
-		return false
 	}
 
 	return true
@@ -763,35 +736,17 @@ func cmdUserFavorRem(sid string, favor string) bool {
 
 	uid := vs[0]
 
-	vs = dbrequest.GetValues("db_datas", []string{"value"}, map[string]string{"uid": vs[0], "key": "favors"})
+	has := dbrequest.HasValues("db_datas", []string{"value"}, map[string]string{"uid": vs[0], "key": "favors", "value": favor})
 
-	if vs == nil || len(vs) < 1 || vs[0] == "" {
-		log.Println("Remove user favor: No favor for user.")
+	if !has {
+		log.Println("Remove user favor: No favor for remove.")
 		return false
 	}
 
-	log.Println("Remove user favor: Income data", vs[0])
-
-	var arr []string = strings.Split(vs[0], ",")
-	var arrq []string
-
-	a := strings.TrimSpace(favor)
-
-	for _, v := range arr {
-		log.Println("Remove user favor: compare favors ", "[", favor, "]", "[", v, "]")
-		b := strings.TrimSpace(v)
-
-		if a != b && b != "" {
-			arrq = append(arrq, b)
-		}
-	}
-
-	fvs := strings.Join(arrq[:], ",")
-
-	rs := dbrequest.SetValues("db_datas", map[string]string{"value": fvs}, map[string]string{"key": "favors", "uid": uid})
+	rs := dbrequest.DelValues("db_datas", []string{}, map[string]string{"key": "favors", "value": favor, "uid": uid})
 
 	if !rs {
-		log.Println("Remove user favor: Unable save favor for user.")
+		log.Println("Remove user favor: Unable remove favor for user.")
 		return false
 	}
 

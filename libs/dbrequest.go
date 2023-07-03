@@ -329,7 +329,7 @@ func (self *DbRequest) GetValues(doc string, vals []string, keys map[string]stri
 
 	log.Println("Get values read body: ", string(b))
 
-	var data map[string]string
+	var data []string
 
 	err = json.Unmarshal(b, &data)
 
@@ -342,9 +342,8 @@ func (self *DbRequest) GetValues(doc string, vals []string, keys map[string]stri
 
 	var ret []string
 
-	for _, v := range vals {
-		a := data[v]
-		ret = append(ret, a)
+	for _, v := range data {
+		ret = append(ret, v)
 	}
 
 	return ret
@@ -415,7 +414,59 @@ func (self *DbRequest) SetValues(doc string, vals map[string]string, keys map[st
 }
 
 func (self *DbRequest) DelValues(doc string, vals []string, keys map[string]string) bool {
-	return false
+	url := proto + self.Addr + ":" + strconv.Itoa(int(self.Port)) + "/valuesdel"
+
+	jdata := kgetvalues{doc, vals, keys}
+
+	jsonBody, err := json.Marshal(jdata)
+
+	if err != nil {
+		log.Println("Del values error: ", err.Error())
+		return false
+	}
+
+	bodyReader := bytes.NewReader(jsonBody)
+
+	req, err := http.NewRequest(http.MethodPost, url, bodyReader)
+
+	if err != nil {
+		log.Println("Del values error: ", err.Error())
+		return false
+	}
+
+	req.AddCookie(&self.Cck)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := http.Client{
+		Timeout: 30 * time.Second,
+	}
+
+	resp, err := client.Do(req)
+
+	if err != nil {
+		log.Println("Del values error: ", err.Error())
+		return false
+	}
+
+	if resp.StatusCode != 200 {
+		log.Println("Del values responce error: Invalid status.")
+		return false
+	}
+
+	var data map[string]string
+
+	json.NewDecoder(resp.Body).Decode(&data)
+
+	if err != nil {
+		log.Println("Del values error: ", err.Error())
+		return false
+	}
+
+	if len(data) != 0 {
+		return false
+	}
+
+	return true
 }
 
 func (self *DbRequest) HasValues(doc string, vals []string, keys map[string]string) bool {
