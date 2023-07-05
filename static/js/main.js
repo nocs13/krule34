@@ -428,8 +428,6 @@ function parseJSON(data)
 
 function onStart()
 {
-  //alert('onStart');
-  //ReactDOM.render(React.createElement(kSearch, null), document.getElementById('div_main'));
 }
 
 function onSearch()
@@ -635,6 +633,11 @@ function onView(id) {
   if (!item)
     return;
 
+  doViewImage(id, item.image);
+
+  /*
+  return;
+
   var ivideo = false;
 
   if (item.image.indexOf(".mp4") > 0 || item.image.indexOf(".webm") > 0) {
@@ -669,26 +672,6 @@ function onView(id) {
       $('#modal').remove();
     }
   });
-  /*
-  for (let i in $('#div_container').children()) {
-    try {
-      let div = $('#div_container').children()[i];
-      let img = $(div).children()[0];
-      if (img.id == id) {
-        let s = '<video id="' + id + '" style="width:100%" preload="auto" controls loop>';
-        s += '  <source src="/getvideo?url=' + item.image + '" type="video/webm">';
-        s += '  <source src="/getvideo?url=' + item.image + '" type="video/mp4">';
-        s += '</video>';
-
-        $(div).empty();
-        $(div).append(s);
-        break;
-      }
-    } catch(e) {
-      console.log('unable replase video: ' + e);
-      break;
-    }
-  }
   */
 }
 
@@ -1262,24 +1245,7 @@ function showProfile()
             return;
           }
 
-          let ivideo = false;
-
-          if (url.indexOf(".mp4") > 0 || url.indexOf(".webm") > 0) {
-            ivideo = true;
-          }
-
-          if (ivideo) {
-            //window.open('/getvideo?url=' + url, '_blank');
-            window.open(window.location.origin + '/getvideo?url=' + url, '_blank');
-          } else {
-            window.open('/getimage?url=' + url, '_blank');
-          }
-          /*for (i in UserInfo.images) {
-            let v = UserInfo.images[i];
-            if (v.id == mid) {
-              window.open('/getimage?url=' + v.image, '_blank');
-            }
-          }*/
+          doViewImage(mid, url);
         });
       });
     });
@@ -1620,4 +1586,41 @@ function showMessage(title, content) {
   $("#kdialog_message").dialog({ autoOpen: false, modal: true, title: title,
     close: function(){ $(this).dialog('close'); $("#kdialog_message").remove();} });
   $("#kdialog_message").dialog("open");
+}
+
+function doViewImage(id, image) {
+  var ivideo = false;
+
+  if (image.indexOf(".mp4") > 0 || image.indexOf(".webm") > 0) {
+    ivideo = true;
+  }
+
+  let modal = '<div id="modal" class="k34-modal">';
+
+  if (ivideo) {
+    let d = image;
+    modal += '<video id=' + id + ' class="k34-modal-content" style="width:100%" preload="auto" controls loop>';
+    modal += '  <source src=/getvideo?url=' + d + ' type="video/webm">';
+    let d1 = d.replace(".webm", ".mp4")
+    modal += '  <source src=/getvideo?url=' + d1 + ' type="video/mp4">';
+    modal += '</video>';
+  } else {
+    modal += '<img class="k34-modal-content" src="/getimage?url=' + image + '">';
+  }
+
+  modal += '</div>';
+
+  $('body').append(modal);
+  $('#modal').css('visibility', 'visible');
+  $('#modal').show();
+
+  $('#modal').on('click', function(e) {
+    var $target = $(e.target);
+
+    if($target.hasClass('k34-modal-content')) {
+
+    } else {
+      $('#modal').remove();
+    }
+  });
 }
