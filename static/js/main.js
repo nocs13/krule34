@@ -15,13 +15,6 @@ var mspos = new function() {
   this.y = 0;
 }
 
-class kSearch extends React.Component {
-  render() {
-    return (React.createElement('div', {className: 'kSearch'},
-            React.createElement('h1', null, "Big lol")));
-  }
-}
-
 function isEmail(email)
 {
   //var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
@@ -66,7 +59,12 @@ function showImgMenu(id)
       d += '<a  id="aImgCharacter" class="dropdown-item">Character</a>';
       d += '<a  id="aImgInfo" class="dropdown-item">Tags</a>';
       d += '<a  id="aImgView" class="dropdown-item">View</a>';
-      //d += '<a  id="aImgLightbox" class="dropdown-item">Modal</a>';
+
+      if (localStorage.getItem("sid") != null && localStorage.getItem("sid") != "" &&
+            UserInfo != null && UserInfo.hasOwnProperty("Sid")) {
+        d += '<a  id="aImgFavor" class="dropdown-item">Favor</a>';
+      }
+
       d += '<a  id="aImgCansel" class="dropdown-item">Cansel</a>';
       d += '</div>';
 
@@ -101,9 +99,9 @@ function showImgMenu(id)
     onView(id);
   });
 
-  $('#aImgLightbox').on('click', function(){
+  $('#aImgFavor').on('click', function(){
     hideImgMenu();
-    onLightbox(id);
+    onFavor(id);
   });
 
   $('#aImgCansel').on('click', function(){
@@ -764,6 +762,20 @@ function onLightbox(id)
   };
 }
 
+function onFavor(id)
+{
+  var index = -1;
+
+  console.log('onFavor: Id ' + id);
+
+  for (var i in items) {
+    if (id == items[i].id)
+      index = i;
+  }
+
+  doAddImage(id);
+}
+
 function checkArtist()
 {
   var href = window.location.href;
@@ -1119,7 +1131,7 @@ function showProfile()
   <div id="div_profile" class="alert alert-info rounded float-left" style="visibility: visible; position: absolute;">
     <div class="row">
       <div class="col"><button id="b_pr_favor" type="button" class="btn btn-secondary">&#127892;</button></div>
-      <div class="col"><button id="b_pr_block" type="button" class="btn btn-secondary">&#128444;</button></div>
+      <div class="col"><button id="b_pr_image" type="button" class="btn btn-secondary">&#128444;</button></div>
       <div class="col"><button id="b_pr_setts" type="button" class="btn btn-info">&#128421;</button></div>
     </div>
     <p> </p>
@@ -1193,9 +1205,84 @@ function showProfile()
       });
     });
   });
-  $('#b_pr_block').click(function () {
+  $('#b_pr_image').click(function () {
     $('#d_pr_cont').html("");
+    doListImages(function(images){
+      let cont = "<table id='tb_fav_images' style='width: 100%; overflow-y: scroll;'> <tbody style='overflow-y: scroll; max-height: 200px;'> </tbody> </table>";
+
+      console.log("Images: " + images);
+
+      $('#d_pr_cont').html(cont);
+
+      doGetImageData(images, function(images){
+        let body = $("#tb_fav_images").find('tbody');
+        let ipr = 3;
+        let j = 1;
+        let hbody = '';
+
+        for (i in images) {
+          let v = images[i];
+          let r = '';
+
+          if (j == 1)
+            r += `<tr> `;
+
+          let ivideo = false;
+
+          if (v.image.indexOf(".mp4") > 0 || v.image.indexOf(".webm") > 0) {
+            ivideo = true;
+          }
+
+          let url = v.image;
+
+          if (ivideo)
+            url = v.sample;
+
+          r += `<td mid='${v.id}' iurl='${url}'> <image src='${v.thumb}' width='48px'></image> </td>`;
+
+          if (j == 3 || ((i + 1) == images.length)) {
+            r += ` </tr>`;
+            j = 1;
+          } else {
+            j++;
+          }
+
+          hbody += r;
+          //body.append(r);
+        }
+
+        body.html(hbody);
+        $("#tb_fav_images").on("click", "td", function() {
+          let mid = $( this ).attr("mid");
+          let url = $( this ).attr("iurl");
+
+          if (mid == null || mid == "") {
+            return;
+          }
+
+          let ivideo = false;
+
+          if (url.indexOf(".mp4") > 0 || url.indexOf(".webm") > 0) {
+            ivideo = true;
+          }
+
+          if (ivideo) {
+            //window.open('/getvideo?url=' + url, '_blank');
+            window.open(window.location.origin + '/getvideo?url=' + url, '_blank');
+          } else {
+            window.open('/getimage?url=' + url, '_blank');
+          }
+          /*for (i in UserInfo.images) {
+            let v = UserInfo.images[i];
+            if (v.id == mid) {
+              window.open('/getimage?url=' + v.image, '_blank');
+            }
+          }*/
+        });
+      });
+    });
   });
+
   $('#b_pr_favor').click(function () {
     $('#d_pr_cont').html("");
     doListFavors(function(favors){
@@ -1337,6 +1424,83 @@ function doRemFavor() {
   }
 
   $('#div_profile').remove();
+}
+
+function doListImages(fn){
+  $.post("/command", {'cmd':'userimages','sid': localStorage.getItem("sid")}, function(data){
+  })
+  .done(function(data){
+    try {
+      console.log("do user images: " + data);
+      let jsbody = data.replace("\n", "")
+      let res = JSON.parse(jsbody);
+      console.log("do user images: " + JSON.stringify(res));
+      fn(res.Images);
+    } catch(e) {
+      console.log('Get user images failed. ' + e);
+      fn(null);
+    }
+  })
+  .fail(function(data){
+    console.log('Unable get user images.');
+    fn(null);
+  })
+}
+
+function doAddImage(id) {
+  console.log("Adding user image : " + id);
+
+  $.post("/command", {'cmd':'userimageadd','sid': localStorage.getItem("sid"), 'image':id}, function(data){
+  })
+  .done(function(data){
+    try {
+      console.log("do user image add: " + data);
+      let jsbody = data.replace("\n", "")
+      let res = JSON.parse(jsbody);
+      if (res.Result != null) {
+      }
+      console.log("do user image add: " + JSON.stringify(res));
+    } catch(e) {
+      console.log('Add user image failed. ' + e);
+    }
+  })
+  .fail(function(data){
+    console.log('Unable add user image.');
+  })
+}
+
+function doGetImageData(ids, fn) {
+  console.log("Get user image data: " + ids);
+
+  $.post("/command", {'cmd':'userimagedata','sid': localStorage.getItem("sid"), 'images': ids}, function(data){
+  })
+  .done(function(data){
+    try {
+      console.log("Get user image data: " + data);
+      let jsbody = data.replace("\n", "")
+      let res = JSON.parse(jsbody);
+      if (res.Images != null) {
+        let ida = ids.split(",");
+        UserInfo.images = new Array();
+        for (i in res.Images) {
+          let v = {id: ida[i],
+            sample: res.Images[i].sample,
+            thumb : res.Images[i].thumb,
+            image : res.Images[i].url
+          };
+          UserInfo.images.push(v);
+        }
+
+        fn(UserInfo.images);
+      }
+      console.log("Get user image data: " + JSON.stringify(res));
+    } catch(e) {
+      console.log('Get user image data failed: ' + e);
+    }
+  })
+  .fail(function(data){
+    console.log('Get user image data failed.');
+  })
 }
 
 function doSidValid(sid) {

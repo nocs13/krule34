@@ -26,6 +26,9 @@ type Content struct {
 	artist *list.List
 }
 
+//search by id
+//https://api.rule34.xxx//index.php?page=dapi&s=post&q=index&id=8170857
+
 func IsPrintable(s string) bool {
 	for i := 0; i < len(s); i++ {
 		if !unicode.IsPrint(rune(s[i])) {
@@ -894,6 +897,62 @@ func Search(key string, pid string) string {
 	r += "]"
 
 	//log.Println("JSON: " + r)
+
+	return r
+}
+
+// Search is ...
+func SearchImage(id string) string {
+	var r string
+
+	var posts XPosts
+
+	ss := "https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&limit=42&json=0&id=" + id
+
+	log.Println("Search image. Id: " + id)
+
+	client := &http.Client{}
+	req, _ := http.NewRequest("GET", ss, nil)
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36")
+
+	res, err := client.Do(req)
+
+	if err != nil || res == nil {
+		log.Println("Search image failed. Id: " + id)
+	}
+
+	defer res.Body.Close()
+
+	responseData, err := ioutil.ReadAll(res.Body)
+
+	if err != nil {
+		log.Println("Read body data error:" + err.Error())
+	}
+
+	final := string(responseData)
+
+	err = xml.Unmarshal([]byte(final), &posts)
+
+	if err != nil {
+		log.Println("Parse error " + err.Error())
+	} else {
+		log.Println("Parse post ", posts.Posts[0])
+	}
+
+	fmt.Printf("Count : %+v \n", posts.Count)
+	fmt.Printf("Offset : %+v \n", posts.Offset)
+
+	r = "{"
+
+	if posts.Count > 0 {
+		post := posts.Posts[0]
+
+		r += "\"url\" : \"" + post.File_url + "\""
+		r += ", \"thumb\" : \"" + post.Preview_url + "\""
+		r += ", \"sample\" : \"" + post.Sample_url + "\""
+	}
+
+	r += "}"
 
 	return r
 }

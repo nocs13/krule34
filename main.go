@@ -625,11 +625,31 @@ func handleCommand(w http.ResponseWriter, r *http.Request) {
 			content = "true"
 			res = true
 		}
-	case "userblocks":
-		m, ok := cmdUserBlocks(sid)
+	case "userimages":
+		m, ok := cmdUserImages(sid)
+		if ok {
+			result = "Images"
+			content = "\"" + m + "\""
+			res = true
+		}
+	case "userimageadd":
+		ok := cmdUserImageAdd(sid, getFormValue(r, "image"))
+		if ok {
+			result = "Result"
+			content = "true"
+			res = true
+		}
+	case "userimagerem":
+		ok := cmdUserImageRem(sid, getFormValue(r, "image"))
 		result = "Blocks"
 		if ok {
-			content = m
+			res = true
+		}
+	case "userimagedata":
+		m, ok := cmdUserImageData(sid, getFormValue(r, "images"))
+		if ok {
+			result = "Images"
+			content = "[" + m + "]"
 			res = true
 		}
 	default:
@@ -753,20 +773,115 @@ func cmdUserFavorRem(sid string, favor string) bool {
 	return true
 }
 
-func cmdUserBlocks(sid string) (string, bool) {
+func cmdUserImages(sid string) (string, bool) {
 	vs := dbrequest.GetValues("db_session", []string{"uid"}, map[string]string{"sid": sid, "closed": "0"})
 
 	if vs == nil || vs[0] == "" {
 		return "", false
 	}
 
-	vs = dbrequest.GetValues("db_datas", []string{"value"}, map[string]string{"uid": vs[0], "key": "blocks"})
+	vs = dbrequest.GetValues("db_datas", []string{"value"}, map[string]string{"uid": vs[0], "key": "images"})
 
 	if vs == nil || vs[0] == "" {
 		return "", false
 	}
 
-	return vs[0], true
+	var vr string
+
+	for _, v := range vs {
+		vr += (v + ",")
+	}
+
+	if strings.HasSuffix(vr, ",") {
+		vr = vr[:len(vr)-1]
+	}
+
+	return vr, true
+}
+
+func cmdUserImageAdd(sid string, image string) bool {
+	log.Println("Add user image: ", image, sid)
+
+	vs := dbrequest.GetValues("db_session", []string{"uid"}, map[string]string{"sid": sid, "closed": "0"})
+
+	if vs == nil || vs[0] == "" {
+		log.Println("Add user image: Invalid session.")
+		return false
+	}
+
+	uid := vs[0]
+
+	has := dbrequest.HasValues("db_datas", []string{"value"}, map[string]string{"uid": vs[0], "key": "images", "value": image})
+
+	if !has {
+		log.Println("Add user image: No image as key for user.")
+
+		rs := dbrequest.SetValues("db_datas", map[string]string{"key": "images", "value": image, "uid": uid}, nil)
+
+		if !rs {
+			log.Println("Add user image: Unable add user images.")
+			return false
+		}
+	}
+
+	return true
+}
+
+func cmdUserImageRem(sid string, image string) bool {
+	log.Println("Remove user image: ", sid, image)
+
+	vs := dbrequest.GetValues("db_session", []string{"uid"}, map[string]string{"sid": sid, "closed": "0"})
+
+	if vs == nil || vs[0] == "" {
+		log.Println("Remove user image: Invalid session.")
+		return false
+	}
+
+	uid := vs[0]
+
+	has := dbrequest.HasValues("db_datas", []string{"value"}, map[string]string{"uid": vs[0], "key": "images", "value": image})
+
+	if !has {
+		log.Println("Remove user image: No image for remove.")
+		return false
+	}
+
+	rs := dbrequest.DelValues("db_datas", []string{}, map[string]string{"key": "images", "value": image, "uid": uid})
+
+	if !rs {
+		log.Println("Remove user image: Unable remove image for user.")
+		return false
+	}
+
+	return true
+}
+
+func cmdUserImageData(sid string, image string) (string, bool) {
+	log.Println("Get user image data: ", sid, image)
+
+	if image == "" {
+		return "", false
+	}
+
+	vs := strings.Split(image, ",")
+
+	if vs == nil || len(vs) < 1 {
+		v := libs.SearchImage(image)
+
+		return v, true
+	}
+
+	var res string
+
+	for i, v := range vs {
+		res += libs.SearchImage(v)
+
+		if i != len(vs)-1 {
+			res += ", "
+		}
+	}
+
+	return res, true
 }
 
 var dbMonitor bool = true
