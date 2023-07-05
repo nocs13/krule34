@@ -994,6 +994,8 @@ function onLogin () {
     return false;
   }
 
+  email = email.toLowerCase();
+
   $('#div_login').remove();
 
   doLogin(email, pass);
