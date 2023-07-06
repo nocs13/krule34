@@ -641,8 +641,9 @@ func handleCommand(w http.ResponseWriter, r *http.Request) {
 		}
 	case "userimagerem":
 		ok := cmdUserImageRem(sid, getFormValue(r, "image"))
-		result = "Blocks"
 		if ok {
+			result = "Result"
+			content = "true"
 			res = true
 		}
 	case "userimagedata":

@@ -1,50 +1,45 @@
 var page = 0;
 var thpp = 42; // thumbs per page for it may be 42
 
-var items  = null;
-var count  = 0;
+var items = null;
+var count = 0;
 var offset = 0;
 
 var UserInfo = null;
 var lock_profile = false;
 
-var posImgMenu = {x: 0, y: 0};
+var posImgMenu = { x: 0, y: 0 };
 
-var mspos = new function() {
+var mspos = new function () {
   this.x = 0;
   this.y = 0;
 }
 
-function isEmail(email)
-{
+function isEmail(email) {
   //var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
   var regex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
   return regex.test(email);
 }
 
-function resetPages()
-{
+function resetPages() {
   pages = 0;
 
   $('#pages').empty();
   $('#pagesMax').text(0);
-  $('#pages').attr({ "max" : 0, "min" : 0 });
+  $('#pages').attr({ "max": 0, "min": 0 });
 }
 
-function hideImgMenu()
-{
-  var el =  document.getElementById('divImgMenu');
+function hideImgMenu() {
+  var el = document.getElementById('divImgMenu');
 
-  if (typeof(el) != 'undefined' && el != null)
-  {
+  if (typeof (el) != 'undefined' && el != null) {
     $('#divImgMenu').hide();
 
     el.parentNode.removeChild(el);
   }
 }
 
-function showImgMenu(id)
-{
+function showImgMenu(id) {
   hideImgMenu();
 
   let type = sessionStorage.getItem('image_list_mode');
@@ -55,75 +50,72 @@ function showImgMenu(id)
   var date = new Date();
 
   var d = '<div id="divImgMenu" class="dropdown-menu" aria-labelledby="dropdownMenuLink" birth="' + date.getTime() + '">';
-      d += '<a  id="aImgArtist" class="dropdown-item">Artist</a>';
-      d += '<a  id="aImgCharacter" class="dropdown-item">Character</a>';
-      d += '<a  id="aImgInfo" class="dropdown-item">Tags</a>';
-      d += '<a  id="aImgView" class="dropdown-item">View</a>';
+  d += '<a  id="aImgArtist" class="dropdown-item">Artist</a>';
+  d += '<a  id="aImgCharacter" class="dropdown-item">Character</a>';
+  d += '<a  id="aImgInfo" class="dropdown-item">Tags</a>';
+  d += '<a  id="aImgView" class="dropdown-item">View</a>';
 
-      if (localStorage.getItem("sid") != null && localStorage.getItem("sid") != "" &&
-            UserInfo != null && UserInfo.hasOwnProperty("Sid")) {
-        d += '<a  id="aImgFavor" class="dropdown-item">Favor</a>';
-      }
+  if (localStorage.getItem("sid") != null && localStorage.getItem("sid") != "" &&
+    UserInfo != null && UserInfo.hasOwnProperty("sid")) {
+    d += '<a  id="aImgFavor" class="dropdown-item">Favor</a>';
+  }
 
-      d += '<a  id="aImgCansel" class="dropdown-item">Cansel</a>';
-      d += '</div>';
+  d += '<a  id="aImgCansel" class="dropdown-item">Cansel</a>';
+  d += '</div>';
 
   $('body').append(d);
 
-  posImgMenu = {'x': 0, 'y': 0};
+  posImgMenu = { 'x': 0, 'y': 0 };
   posImgMenu.x = mspos.x;
   posImgMenu.y = mspos.y;
 
-  $('#divImgMenu').css({top: mspos.y + 'px', left: mspos.x + 'px', position:'absolute'});
+  $('#divImgMenu').css({ top: mspos.y + 'px', left: mspos.x + 'px', position: 'absolute' });
 
-  $( "#divImgMenu" ).selectmenu();
+  $("#divImgMenu").selectmenu();
   $('#divImgMenu').show();
 
-  $('#aImgArtist').on('click', function(){
+  $('#aImgArtist').on('click', function () {
     hideImgMenu();
     onArtist(id);
   });
 
-  $('#aImgCharacter').on('click', function(){
+  $('#aImgCharacter').on('click', function () {
     hideImgMenu();
     onCharacter(id);
   });
 
-  $('#aImgInfo').on('click', function(){
+  $('#aImgInfo').on('click', function () {
     hideImgMenu();
     onInfo(id);
   });
 
-  $('#aImgView').on('click', function(){
+  $('#aImgView').on('click', function () {
     hideImgMenu();
     onView(id);
   });
 
-  $('#aImgFavor').on('click', function(){
+  $('#aImgFavor').on('click', function () {
     hideImgMenu();
     onFavor(id);
   });
 
-  $('#aImgCansel').on('click', function(){
+  $('#aImgCansel').on('click', function () {
     hideImgMenu();
   });
 }
 
 ////
-function hideImgInfo()
-{
-  var el =  document.getElementById('divImgInfo');
+function hideImgInfo() {
+  var el = document.getElementById('divImgInfo');
 
-  if (typeof(el) != 'undefined' && el != null)
-  {
+  if (typeof (el) != 'undefined' && el != null) {
     $('#divImgInfo').hide();
 
     el.parentNode.removeChild(el);
   }
 }
 
-function showImgInfo(arts, char, tags)
-{
+function showImgInfo(arts, char, tags) {
   hideImgInfo();
 
   let type = sessionStorage.getItem('image_list_mode');
@@ -156,8 +148,8 @@ function showImgInfo(arts, char, tags)
   }
 
   for (i in ts) {
-        if (ts[i].length > 0)
-          d += '<a  class="k34imginfoitemtag dropdown-item" style="color: blue">' + decodeURI(ts[i]) + '</a>';
+    if (ts[i].length > 0)
+      d += '<a  class="k34imginfoitemtag dropdown-item" style="color: blue">' + decodeURI(ts[i]) + '</a>';
   }
   d += '<a  id="aImgInfoCansel" class="dropdown-item">Cansel</a>';
   d += '</div>';
@@ -167,44 +159,44 @@ function showImgInfo(arts, char, tags)
   let mnpos = posImgMenu;
 
   if (type == 'gallery') {
-    try{
+    try {
       let o = $('.modemod').offset();
       mnpos.x = o.left;
       mnpos.y = o.top;
-    }catch(e){
+    } catch (e) {
       console.log('Error: No found modemod ' + e.toString());
     }
   } else if (mnpos == null) {
     let v = $('.modemod').offset();
 
-    mnpos = {x: v.left, y: v.top};
+    mnpos = { x: v.left, y: v.top };
   }
 
   //$('#divImgInfo').css({top: 0 + 'px', left: 1024 + 'px', position:'absolute'});
-  $('#divImgInfo').css({top: mnpos.y + 'px', left: mnpos.x + 'px', position:'absolute'});
+  $('#divImgInfo').css({ top: mnpos.y + 'px', left: mnpos.x + 'px', position: 'absolute' });
 
   $("#divImgInfo").selectmenu();
   $('#divImgInfo').show();
 
-  $('#aImgInfoCansel').on('click', function(){
+  $('#aImgInfoCansel').on('click', function () {
     hideImgInfo();
   });
 
-  $('.k34imginfoitemtag').on('click', function(i){
+  $('.k34imginfoitemtag').on('click', function (i) {
     let tag = i.target.text;
     hideImgInfo();
     if (tag != "") {
       window.open(window.location.origin + "/k34tag/" + tag, '_blank');
     }
   });
-  $('.k34imginfoitemartist').on('click', function(i){
+  $('.k34imginfoitemartist').on('click', function (i) {
     let tag = i.target.text;
     hideImgInfo();
     if (tag != "") {
       window.open(window.location.origin + "/artist/" + tag, '_blank');
     }
   });
-  $('.k34imginfoitemcharacter').on('click', function(i){
+  $('.k34imginfoitemcharacter').on('click', function (i) {
     let tag = i.target.text;
     hideImgInfo();
     if (tag != "") {
@@ -214,8 +206,7 @@ function showImgInfo(arts, char, tags)
 }
 
 ////
-function pagePidLeft(pid)
-{
+function pagePidLeft(pid) {
   pid = parseInt(pid, 10);
 
   if (pid > 0)
@@ -226,8 +217,7 @@ function pagePidLeft(pid)
   return -1;
 }
 
-function pagePidRight(pid)
-{
+function pagePidRight(pid) {
   pid = parseInt(pid, 10);
 
   let pages = count / thpp;
@@ -238,12 +228,10 @@ function pagePidRight(pid)
   return -1;
 }
 
-function showImages(images, ids)
-{
+function showImages(images, ids) {
   $('#div_container').html('');
 
-   for (i in items)
-   {
+  for (i in items) {
     var id = items[i].id;
     var s = '<div>';
 
@@ -283,7 +271,7 @@ function showImages(images, ids)
     $(img).attr("alt", items[i].tags);
 
     if (img != null) {
-      img.onload = function() {
+      img.onload = function () {
         //console.log("Height: " + this.height);
       }
 
@@ -296,9 +284,8 @@ function showImages(images, ids)
   }
 }
 
-function showImageGallery(images, thumbs, ids)
-{
-  imgSlide.new(function(){ onPageSide(-1, $('#key').val()); }, function() {onPageSide(1, $('#key').val()); });
+function showImageGallery(images, thumbs, ids) {
+  imgSlide.new(function () { onPageSide(-1, $('#key').val()); }, function () { onPageSide(1, $('#key').val()); });
 
   for (i in items)
     imgSlide.add('/getimage?url=' + items[i].thumb, items[i].id, '/getimage?url=' + items[i].image);
@@ -306,13 +293,12 @@ function showImageGallery(images, thumbs, ids)
   imgSlide.set('/getimage?url=' + items[0].image, items[0].id);
 }
 
-function parseArtist(data)
-{
+function parseArtist(data) {
   var items;
 
   try {
     items = JSON.parse(data);
-  } catch(e) {
+  } catch (e) {
     console.error(e);
     return;
   }
@@ -324,7 +310,7 @@ function parseArtist(data)
   if (artists.length < 1)
     return
 
-  for(s in artists) {
+  for (s in artists) {
     console.log('match: ' + artists[s]);
   }
 
@@ -335,13 +321,12 @@ function parseArtist(data)
   }
 }
 
-function parseCharacter(data)
-{
+function parseCharacter(data) {
   var items;
 
   try {
     items = JSON.parse(data);
-  } catch(e) {
+  } catch (e) {
     console.error(e);
     return;
   }
@@ -353,7 +338,7 @@ function parseCharacter(data)
   if (characters.length < 1)
     return
 
-  for(s in characters) {
+  for (s in characters) {
     console.log('match: ' + characters[s]);
   }
 
@@ -364,14 +349,13 @@ function parseCharacter(data)
   }
 }
 
-function parseJSON(data)
-{
+function parseJSON(data) {
   if (items != null)
     items = null;
 
   try {
     items = JSON.parse(data);
-  } catch(e) {
+  } catch (e) {
     console.error(e);
     return;
   }
@@ -404,7 +388,7 @@ function parseJSON(data)
 
   $('#pagesMax').text(maxPages);
 
-  $('#pages').attr({ "max" : maxPages, "min" : 0 });
+  $('#pages').attr({ "max": maxPages, "min": 0 });
 
   if (items.length > 0) {
     var imode = sessionStorage.getItem('image_list_mode');
@@ -426,48 +410,43 @@ function parseJSON(data)
   }
 }
 
-function onStart()
-{
+function onStart() {
 }
 
-function onSearch()
-{
+function onSearch() {
   var key = $('#key').val();
 
-  if (key == "")
-  {
+  if (key == "") {
     alert('Empty value.');
 
     return;
   }
 
   $('#busy').show();
-  $.get("/search", {key: key}, function(data){
+  $.get("/search", { key: key }, function (data) {
     if (data != "")
       parseJSON(data);
 
     console.log("Done");
   })
-  .done(function(){
-    paginator = 0;
-    $('#pagesValue').text(0)
-    $('#pages').val(0)
-    window.scrollTo(0,0);
-    console.log('success');
-  })
-  .fail(function(){
-    console.log('fail');
-  })
-  .always(function() {
-    console.log( "finished" );
-    $('#busy').hide();
-  });
+    .done(function () {
+      paginator = 0;
+      $('#pagesValue').text(0)
+      $('#pages').val(0)
+      window.scrollTo(0, 0);
+      console.log('success');
+    })
+    .fail(function () {
+      console.log('fail');
+    })
+    .always(function () {
+      console.log("finished");
+      $('#busy').hide();
+    });
 }
 
-function onSelect(tag)
-{
-  if (key == "")
-  {
+function onSelect(tag) {
+  if (key == "") {
     alert('Empty value.');
 
     return;
@@ -475,7 +454,7 @@ function onSelect(tag)
 
   $('#busy').show();
 
-  $.get("/tag", {tag: tag}, function(data){
+  $.get("/tag", { tag: tag }, function (data) {
     if (data != "")
       parseJSON(data);
 
@@ -483,54 +462,52 @@ function onSelect(tag)
 
     console.log("Done");
   })
-  .done(function(){
-    paginator = 0;
-    $('#pagesValue').text(0)
-    $('#pages').val(0)
+    .done(function () {
+      paginator = 0;
+      $('#pagesValue').text(0)
+      $('#pages').val(0)
 
-    window.scrollTo(0,0);
-    console.log('success');
-  })
-  .fail(function(){
-    console.log('fail');
-  })
-  .always(function() {
-    console.log( "finished" );
-    $('#busy').hide();
-  });
+      window.scrollTo(0, 0);
+      console.log('success');
+    })
+    .fail(function () {
+      console.log('fail');
+    })
+    .always(function () {
+      console.log("finished");
+      $('#busy').hide();
+    });
 }
 
-function onPage(pid, tag)
-{
+function onPage(pid, tag) {
   $('#busy').show();
 
-  $.get("/page", {pid: pid, tag: tag}, function(data){
+  $.get("/page", { pid: pid, tag: tag }, function (data) {
     if (data != "")
       parseJSON(data)
 
     console.log("Done");
   })
-  .done(function(){
-    paginator = pid;
-    //$('#pages').append('<option value="' + pid + '" selected>' + pid / thpp + '</option>');
-    //$('#pages').append('<li value="' + pid + '" selected>' + pid / thpp + '</li>');
-    $('#pagesValue').text(pid)
-    $('#pages').val(pid)
+    .done(function () {
+      paginator = pid;
+      //$('#pages').append('<option value="' + pid + '" selected>' + pid / thpp + '</option>');
+      //$('#pages').append('<li value="' + pid + '" selected>' + pid / thpp + '</li>');
+      $('#pagesValue').text(pid)
+      $('#pages').val(pid)
 
-    window.scrollTo(0,0);
-    console.log('success');
-  })
-  .fail(function(){
-    console.log('fail');
-  })
-  .always(function() {
-    console.log( "finished" );
-    $('#busy').hide();
-  });
+      window.scrollTo(0, 0);
+      console.log('success');
+    })
+    .fail(function () {
+      console.log('fail');
+    })
+    .always(function () {
+      console.log("finished");
+      $('#busy').hide();
+    });
 }
 
-function onPageSide(side, tag)
-{
+function onPageSide(side, tag) {
   var pid = 0;
 
   if (side == 0 || tag == "")
@@ -572,11 +549,10 @@ function onPageSide(side, tag)
   });*/
 }
 
-function onArtist(id)
-{
+function onArtist(id) {
   $('#busy').show();
 
-  $.get("/getartist", {id: id}, function(data){
+  $.get("/getartist", { id: id }, function (data) {
     $('#busy').hide();
 
     if (data != "")
@@ -584,23 +560,22 @@ function onArtist(id)
 
     console.log("Done");
   })
-  .done(function(){
-    console.log('success');
-  })
-  .fail(function(){
-    console.log('fail');
-    $('#busy').hide();
-  })
-  .always(function() {
-    console.log( "finished" );
-  });
+    .done(function () {
+      console.log('success');
+    })
+    .fail(function () {
+      console.log('fail');
+      $('#busy').hide();
+    })
+    .always(function () {
+      console.log("finished");
+    });
 }
 
-function onCharacter(id)
-{
+function onCharacter(id) {
   $('#busy').show();
 
-  $.get("/getcharacter", {id: id}, function(data){
+  $.get("/getcharacter", { id: id }, function (data) {
     $('#busy').hide();
 
     if (data != "")
@@ -608,16 +583,16 @@ function onCharacter(id)
 
     console.log("Done");
   })
-  .done(function(){
-    console.log('success');
-  })
-  .fail(function(){
-    console.log('fail');
-    $('#busy').hide();
-  })
-  .always(function() {
-    console.log( "finished" );
-  });
+    .done(function () {
+      console.log('success');
+    })
+    .fail(function () {
+      console.log('fail');
+      $('#busy').hide();
+    })
+    .always(function () {
+      console.log("finished");
+    });
 }
 
 function onView(id) {
@@ -684,7 +659,7 @@ function onInfo(id) {
   let item = null;
 
 
-   for (var i = 0; i < items.length; i++) {
+  for (var i = 0; i < items.length; i++) {
     if (items[i].id == id) {
       item = items[i];
       break;
@@ -697,33 +672,32 @@ function onInfo(id) {
     return;
   }
 
-  $.get("/getcharacter", {id: id}, function(data){
+  $.get("/getcharacter", { id: id }, function (data) {
     $('#busy').hide();
 
     char = data;
   })
-  .done(function(){
-    $.get("/getartist", {id: id}, function(data){
-      arts = data;
-    })
-    .done(function(){
-      if (char == null && arts == null){
+    .done(function () {
+      $.get("/getartist", { id: id }, function (data) {
+        arts = data;
+      })
+        .done(function () {
+          if (char == null && arts == null) {
 
-      }
-      $('#busy').hide();
-      showImgInfo(arts, char, item.tags);
+          }
+          $('#busy').hide();
+          showImgInfo(arts, char, item.tags);
+        })
+        .fail(function () {
+          $('#busy').hide();
+        })
     })
-    .fail(function(){
+    .fail(function () {
       $('#busy').hide();
     })
-  })
-  .fail(function(){
-    $('#busy').hide();
-  })
 }
 
-function onLightbox(id)
-{
+function onLightbox(id) {
   lightBox.new();
 
   var index = -1;
@@ -737,16 +711,15 @@ function onLightbox(id)
   }
 
   lightBox.set(index);
-  lightBox.fn_artist = function(id) {
+  lightBox.fn_artist = function (id) {
     onArtist(id);
   };
-  lightBox.fn_character = function(id) {
+  lightBox.fn_character = function (id) {
     onCharacter(id);
   };
 }
 
-function onFavor(id)
-{
+function onFavor(id) {
   var index = -1;
 
   console.log('onFavor: Id ' + id);
@@ -759,14 +732,13 @@ function onFavor(id)
   doAddImage(id);
 }
 
-function checkArtist()
-{
+function checkArtist() {
   var href = window.location.href;
   var re = /artist\/(.*?)$/gi;
   var ar = href.match(re);
 
   var meta = "";
-  var a    = "";
+  var a = "";
 
   if (ar == null || ar.length < 1) {
     var re = /character\/(.*?)$/gi;
@@ -806,8 +778,7 @@ function checkArtist()
   return false;
 }
 
-function onImage(id)
-{
+function onImage(id) {
   showImgMenu(id);
 
   var imode = sessionStorage.getItem('image_list_mode');
@@ -824,8 +795,7 @@ function onImage(id)
   }
 }
 
-function onThumb(id)
-{
+function onThumb(id) {
   for (i in items) {
     if (items[i].id == id) {
       imgSlide.set('/getimage?url=' + items[i].image, id);
@@ -836,7 +806,7 @@ function onThumb(id)
 }
 
 function onAutocompete(id) {
-  $.get("/getautocomplete", {id: id}, function(data){
+  $.get("/getautocomplete", { id: id }, function (data) {
     if (data != "") {
       var items = JSON.parse(data);
       $('#keyauto').empty();
@@ -860,12 +830,12 @@ function onAutocompete(id) {
 
     console.log("Done");
   })
-  .done(function(){
-  })
-  .fail(function(){
-  })
-  .always(function() {
-  });
+    .done(function () {
+    })
+    .fail(function () {
+    })
+    .always(function () {
+    });
 }
 
 function onOrientationChange(type) {
@@ -876,8 +846,7 @@ function onOrientationChange(type) {
 
 }
 
-function onProfile()
-{
+function onProfile() {
   let sid = localStorage.getItem("sid");
 
   if ($("#div_login").length || $("#div_register").length || $("#div_profile").length) {
@@ -898,8 +867,7 @@ function onProfile()
   showProfile();
 }
 
-function showLogin()
-{
+function showLogin() {
   var con = `
   <div id="div_login" class="alert alert-info" style="visibility: visible; position: absolute;">
     <form id="form_login" onsubmit="onLogin();" autocomplete="on">
@@ -928,13 +896,13 @@ function showLogin()
 
   var pos = $("#btn_profile").offset();
 
-  $("#div_login").css({top: pos.top + 50, left: pos.left, position:'absolute'});
+  $("#div_login").css({ top: pos.top + 50, left: pos.left, position: 'absolute' });
 
   let ww = $(window).width();
   let lw = 200;
 
   if ((pos.left + lw) > ww) {
-    $("#div_login").css({left: (ww - lw)});
+    $("#div_login").css({ left: (ww - lw) });
   }
 
   /*
@@ -961,9 +929,9 @@ function showLogin()
   });
 }
 
-function onLogin () {
+function onLogin() {
   var email = $("#inp_log_email").val();
-  var pass =  $("#inp_log_pass").val();
+  var pass = $("#inp_log_pass").val();
 
   console.log("email: ", email);
 
@@ -986,35 +954,40 @@ function onLogin () {
   return true;
 }
 
-function doLogin(email, pass)
-{
+function doLogin(email, pass) {
   lock_profile = true;
 
-  $.post("/login", {'email': email, 'pass' : pass}, function(data){
+  $.post("/login", { 'email': email, 'pass': pass }, function (data) {
   })
-  .done(function(data){
-    try {
-      let jsbody = data.replace("\n", "")
-      let res = JSON.parse(jsbody);
-      localStorage.setItem("sid", res.Sid)
+    .done(function (data) {
+      try {
+        let jsbody = data.replace("\n", "")
+        let res = JSON.parse(jsbody);
+        localStorage.setItem("sid", res.Sid)
 
-      UserInfo = {Sid:res.Sid};
-    } catch(e) {
-      console.log(e)
+        UserInfo = {
+          sid: res.Sid,
+          favors: new Array(),
+          images: new Array()
+        };
+
+        doListFavors(UserInfo);
+        doListImages(UserInfo);
+      } catch (e) {
+        console.log(e)
+        showMessage('Error', 'Login failed.');
+      }
+    })
+    .fail(function (data) {
+      console.log(data.responseText)
       showMessage('Error', 'Login failed.');
-    }
-  })
-  .fail(function(data){
-    console.log(data.responseText)
-    showMessage('Error', 'Login failed.');
-  })
-  .always(function(){
-    lock_profile = false;
-  })
+    })
+    .always(function () {
+      lock_profile = false;
+    })
 }
 
-function doLogout()
-{
+function doLogout() {
   let sid = localStorage.getItem("sid");
 
   if (sid == null || sid == "") {
@@ -1022,27 +995,26 @@ function doLogout()
     return;
   }
 
-  $.get("/logout", {'sid': sid}, function(data){
+  $.get("/logout", { 'sid': sid }, function (data) {
   })
-  .done(function(data){
-    try {
-      let jsbody = data.replace("\n", "")
-      let res = JSON.parse(jsbody);
-      localStorage.removeItem("sid")
-      UserInfo = null;
-    } catch(e) {
-      console.log(e)
+    .done(function (data) {
+      try {
+        let jsbody = data.replace("\n", "")
+        let res = JSON.parse(jsbody);
+        localStorage.removeItem("sid")
+        UserInfo = null;
+      } catch (e) {
+        console.log(e)
+        showMessage('Error', 'Failed logout.');
+      }
+    })
+    .fail(function (data) {
+      console.log(data)
       showMessage('Error', 'Failed logout.');
-    }
-  })
-  .fail(function(data){
-    console.log(data)
-    showMessage('Error', 'Failed logout.');
-  })
+    })
 }
 
-function showRegister()
-{
+function showRegister() {
   var con = `
   <div id="div_register" class="alert alert-info" style="visibility: visible; position: absolute;">
     <form id="form_register">
@@ -1063,19 +1035,19 @@ function showRegister()
 
   var pos = $("#btn_profile").offset();
 
-  $("#div_register").css({top: pos.top + 50, left: pos.left, position:'absolute'});
+  $("#div_register").css({ top: pos.top + 50, left: pos.left, position: 'absolute' });
 
   let ww = $(window).width();
   let lw = 200;
 
   if ((pos.left + lw) > ww) {
-    $("#div_register").css({left: (ww - lw)});
+    $("#div_register").css({ left: (ww - lw) });
   }
 
   $('#btn_register').click(function () {
     var email = $("#inp_reg_email").val();
     var uname = $("#inp_reg_uname").val();
-    var pass =  $("#inp_reg_pass").val();
+    var pass = $("#inp_reg_pass").val();
 
     console.log("email: ", email);
     console.log("uname: ", uname);
@@ -1085,33 +1057,31 @@ function showRegister()
   });
 }
 
-function doRegister(email, uname, pass)
-{
+function doRegister(email, uname, pass) {
   lock_profile = true;
-  $.post("/register", {'email': email, 'uname' : uname, 'pass' : pass}, function(data){
+  $.post("/register", { 'email': email, 'uname': uname, 'pass': pass }, function (data) {
   })
-  .done(function(data){
-    try {
-      let res = JSON.parse(data);
-      if (res.Result == true) {
-        console.log('Registration success.');
+    .done(function (data) {
+      try {
+        let res = JSON.parse(data);
+        if (res.Result == true) {
+          console.log('Registration success.');
+        }
+      } catch (e) {
+        console.log('Registration failed. ' + data);
+        showMessage('Error', 'Registration failed.');
       }
-    } catch(e) {
+    })
+    .fail(function (data) {
       console.log('Registration failed. ' + data);
       showMessage('Error', 'Registration failed.');
-    }
-  })
-  .fail(function(data){
-    console.log('Registration failed. ' + data);
-    showMessage('Error', 'Registration failed.');
-  })
-  .always(function(data){
-    lock_profile = false;
-  })
+    })
+    .always(function (data) {
+      lock_profile = false;
+    })
 }
 
-function showProfile()
-{
+function showProfile() {
   var con = `
   <div id="div_profile" class="alert alert-info rounded float-left" style="visibility: visible; position: absolute;">
     <div class="row">
@@ -1132,18 +1102,18 @@ function showProfile()
 
   var pos = $("#btn_profile").offset();
 
-  $("#div_profile").css({top: pos.top + 50, left: pos.left, position:'absolute'});
+  $("#div_profile").css({ top: pos.top + 50, left: pos.left, position: 'absolute' });
 
   let ww = $(window).width();
   let lw = 260;
 
   if ((pos.left + lw) > ww) {
-    $("#div_profile").css({left: (ww - lw)});
+    $("#div_profile").css({ left: (ww - lw) });
   }
 
   $('#b_pr_setts').click(function () {
     $('#d_pr_cont').html("");
-    doUserInfo(function(email, firstname, lastname, username){
+    doUserInfo(function (email, firstname, lastname, username) {
       let cont = `
       <table class="table">
       <thead>
@@ -1158,23 +1128,23 @@ function showProfile()
           <td>${username}</td>
         </tr>`;
 
-        if (firstname != "") {
-          cont += `
+      if (firstname != "") {
+        cont += `
           <tr>
             <td>Firstname</td>
             <td>${firstname}</td>
           </tr>`;
-        }
+      }
 
-        if (lastname != "") {
-          cont += `
+      if (lastname != "") {
+        cont += `
           <tr>
           <td>Lastname</td>
           <td>${lastname}</td>
           </tr>`;
-        }
+      }
 
-        cont += `<tr>
+      cont += `<tr>
           <td>Email</td>
           <td>${email}</td>
         </tr>
@@ -1192,174 +1162,172 @@ function showProfile()
   });
   $('#b_pr_image').click(function () {
     $('#d_pr_cont').html("");
-    doListImages(function(images){
-      let cont = "<table id='tb_fav_images' style='width: 100%; overflow-y: scroll;'> <tbody style='overflow-y: scroll; max-height: 200px;'> </tbody> </table>";
+    let cont = "<table id='tb_fav_images' style='width: 100%; overflow-y: scroll;'> <tbody style='overflow-y: scroll; max-height: 200px;'> </tbody> </table>";
 
-      console.log("Images: " + images);
+    $('#d_pr_cont').html(cont);
 
-      $('#d_pr_cont').html(cont);
+    let body = $("#tb_fav_images").find('tbody');
+    let ipr = 3;
+    let j = 1;
+    let hbody = '';
 
-      doGetImageData(images, function(images){
-        let body = $("#tb_fav_images").find('tbody');
-        let ipr = 3;
-        let j = 1;
-        let hbody = '';
+    for (i in UserInfo.images) {
+      let v = UserInfo.images[i];
+      let r = '';
 
-        for (i in images) {
-          let v = images[i];
-          let r = '';
+      if (j == 1)
+        r += `<tr> `;
 
-          if (j == 1)
-            r += `<tr> `;
+      let ivideo = false;
 
-          let ivideo = false;
+      if (v.image.indexOf(".mp4") > 0 || v.image.indexOf(".webm") > 0) {
+        ivideo = true;
+      }
 
-          if (v.image.indexOf(".mp4") > 0 || v.image.indexOf(".webm") > 0) {
-            ivideo = true;
-          }
+      let url = v.image;
 
-          let url = v.image;
+      if (ivideo)
+        url = v.sample;
 
-          if (ivideo)
-            url = v.sample;
+      r += `<td mid='${v.id}' iurl='${url}'>
+              <div style='position: relative;'>
+                <span style='position: absolute;top:2px;left:2px;z-index:1;'>
+                  <!--<img class="btn-delete" onclick="alert('Do something!');" src="http://cdn1.iconfinder.com/data/icons/diagona/icon/16/101.png"/>-->
+                </span>
+                <image sid='${v.id}' class='img-drag-remove' draggable="true" ondragstart="onImgDragDel(event)" src='${v.thumb}' width='48px'></image>
+              </div>
+          </td>`;
 
-          r += `<td mid='${v.id}' iurl='${url}'> <image src='${v.thumb}' width='48px'></image> </td>`;
+      if (j == 3 || ((i + 1) == UserInfo.images.length)) {
+        r += ` </tr>`;
+        j = 1;
+      } else {
+        j++;
+      }
 
-          if (j == 3 || ((i + 1) == images.length)) {
-            r += ` </tr>`;
-            j = 1;
-          } else {
-            j++;
-          }
+      hbody += r;
+    }
 
-          hbody += r;
-          //body.append(r);
-        }
+    body.html(hbody);
+    $("#tb_fav_images").on("click", "td", function () {
+      let mid = $(this).attr("mid");
+      let url = $(this).attr("iurl");
 
-        body.html(hbody);
-        $("#tb_fav_images").on("click", "td", function() {
-          let mid = $( this ).attr("mid");
-          let url = $( this ).attr("iurl");
+      if (mid == null || mid == "") {
+        return;
+      }
 
-          if (mid == null || mid == "") {
-            return;
-          }
-
-          doViewImage(mid, url);
-        });
-      });
+      doViewImage(mid, url);
     });
   });
 
   $('#b_pr_favor').click(function () {
     $('#d_pr_cont').html("");
-    doListFavors(function(favors){
-      let cont = '';
+    let cont = '';
 
-      console.log("Favors: " + toString(favors))
+    cont += "<table style='width: 100%'> <tr style='width: 100%'> <td> "
+    cont += '<button  id="btn_favor_add" class="btn btn-sm" style="background-color: #7cc;" onclick="doAddFavor(this);">&#10133;</button>';
+    cont += '</td> <td> '
+    cont += "<select id='sel_list_favor' class='list-group' style='width: 100px' onchange='doSelFavor(this)'>";
+    if (UserInfo != null && UserInfo.favors != null) {
+      console.log("Favors: " + toString(UserInfo.favors))
 
-      cont += "<table style='width: 100%'> <tr style='width: 100%'> <td> "
-      cont += '<button  id="btn_favor_add" class="btn btn-sm" style="background-color: #7cc;" onclick="doAddFavor(this);">&#10133;</button>';
-      cont += '</td> <td> '
-      cont += "<select id='sel_list_favor' class='list-group' style='width: 100px' onchange='doSelFavor(this)'>";
-      if (favors != null) {
-        favors = favors.split(",")
-
-        for (v in favors) {
-          if (favors[v] == "")
-            continue;
-          cont += `<option> ${favors[v]}`
-        }
+      for (v in UserInfo.favors) {
+        if (UserInfo.favors[v] == "")
+          continue;
+        cont += `<option> ${UserInfo.favors[v]}`
       }
-      cont += "</select>";
-      cont += '</td> <td style="display: grid;"> '
-      cont += '<button  id="btn_favor_rem" class="btn btn-sm" style="background-color: #cf8987;" onclick="doRemFavor(this);">&#10134;</button>';
-      cont += '</td>'
-      cont += "</tr> </table>"
-      $('#d_pr_cont').html(cont);
-    });
+    }
+    cont += "</select>";
+    cont += '</td> <td style="display: grid;"> '
+    cont += '<button  id="btn_favor_rem" class="btn btn-sm" style="background-color: #cf8987;" onclick="doRemFavor(this);">&#10134;</button>';
+    cont += '</td>'
+    cont += "</tr> </table>"
+    $('#d_pr_cont').html(cont);
   });
 }
 
-function doUserInfo(fn){
+function onImgDragDel(evt) {
+  addEventListener("dragend", (event) => {
+    let id = $(event.target).attr('sid');
+    let index = -1;
+
+    let pos = $('#div_profile').offset();
+
+    if (event.clientX >= (pos.left - 30)) {
+      return;
+    }
+
+    for (i in UserInfo.images) {
+      v = UserInfo.images[i];
+      if (v.id == id) {
+        index = i;
+        break;
+      }
+    }
+
+    if (index != -1) {
+      UserInfo.images.splice(index, 1);
+      doRemImage(id);
+      $('#div_profile').remove();
+    }
+  });
+}
+
+function doUserInfo(fn) {
   if (localStorage.getItem("sid") != null && UserInfo != null) {
     if (UserInfo.hasOwnProperty("Sid") && (UserInfo.Sid == localStorage.getItem("sid")) && UserInfo.hasOwnProperty('email')) {
       fn(UserInfo.email, UserInfo.firstname, UserInfo.lastname, UserInfo.username);
       return
     }
   }
-  $.post("/command", {'cmd':'userinfo','sid': localStorage.getItem("sid")}, function(data){
+  $.post("/command", { 'cmd': 'userinfo', 'sid': localStorage.getItem("sid") }, function (data) {
   })
-  .done(function(data){
-    try {
-      console.log("do user info: " + data);
-      let jsbody = data.replace("\n", "")
-      let res = JSON.parse(jsbody);
-      console.log("do user info: " + JSON.stringify(res));
-      console.log("do user info: " + JSON.stringify(res.UserInfo));
-      let ui = res.UserInfo;
-      console.log("do user info: " + ui);
-      fn(ui.email, ui.firstname, ui.lastname, ui.username);
+    .done(function (data) {
+      try {
+        console.log("do user info: " + data);
+        let jsbody = data.replace("\n", "")
+        let res = JSON.parse(jsbody);
+        console.log("do user info: " + JSON.stringify(res));
+        console.log("do user info: " + JSON.stringify(res.UserInfo));
+        let ui = res.UserInfo;
+        console.log("do user info: " + ui);
+        fn(ui.email, ui.firstname, ui.lastname, ui.username);
 
-      UserInfo.email = ui.email;
-      UserInfo.firstname = ui.firstname;
-      UserInfo.lastname = ui.lastname;
-      UserInfo.username = ui.username;
-    } catch(e) {
-      alert('Get user info failed. ' + e);
-    }
-  })
-  .fail(function(data){
-    alert('Unable get user info.');
-  })
-  .always(function() {
-  });
-}
-
-function doListFavors(fn){
-  $.post("/command", {'cmd':'userfavors','sid': localStorage.getItem("sid")}, function(data){
-  })
-  .done(function(data){
-    try {
-      console.log("do user favors: " + data);
-      let jsbody = data.replace("\n", "")
-      let res = JSON.parse(jsbody);
-      console.log("do user favors: " + JSON.stringify(res));
-      fn(res.Favors);
-    } catch(e) {
-      console.log('Get user favors failed. ' + e);
-      fn(null);
-    }
-  })
-  .fail(function(data){
-    console.log('Unable get user favors.');
-    fn(null);
-  })
-}
-
-function doAddFavor() {
-  let k = $("#key").val()
-  console.log("Adding user favor : " + k);
-  $.post("/command", {'cmd':'userfavoradd','sid': localStorage.getItem("sid"), 'favor':k}, function(data){
-  })
-  .done(function(data){
-    try {
-      console.log("do user favor add: " + data);
-      let jsbody = data.replace("\n", "")
-      let res = JSON.parse(jsbody);
-      if (res.Result != null) {
-
+        UserInfo.email = ui.email;
+        UserInfo.firstname = ui.firstname;
+        UserInfo.lastname = ui.lastname;
+        UserInfo.username = ui.username;
+      } catch (e) {
+        alert('Get user info failed. ' + e);
       }
-      console.log("do user favor add: " + JSON.stringify(res));
-    } catch(e) {
-      console.log('Add user favor failed. ' + e);
-    }
-  })
-  .fail(function(data){
-    console.log('Unable add user favor.');
-  })
+    })
+    .fail(function (data) {
+      alert('Unable get user info.');
+    })
+    .always(function () {
+    });
+}
 
-  $('#div_profile').remove();
+function doListFavors() {
+  $.post("/command", { 'cmd': 'userfavors', 'sid': localStorage.getItem("sid") }, function (data) {
+  })
+    .done(function (data) {
+      try {
+        console.log("do user favors: " + data);
+        let jsbody = data.replace("\n", "")
+        let res = JSON.parse(jsbody);
+        console.log("do user favors: " + JSON.stringify(res));
+        if (res.Favors != null && UserInfo != null) {
+          UserInfo.favors = res.Favors.split(",");
+        }
+      } catch (e) {
+        console.log('Get user favors failed. ' + e);
+      }
+    })
+    .fail(function (data) {
+      console.log('Unable get user favors.');
+    })
 }
 
 function doSelFavor(data) {
@@ -1370,23 +1338,50 @@ function doSelFavor(data) {
   }
 }
 
+function doAddFavor() {
+  let k = $("#key").val()
+  console.log("Adding user favor : " + k);
+  $.post("/command", { 'cmd': 'userfavoradd', 'sid': localStorage.getItem("sid"), 'favor': k }, function (data) {
+  })
+    .done(function (data) {
+      try {
+        console.log("do user favor add: " + data);
+        let jsbody = data.replace("\n", "")
+        let res = JSON.parse(jsbody);
+        if (res.Result == true) {
+          UserInfo.favors.push(k);
+          console.log("user favor add: " + JSON.stringify(res));
+        }
+      } catch (e) {
+        console.log('Add user favor failed. ' + e);
+      }
+    })
+    .fail(function (data) {
+      console.log('Unable add user favor.');
+    })
+
+  $('#div_profile').remove();
+}
+
 function doRemFavor() {
   try {
     let fav = $('#sel_list_favor').val();
 
-    $.post("/command", {'cmd':'userfavorrem','sid': localStorage.getItem("sid"), 'favor':fav}, function(data){
+    $.post("/command", { 'cmd': 'userfavorrem', 'sid': localStorage.getItem("sid"), 'favor': fav }, function (data) {
     })
-    .done(function(data){
+      .done(function (data) {
         console.log("do user favor remove: " + data);
         let jsbody = data.replace("\n", "")
         let res = JSON.parse(jsbody);
-        if (res.Result != null) {
+        if (res.Result == true) {
+          let i = UserInfo.favors.indexOf(fav);
+          UserInfo.favors.splice(i, 1);
+          console.log("user favor remove: " + JSON.stringify(res));
         }
-        console.log("do user favor add: " + JSON.stringify(res));
-    })
-    .fail(function(data){
-      alert('Unable remove user favor.');
-    })
+      })
+      .fail(function (data) {
+        alert('Unable remove user favor.');
+      })
   } catch (e) {
     console.log(e);
   }
@@ -1394,100 +1389,131 @@ function doRemFavor() {
   $('#div_profile').remove();
 }
 
-function doListImages(fn){
-  $.post("/command", {'cmd':'userimages','sid': localStorage.getItem("sid")}, function(data){
+function doListImages() {
+  $.post("/command", { 'cmd': 'userimages', 'sid': localStorage.getItem("sid") }, function (data) {
   })
-  .done(function(data){
-    try {
-      console.log("do user images: " + data);
-      let jsbody = data.replace("\n", "")
-      let res = JSON.parse(jsbody);
-      console.log("do user images: " + JSON.stringify(res));
-      fn(res.Images);
-    } catch(e) {
-      console.log('Get user images failed. ' + e);
-      fn(null);
-    }
-  })
-  .fail(function(data){
-    console.log('Unable get user images.');
-    fn(null);
-  })
+    .done(function (data) {
+      try {
+        console.log("do user images: " + data);
+        let jsbody = data.replace("\n", "")
+        let res = JSON.parse(jsbody);
+        console.log("do user images: " + JSON.stringify(res));
+
+        if (UserInfo.images == null) {
+          UserInfo.images = new Array();
+        }
+        doGetImageData(res.Images);
+      } catch (e) {
+        console.log('Get user images failed. ' + e);
+      }
+    })
+    .fail(function (data) {
+      console.log('Unable get user images.');
+    })
 }
 
 function doAddImage(id) {
   console.log("Adding user image : " + id);
 
-  $.post("/command", {'cmd':'userimageadd','sid': localStorage.getItem("sid"), 'image':id}, function(data){
+  $.post("/command", { 'cmd': 'userimageadd', 'sid': localStorage.getItem("sid"), 'image': id }, function (data) {
   })
-  .done(function(data){
-    try {
-      console.log("do user image add: " + data);
-      let jsbody = data.replace("\n", "")
-      let res = JSON.parse(jsbody);
-      if (res.Result != null) {
+    .done(function (data) {
+      try {
+        console.log("do user image add: " + data);
+        let jsbody = data.replace("\n", "")
+        let res = JSON.parse(jsbody);
+        if (res.Result == true) {
+          doGetImageData(id);
+          console.log("Do user image add: " + id);
+        }
+      } catch (e) {
+        console.log('Add user image failed. ' + e);
       }
-      console.log("do user image add: " + JSON.stringify(res));
-    } catch(e) {
-      console.log('Add user image failed. ' + e);
-    }
-  })
-  .fail(function(data){
-    console.log('Unable add user image.');
-  })
+    })
+    .fail(function (data) {
+      console.log('Unable add user image.');
+    })
 }
 
-function doGetImageData(ids, fn) {
+function doRemImage(id) {
+  console.log("Adding user image : " + id);
+
+  $.post("/command", { 'cmd': 'userimagerem', 'sid': localStorage.getItem("sid"), 'image': id }, function (data) {
+  })
+    .done(function (data) {
+      try {
+        console.log("do user image rem: " + data);
+        let jsbody = data.replace("\n", "")
+        let res = JSON.parse(jsbody);
+        if (res.Result == true) {
+          console.log("Do user image rem: " + id);
+        }
+      } catch (e) {
+        console.log('Rem user image failed. ' + e);
+      }
+    })
+    .fail(function (data) {
+      console.log('Unable rem user image.');
+    })
+}
+
+function doGetImageData(ids) {
   console.log("Get user image data: " + ids);
 
-  $.post("/command", {'cmd':'userimagedata','sid': localStorage.getItem("sid"), 'images': ids}, function(data){
+  $.post("/command", { 'cmd': 'userimagedata', 'sid': localStorage.getItem("sid"), 'images': ids }, function (data) {
   })
-  .done(function(data){
-    try {
-      console.log("Get user image data: " + data);
-      let jsbody = data.replace("\n", "")
-      let res = JSON.parse(jsbody);
-      if (res.Images != null) {
-        let ida = ids.split(",");
-        UserInfo.images = new Array();
-        for (i in res.Images) {
-          let v = {id: ida[i],
-            sample: res.Images[i].sample,
-            thumb : res.Images[i].thumb,
-            image : res.Images[i].url
-          };
-          UserInfo.images.push(v);
-        }
+    .done(function (data) {
+      try {
+        console.log("Get user image data: " + data);
+        let jsbody = data.replace("\n", "")
+        let res = JSON.parse(jsbody);
+        if (res.Images != null) {
+          let ida = ids.split(",");
 
-        fn(UserInfo.images);
+          for (i in res.Images) {
+            let v = {
+              id: ida[i],
+              sample: res.Images[i].sample,
+              thumb: res.Images[i].thumb,
+              image: res.Images[i].url
+            };
+            UserInfo.images.push(v);
+          }
+        }
+        console.log("Get user image data: " + JSON.stringify(res));
+      } catch (e) {
+        console.log('Get user image data failed: ' + e);
       }
-      console.log("Get user image data: " + JSON.stringify(res));
-    } catch(e) {
-      console.log('Get user image data failed: ' + e);
-    }
-  })
-  .fail(function(data){
-    console.log('Get user image data failed.');
-  })
+    })
+    .fail(function (data) {
+      console.log('Get user image data failed.');
+    })
 }
 
 function doSidValid(sid) {
   try {
-    $.post("/command", {'cmd':'sidvalid','sid': sid}, function(data){
+    $.post("/command", { 'cmd': 'sidvalid', 'sid': sid }, function (data) {
     })
-    .done(function(data){
+      .done(function (data) {
         console.log("do user favor remove: " + data);
         let jsbody = data.replace("\n", "")
         let res = JSON.parse(jsbody);
         if (res.Result == true) {
-          UserInfo = { Sid: sid };
+          UserInfo = {
+            sid: sid,
+            favors: new Array(),
+            images: new Array()
+          };
+
+          doListFavors();
+          doListImages();
         }
-    })
-    .fail(function(data){
-      console.log('Sid: ' + sid + 'is invalid.');
-      UserInfo = null;
-      localStorage.removeItem("sid")
-    })
+      })
+      .fail(function (data) {
+        console.log('Sid: ' + sid + 'is invalid.');
+        UserInfo = null;
+        localStorage.removeItem("sid")
+      })
   } catch (e) {
     console.log('Sid: ' + sid + 'is invalid.');
     localStorage.removeItem("sid")
@@ -1571,7 +1597,7 @@ function getRandomInt(max) {
 }
 
 function getPagesMinMax() {
-  var v = {min: 0, max: 0};
+  var v = { min: 0, max: 0 };
 
   v.max = parseInt(count / thpp, 10);
 
@@ -1583,8 +1609,10 @@ function showMessage(title, content) {
 
   $('body').append(cont);
   $("#kdialog_message").html("<p>" + content + "</p>");
-  $("#kdialog_message").dialog({ autoOpen: false, modal: true, title: title,
-    close: function(){ $(this).dialog('close'); $("#kdialog_message").remove();} });
+  $("#kdialog_message").dialog({
+    autoOpen: false, modal: true, title: title,
+    close: function () { $(this).dialog('close'); $("#kdialog_message").remove(); }
+  });
   $("#kdialog_message").dialog("open");
 }
 
@@ -1614,10 +1642,10 @@ function doViewImage(id, image) {
   $('#modal').css('visibility', 'visible');
   $('#modal').show();
 
-  $('#modal').on('click', function(e) {
+  $('#modal').on('click', function (e) {
     var $target = $(e.target);
 
-    if($target.hasClass('k34-modal-content')) {
+    if ($target.hasClass('k34-modal-content')) {
 
     } else {
       $('#modal').remove();
