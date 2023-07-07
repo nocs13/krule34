@@ -33,6 +33,7 @@ function hideImgMenu() {
   var el = document.getElementById('divImgMenu');
 
   if (typeof (el) != 'undefined' && el != null) {
+    //$('#divImgMenu').hide();
     $('#divImgMenu').hide();
 
     el.parentNode.removeChild(el);
@@ -71,7 +72,7 @@ function showImgMenu(id) {
 
   $('#divImgMenu').css({ top: mspos.y + 'px', left: mspos.x + 'px', position: 'absolute' });
 
-  $("#divImgMenu").selectmenu();
+  //$("#divImgMenu").selectmenu();
   $('#divImgMenu').show();
 
   $('#aImgArtist').on('click', function () {
@@ -109,6 +110,7 @@ function hideImgInfo() {
   var el = document.getElementById('divImgInfo');
 
   if (typeof (el) != 'undefined' && el != null) {
+    //$('#divImgInfo').selectmenu('destroy');
     $('#divImgInfo').hide();
 
     el.parentNode.removeChild(el);
@@ -160,9 +162,12 @@ function showImgInfo(arts, char, tags) {
 
   if (type == 'gallery') {
     try {
-      let o = $('.modemod').offset();
+      //let o = $('.modemod').offset();
+      //let o = {left: parseInt($('#k_menu').css("left")), top: parseInt($('#k_menu').css("top")) }; //$('#k_menu_drop').offset();
+      let o = $('#k_menu').offset();
+
       mnpos.x = o.left;
-      mnpos.y = o.top;
+      mnpos.y = o.top + 20;
     } catch (e) {
       console.log('Error: No found modemod ' + e.toString());
     }
@@ -175,7 +180,7 @@ function showImgInfo(arts, char, tags) {
   //$('#divImgInfo').css({top: 0 + 'px', left: 1024 + 'px', position:'absolute'});
   $('#divImgInfo').css({ top: mnpos.y + 'px', left: mnpos.x + 'px', position: 'absolute' });
 
-  $("#divImgInfo").selectmenu();
+  //$("#divImgInfo").selectmenu();
   $('#divImgInfo').show();
 
   $('#aImgInfoCansel').on('click', function () {
@@ -1092,7 +1097,7 @@ function showProfile() {
     <p> </p>
     <div class="row">
       <div class="col">
-        <div id = "d_pr_cont" class="tab-content"></div>
+        <div id = "d_pr_cont" class="tab-content" style="overflow-y: scroll; max-height:300px;"></div>
       </div>
     </div>
   </div>
@@ -1162,7 +1167,7 @@ function showProfile() {
   });
   $('#b_pr_image').click(function () {
     $('#d_pr_cont').html("");
-    let cont = "<table id='tb_fav_images' style='width: 100%; overflow-y: scroll;'> <tbody style='overflow-y: scroll; max-height: 200px;'> </tbody> </table>";
+    let cont = "<table id='tb_fav_images' style='width: 100%;'> <tbody> </tbody> </table>";
 
     $('#d_pr_cont').html(cont);
 
@@ -1191,9 +1196,6 @@ function showProfile() {
 
       r += `<td mid='${v.id}' iurl='${url}'>
               <div style='position: relative;'>
-                <span style='position: absolute;top:2px;left:2px;z-index:1;'>
-                  <!--<img class="btn-delete" onclick="alert('Do something!');" src="http://cdn1.iconfinder.com/data/icons/diagona/icon/16/101.png"/>-->
-                </span>
                 <image sid='${v.id}' class='img-drag-remove' draggable="true" ondragstart="onImgDragDel(event)" src='${v.thumb}' width='48px'></image>
               </div>
           </td>`;
@@ -1252,24 +1254,28 @@ function onImgDragDel(evt) {
     let id = $(event.target).attr('sid');
     let index = -1;
 
-    let pos = $('#div_profile').offset();
+    try {
+      let pos = $('#div_profile').offset();
 
-    if (event.clientX >= (pos.left - 30)) {
-      return;
-    }
-
-    for (i in UserInfo.images) {
-      v = UserInfo.images[i];
-      if (v.id == id) {
-        index = i;
-        break;
+      if (event.clientX >= (pos.left - 30)) {
+        return;
       }
-    }
 
-    if (index != -1) {
-      UserInfo.images.splice(index, 1);
-      doRemImage(id);
-      $('#div_profile').remove();
+      for (i in UserInfo.images) {
+        v = UserInfo.images[i];
+        if (v.id == id) {
+          index = i;
+          break;
+        }
+      }
+
+      if (index != -1) {
+        UserInfo.images.splice(index, 1);
+        doRemImage(id);
+        $('#div_profile').remove();
+      }
+    } catch (e) {
+
     }
   });
 }
@@ -1559,6 +1565,18 @@ function k_menuInfo() {
   onInfo(imgSlide.imgid);
 }
 
+function k_menuFavor() {
+  var imode = sessionStorage.getItem('image_list_mode');
+
+  if (imode == null || imode != "gallery")
+    return;
+
+  if (imgSlide.imgid === undefined || imgSlide.imgid == "")
+    return;
+
+  doAddImage(imgSlide.imgid);
+}
+
 function k_menuView() {
   var imode = sessionStorage.getItem('image_list_mode');
 
@@ -1585,11 +1603,7 @@ function k_menuLightbox() {
 }
 
 function k_menuTags() {
-  //var imode = Cookies.get('image_list_mode');
-  //var imode = sessionStorage.getItem('image_list_mode');
-
   onInfo(imgSlide.imgid);
-  //on(imgSlide.imgid);
 }
 
 function getRandomInt(max) {

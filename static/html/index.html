@@ -96,11 +96,24 @@
         </div>
       </div>
       <div class="col-sm-1">
-        <div id="k_menu" style="display: none;">
-          <span class="artist cursor" onclick="k_menuArtist()"> a</span>
+        <!--<div id="k_menu" style="display: none;">
+          <span class="artist cursor"    onclick="k_menuArtist()"> a</span>
           <span class="character cursor" onclick="k_menuCharacter()"> c</span>
-          <span class="modview cursor" onclick="k_menuView()"> v</span>
-          <span class="modemod cursor" onclick="k_menuTags()"> t</span>
+          <span class="modview cursor"   onclick="k_menuView()"> v</span>
+          <span class="modemod cursor"   onclick="k_menuTags()"> t</span>
+        </div>-->
+        <div  id="k_menu" class="dropdown" >
+          <button type="button" class="btn btn-primary dropdown-toggle px-3" data-toggle="dropdown" aria-haspopup="true"
+            aria-expanded="false">
+            <span class="sr-only">Toggle Dropdown</span>
+          </button>
+          <div id="k_menu_drop" class="dropdown-menu">
+            <a class="dropdown-item" href="javascript:k_menuArtist()">Artist</a>
+            <a class="dropdown-item" href="javascript:k_menuCharacter()">Character</a>
+            <a class="dropdown-item" href="javascript:k_menuFavor()">Favorite</a>
+            <a class="dropdown-item" href="javascript:k_menuView()">View</a>
+            <a class="dropdown-item" href="javascript:k_menuTags()">Tags</a>
+          </div>
         </div>
       </div>
     </div>
@@ -381,7 +394,7 @@
                          "thighs", "thigh_strap", "thigh_sex", "thick_thighs", "thighhighs", "knee_highs",
                           "lingerie", "thong", "panties_down", "panties ", "bra", "high_heels", "pantyhose"];
         var base_tag  = base_tags[getRandomInt(base_tags.length)];
-        //base_tag = 'nonude';
+        base_tag = 'nonude';
         //base_tag = 'mixplin';
         $('#key').val(base_tag);
         onSearch();
