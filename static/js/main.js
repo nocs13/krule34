@@ -162,12 +162,10 @@ function showImgInfo(arts, char, tags) {
 
   if (type == 'gallery') {
     try {
-      //let o = $('.modemod').offset();
-      //let o = {left: parseInt($('#k_menu').css("left")), top: parseInt($('#k_menu').css("top")) }; //$('#k_menu_drop').offset();
       let o = $('#k_menu').offset();
 
       mnpos.x = o.left;
-      mnpos.y = o.top + 20;
+      mnpos.y = o.top + $('#k_menu').height();
     } catch (e) {
       console.log('Error: No found modemod ' + e.toString());
     }
@@ -177,11 +175,18 @@ function showImgInfo(arts, char, tags) {
     mnpos = { x: v.left, y: v.top };
   }
 
-  //$('#divImgInfo').css({top: 0 + 'px', left: 1024 + 'px', position:'absolute'});
   $('#divImgInfo').css({ top: mnpos.y + 'px', left: mnpos.x + 'px', position: 'absolute' });
 
   //$("#divImgInfo").selectmenu();
   $('#divImgInfo').show();
+
+  let el = document.querySelector('#divImgInfo');
+  let bx = el.getBoundingClientRect();
+
+  if ((bx.left + bx.width) > $(window).width()) {
+    let x = $(window).width() - bx.width;
+    $('#divImgInfo').css({ top: mnpos.y + 'px', left: x + 'px', position: 'absolute' });
+  }
 
   $('#aImgInfoCansel').on('click', function () {
     hideImgInfo();
@@ -253,17 +258,7 @@ function showImages(images, ids) {
 
     var imode = sessionStorage.getItem('image_list_mode');
 
-    if (ivideo) { // && (imode == 'gallery')) {
-      /*
-      s += '<video style="width:100%" preload="auto" controls loop';
-      if (id != "")
-        s += ' iid="' + id + '"';
-      s += '>';
-      s += '  <source src=/getimage?url="' + th + '" type="video/webm">';
-      let d1 = d.replace(".webm", ".mp4")
-      s += '  <source src=/getvideo?url="' + th + '" type="video/mp4">';
-      s += '</video>'; */
-      //s += '<img id="' + id + '" src="/getimage?url=' + th + '" class="image demo cursor" style="width:100%; border: 5px; ">';
+    if (ivideo) {
       s += '<img id="' + id + '" class="image demo cursor" style="width:100%; border: 5px solid #555;">';
     } else if (ivideo == false) {
       s += '<img id="' + id + '" class="image demo cursor" style="width:100%">';
@@ -281,7 +276,7 @@ function showImages(images, ids) {
       }
 
       if (d.indexOf(".mp4") > 0 || d.indexOf(".webm") > 0) {
-        img.src = "/getimage?url=" + t;
+        img.src = "/getvideo?url=" + t;
       } else {
         img.src = "/getimage?url=" + d;
       }
@@ -292,10 +287,13 @@ function showImages(images, ids) {
 function showImageGallery(images, thumbs, ids) {
   imgSlide.new(function () { onPageSide(-1, $('#key').val()); }, function () { onPageSide(1, $('#key').val()); });
 
-  for (i in items)
-    imgSlide.add('/getimage?url=' + items[i].thumb, items[i].id, '/getimage?url=' + items[i].image);
+  let d = "";
 
-  imgSlide.set('/getimage?url=' + items[0].image, items[0].id);
+  for (i in items) {
+    imgSlide.add(items[i].thumb, items[i].id, items[i].image);
+  }
+
+  imgSlide.set(items[0].image, items[0].id);
 }
 
 function parseArtist(data) {
@@ -614,45 +612,6 @@ function onView(id) {
     return;
 
   doViewImage(id, item.image);
-
-  /*
-  return;
-
-  var ivideo = false;
-
-  if (item.image.indexOf(".mp4") > 0 || item.image.indexOf(".webm") > 0) {
-    ivideo = true;
-  }
-
-  let modal = '<div id="modal" class="k34-modal">';
-
-  if (ivideo) {
-    let d = item.image;
-    modal += '<video id=' + item.id + ' class="k34-modal-content" style="width:100%" preload="auto" controls loop>';
-    modal += '  <source src=/getvideo?url=' + d + ' type="video/webm">';
-    let d1 = d.replace(".webm", ".mp4")
-    modal += '  <source src=/getvideo?url=' + d1 + ' type="video/mp4">';
-    modal += '</video>';
-  } else {
-    modal += '<img class="k34-modal-content" src="/getimage?url=' + item.image + '">';
-  }
-
-  modal += '</div>';
-
-  $('body').append(modal);
-  $('#modal').css('visibility', 'visible');
-  $('#modal').show();
-
-  $('#modal').on('click', function(e) {
-    var $target = $(e.target);
-
-    if($target.hasClass('k34-modal-content')) {
-
-    } else {
-      $('#modal').remove();
-    }
-  });
-  */
 }
 
 function onInfo(id) {
@@ -708,7 +667,6 @@ function onLightbox(id) {
   var index = -1;
 
   for (var i in items) {
-    //imgSlide.add('/getimage?url=' + items[i].thumb, items[i].id, '/getimage?url=' + items[i].image);
     if (id == items[i].id)
       index = i;
 
@@ -803,7 +761,7 @@ function onImage(id) {
 function onThumb(id) {
   for (i in items) {
     if (items[i].id == id) {
-      imgSlide.set('/getimage?url=' + items[i].image, id);
+      imgSlide.set(items[i].image, id);
 
       return;
     }
@@ -876,8 +834,10 @@ function showLogin() {
   var con = `
   <div id="div_login" class="alert alert-info" style="visibility: visible; position: absolute;">
     <form id="form_login" onsubmit="onLogin();" autocomplete="on">
-      <br><input id="inp_log_email" class="form-control ds-input" type="text" placeholder="email" autocomplete="on"/>
-      <br><input id="inp_log_pass" class="form-control ds-input" type="password" placeholder="password" autocomplete="on"/>
+      <!--<br><input id="inp_log_email" class="form-control ds-input" type="text" placeholder="email" autocomplete="on"/>
+      <br><input id="inp_log_pass" class="form-control ds-input" type="password" placeholder="password" autocomplete="on"/>-->
+      <br><input id="inp_log_email" class="form-control ds-input" type="text" placeholder="email" value="" autocomplete="on"/>
+      <br><input id="inp_log_pass" class="form-control ds-input" type="password" placeholder="password" value="" autocomplete="on"/>
       <br>
       <table> <tr>
       <td> <input type="submit" id="btn_log_submit" class="btn btn-primary" value="Login"></input> </td>
@@ -961,6 +921,7 @@ function onLogin() {
 
 function doLogin(email, pass) {
   lock_profile = true;
+  showSpinner('btn_profile', true);
 
   $.post("/login", { 'email': email, 'pass': pass }, function (data) {
   })
@@ -989,6 +950,7 @@ function doLogin(email, pass) {
     })
     .always(function () {
       lock_profile = false;
+      showSpinner('btn_profile', false);
     })
 }
 
@@ -1219,7 +1181,15 @@ function showProfile() {
         return;
       }
 
-      doViewImage(mid, url);
+      //doViewImage(mid, url);
+      let index = -1;
+      lightBox.new();
+
+      for (i in UserInfo.images) {
+        if (UserInfo.images[i].id == mid) index = i;
+        lightBox.add(UserInfo.images[i].image, UserInfo.images[i].id);
+      }
+      lightBox.set(index);
     });
   });
 
@@ -1230,7 +1200,7 @@ function showProfile() {
     cont += "<table style='width: 100%'> <tr style='width: 100%'> <td> "
     cont += '<button  id="btn_favor_add" class="btn btn-sm" style="background-color: #7cc;" onclick="doAddFavor(this);">&#10133;</button>';
     cont += '</td> <td> '
-    cont += "<select id='sel_list_favor' class='list-group' style='width: 100px' onchange='doSelFavor(this)'>";
+    cont += "<select id='sel_list_favor' class='dropdown list-group' style='width: 100px' onchange='doSelFavor(this)'>";
     if (UserInfo != null && UserInfo.favors != null) {
       console.log("Favors: " + toString(UserInfo.favors))
 
@@ -1628,6 +1598,29 @@ function showMessage(title, content) {
     close: function () { $(this).dialog('close'); $("#kdialog_message").remove(); }
   });
   $("#kdialog_message").dialog("open");
+}
+
+function showSpinner(id, on) {
+  let o = $('#'+id);
+
+  if (o == null) return;
+
+  let pos = o.offset();
+  let res = { width: o.width(), height: o.height() };
+
+  if (on) {
+    let par = o.parent();
+    par.append(`<div id="divSpinner" class="spinner-border text-primary"></div>`);
+    let spos = { x: pos .left + res.width / 2 - 10, y: pos.top + res.height / 2 - 10 };
+    $('#divSpinner').css({ top: spos.y + 'px', left: spos.x + 'px', position: 'absolute' });
+  } else {
+    let par = o.parent();
+    let spr = par.children('#divSpinner');
+
+    if (spr == null) spr = $('#divSpinner');
+
+    if (spr != null ) spr.remove();
+  }
 }
 
 function doViewImage(id, image) {

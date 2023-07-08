@@ -1,5 +1,5 @@
 var imgSlide = {
-	new: function(gprev, gnext){
+	new: function (gprev, gnext) {
 		this.remove();
 
 		this.index = 0;
@@ -9,53 +9,53 @@ var imgSlide = {
 		//this.build = "col-sm-3";
 		this.build = "col-sm-4";
 
-		var sl =  '<div id="div_image_slider" class="container">';
-			  sl += ' <div id="div_image_slider_images" class="row"></div>';
-			  sl += '</div>';
-			  sl += '<div class="container"><div class="row"><br></div></div>';
-			  sl += '<div class="container"><div class="row"><table class="col-sm"><tr>';
-		    sl += '<td><a id="a_image_slider_imgprev" class="imgprev" onclick="imgSlide.prev()">❮</a></td>';
-		    sl += '<td><a id="a_image_slider_imgnext" class="imgnext" onclick="imgSlide.down()">&dArr;</a></td>';
-		    sl += '<td><a id="a_image_slider_imgnext" class="imgnext" onclick="imgSlide.next()">❯</a></td>';
-			  sl += '</tr></table></div></div><br>';
-			  sl += '<div class="container"><div id="tr_image_slider_thumbs" class="row  d-flex justify-content-center text-center">';
-			  sl += '</div></div>';
+		var sl = '<div id="div_image_slider" class="container">';
+		sl += ' <div id="div_image_slider_images" class="row"></div>';
+		sl += '</div>';
+		sl += '<div class="container"><div class="row"><br></div></div>';
+		sl += '<div class="container"><div class="row"><table class="col-sm"><tr>';
+		sl += '<td><a id="a_image_slider_imgprev" class="imgprev" onclick="imgSlide.prev()">❮</a></td>';
+		sl += '<td><a id="a_image_slider_imgnext" class="imgnext" onclick="imgSlide.down()">&dArr;</a></td>';
+		sl += '<td><a id="a_image_slider_imgnext" class="imgnext" onclick="imgSlide.next()">❯</a></td>';
+		sl += '</tr></table></div></div><br>';
+		sl += '<div class="container"><div id="tr_image_slider_thumbs" class="row  d-flex justify-content-center text-center">';
+		sl += '</div></div>';
 
 		$('#div_main').html('');
 		$('#div_main').append(sl);
 	},
 
-	remove: function(){
+	remove: function () {
 		var sl = document.getElementById('div_image_slider');
 
-		if (typeof(sl) != undefined && sl != null)
+		if (typeof (sl) != undefined && sl != null)
 			sl.parentNode.removeChild(sl);
 	},
 
-	add: function(src, id, img) {
-			var d = {'id': id, 'src': src, 'img': img};
-			let ext = '';
+	add: function (src, id, img) {
+		var d = { 'id': id, 'src': src, 'img': img };
+		let ext = '';
 
-			if (img != null) {
-				ext = img.split('.').pop();
-			}
+		if (img != null) {
+			ext = img.split('.').pop();
+		}
 
-			this.images.push(d);
+		this.images.push(d);
 
-    	var th = '<div class="' + this.build + '"><a>';
-            //th += '<img imgid="' + id + '" class="img-fluid thumb cursor" src="' + src + '" style="max-width: 150px; max-height: 200px;">';
-			if (ext == "mp4" || ext == "webm") {
-       	th += '<img imgid="' + id + '" class="video thumb cursor" src="' + src + '" >';
-			} else {
-       	th += '<img imgid="' + id + '" class="img-fluid thumb cursor" src="' + src + '">';
-			}
+		var th = '<div class="' + this.build + '"><a>';
 
-      th += '</a></div>';
+		if (ext == "mp4" || ext == "webm") {
+			th += '<img imgid="' + id + '" class="video thumb cursor" src="' + src + '" >';
+		} else {
+			th += '<img imgid="' + id + '" class="img-fluid thumb cursor" src="' + src + '">';
+		}
 
-      $('#tr_image_slider_thumbs').append(th);
+		th += '</a></div>';
+
+		$('#tr_image_slider_thumbs').append(th);
 	},
 
-	set: function(src, id) {
+	set: function (src, id) {
 		var th = "";
 
 		for (var i = 0; i < this.images.length; i++) {
@@ -69,65 +69,65 @@ var imgSlide = {
 
 		this.imgid = id;
 
-		let isvid  = false;
+		let isvid = false;
 		let vol = 1.0;
 
-    if (src.indexOf(".mp4") > 0 || src.indexOf(".webm") > 0) {
-	    	var s = "";
-				let vid = $("video");
+		if (src.indexOf(".mp4") > 0 || src.indexOf(".webm") > 0) {
+			var s = "";
+			let vid = $("video");
 
-				if (vid != null)
-					vol = $(vid).prop("volume");
+			if (vid != null)
+				vol = $(vid).prop("volume");
 
-    	  s += '<video class="bord" style="width:100%" preload="auto" controls loop';
-       	s += ' id="' + id + '"';
-        s += '>';
-        s += '  <source src="' + src + '" type="video/webm">';
-        let d1 = src.replace(".webm", ".mp4")
-        s += '  <source src="' + d1 + '" type="video/mp4">';
-        s += '</video>';
+			s += '<video class="bord" style="width:100%" preload="auto" controls loop';
+			s += ' id="' + id + '"';
+			s += '>';
+			s += '  <source src="/getvideo?url=' + src + '" type="video/webm">';
+			let d1 = src.replace(".webm", ".mp4")
+			s += '  <source src="/getvideo?url=' + d1 + '" type="video/mp4">';
+			s += '</video>';
 
-        th = s;
+			th = s;
 
-				isvid = true;
-    } else {
-				$('#busy').show();
-	        th = '<img id="' + id + '" class="image demo cursor" src="' + src + '" style="width:100%" onload="imgSlide.onload()">';
-    }
+			isvid = true;
+		} else {
+			$('#busy').show();
+			th = '<img id="' + id + '" class="image demo cursor" src="/getimage?url=' + src + '" style="width:100%" onload="imgSlide.onload()">';
+		}
 
-    $('#div_image_slider_images').html('');
-    $('#div_image_slider_images').append(th);
+		$('#div_image_slider_images').html('');
+		$('#div_image_slider_images').append(th);
 
 		if (isvid) {
 			$("video").prop("volume", vol);
 		}
-				/*
-        $('#div_image_slider_images').mouseover(function(){
-					 var sl = '';
+		/*
+		$('#div_image_slider_images').mouseover(function(){
+			 var sl = '';
 
-					 if ($('#a_image_slider_imgprev').length === 0) {
-						 //sl += '<a id="a_image_slider_imgprev" class="imgprev" onclick="">❮</a>';
-					 }
+			 if ($('#a_image_slider_imgprev').length === 0) {
+				 //sl += '<a id="a_image_slider_imgprev" class="imgprev" onclick="">❮</a>';
+			 }
 
-					 if ($('#a_image_slider_imgnext').length === 0) {
-					 	 //sl += '<a id="a_image_slider_imgnext" class="imgnext" onclick="">❯</a>';
-					 }
-					 if (sl.length > 0)	{
-						 //$('#div_image_slider_images').append(sl);
-					 }
-				});
-        $('#div_image_slider_images').mouseout(function(){
-					if ($('#a_image_slider_imgprev').length !== 0) {
-						//$('#a_image_slider_imgprev').remove();
-					}
-					if ($('#a_image_slider_imgnext').length !== 0) {
-						//$('#a_image_slider_imgnext').remove();
-					}
-        });
-				*/
-  },
+			 if ($('#a_image_slider_imgnext').length === 0) {
+					 //sl += '<a id="a_image_slider_imgnext" class="imgnext" onclick="">❯</a>';
+			 }
+			 if (sl.length > 0)	{
+				 //$('#div_image_slider_images').append(sl);
+			 }
+		});
+		$('#div_image_slider_images').mouseout(function(){
+			if ($('#a_image_slider_imgprev').length !== 0) {
+				//$('#a_image_slider_imgprev').remove();
+			}
+			if ($('#a_image_slider_imgnext').length !== 0) {
+				//$('#a_image_slider_imgnext').remove();
+			}
+		});
+		*/
+	},
 
-	next: function() {
+	next: function () {
 		if (this.index >= (this.images.length - 1)) {
 			if (this.gnext != null)
 				this.gnext();
@@ -142,7 +142,7 @@ var imgSlide = {
 		this.set(img, id);
 	},
 
-	prev: function() {
+	prev: function () {
 		if (this.index <= 0) {
 			if (this.gprev != null)
 				this.gprev();
@@ -157,7 +157,7 @@ var imgSlide = {
 		this.set(img, id);
 	},
 
-	down: function() {
+	down: function () {
 		let id = this.images[i].id;
 
 		try {
@@ -168,9 +168,9 @@ var imgSlide = {
 		}
 	},
 
-	onload: function() {
+	onload: function () {
 		$('#busy').hide();
 
-		window.scrollTo(0,0);
+		window.scrollTo(0, 0);
 	}
 };

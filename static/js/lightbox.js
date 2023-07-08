@@ -1,5 +1,5 @@
 var lightBox = {
-	new: function(){
+	new: function (amenu) {
 		this.images = new Array();
 		this.imgids = new Array();
 		this.index = 0;
@@ -9,22 +9,22 @@ var lightBox = {
 		this.fn_artist = null;
 		this.fn_character = null;
 
-		var sl =  '<div id="div_lightbox" class="modal" style="display: block;">';
-			sl += ' <span class="close cursor" onclick="lightBox.close()">x</span>';
-			sl += ' <span id="lightbox-zoom" class="zoom cursor" onclick="lightBox.onzoom()">';
-			sl += '  <img src="/static/img/zoom-in.svg" style="width: 10px; height: 10px" alt="zoom-in">'
-			sl += ' </span>';
+		let sl = '<div id="div_lightbox" class="modal" style="display: block;">';
+		sl += ' <span class="close cursor" onclick="lightBox.close()">&times;</span>';
+		sl += ' <span id="lightbox-zoom" class="zoom-in cursor" onclick="lightBox.onzoom()" style="width:32px;"></span>';
+
+		if (typeof amenu !== 'undefined' && amenu == true) {
 			sl += ' <span class="artist cursor" onclick="lightBox.artist()">A</span>';
 			sl += ' <span class="character cursor" onclick="lightBox.character()">C</span>';
-			sl += ' <div class="modal-content">';
-			sl += '  <div id="lightbox-content" class="lightbox-slides" style="overflow: auto; background-color: gray; white-space: nowrap;">';
-			sl += '   <img id="lightbox-image" class="lightbox" src="" onload="lightBox.onload(this)" onclick="lightBox.menu()">';
-			sl += '  </div>';
-			sl += '  <a class="prev" onclick="lightBox.prev()">❮</a>';
-			//need add down scroll to element function.
-			//sl += '  <a class="prev" onclick="lightBox.prev()">❮</a>';
-			sl += '  <a class="next" onclick="lightBox.next()">❯</a>';
-			sl += '</div></div>';
+		}
+
+		sl += ' <div class="modal-content">';
+		sl += '  <div id="lightbox-content" class="lightbox-slides" style="overflow: auto; background-color: gray; white-space: nowrap;">';
+		sl += '   <img id="lightbox-image" class="lightbox" src="" onload="lightBox.onload(this)" onclick="lightBox.menu()">';
+		sl += '  </div>';
+		sl += '  <a class="prev" onclick="lightBox.prev()">❮</a>';
+		sl += '  <a class="next" onclick="lightBox.next()">❯</a>';
+		sl += '</div></div>';
 
 		$('#div_main').css("display", "none");
 		$('#k_header').css("display", "none");
@@ -32,10 +32,10 @@ var lightBox = {
 		$('body').append(sl);
 	},
 
-	remove: function(){
+	remove: function () {
 		var sl = document.getElementById('div_lightbox');
 
-		if (typeof(sl) != undefined && sl != null)
+		if (typeof (sl) != undefined && sl != null)
 			sl.parentNode.removeChild(sl);
 
 		this.images = null;
@@ -48,16 +48,16 @@ var lightBox = {
 		$('#div_main').css("display", "block");
 	},
 
-	close: function() {
+	close: function () {
 		this.remove();
 	},
 
-	add: function(src, id) {
+	add: function (src, id) {
 		this.images.push(src);
 		this.imgids.push(id);
 	},
 
-	set: function(i) {
+	set: function (i) {
 
 		if ((i > -1) && (i < this.images.length))
 			this.index = i;
@@ -67,46 +67,46 @@ var lightBox = {
 		var src = this.images[i];
 		var id = this.imgids[i];
 
-	    if (src.indexOf(".mp4") > 0 || src.indexOf(".webm") > 0) {
-	    	var s = "";
-    	    s += '<video class="bord" style="width:100%" preload="auto" controls loop';
-       		s += ' id="' + id + '"';
-        	s += '>';
-        	s += '  <source src="' + src + '" type="video/webm">';
-        	let d1 = src.replace(".webm", ".mp4")
-        	s += '  <source src="' + d1 + '" type="video/mp4">';
-        	s += '</video>';
-      		$("#lightbox-content").html(s);
-      	} else {
-      		var s = "";
+		if (src.indexOf(".mp4") > 0 || src.indexOf(".webm") > 0) {
+			var s = "";
+			s += '<video class="bord" style="width:100%" preload="auto" controls loop';
+			s += ' id="' + id + '"';
+			s += '>';
+			s += '  <source src="/getvideo?url=' + src + '" type="video/webm">';
+			let d1 = src.replace(".webm", ".mp4")
+			s += '  <source src="/getvideo?url=' + d1 + '" type="video/mp4">';
+			s += '</video>';
+			$("#lightbox-content").html(s);
+		} else {
+			var s = "";
 
-   			s += '<div>'
-      		s += '<img id="lightbox-image" class="lightbox" src="" onload="lightBox.onload(this)" onclick="lightBox.menu()">';
-   			s += '</div">'
+			s += '<div>'
+			s += '<img id="lightbox-image" class="lightbox" src="" onload="lightBox.onload(this)" onclick="lightBox.menu()">';
+			s += '</div">'
 
 			$('#busy').show();
-      		$("#lightbox-content").html(s);
-			$("#lightbox-image").attr({"src": this.images[i]});
+			$("#lightbox-content").html(s);
+			$("#lightbox-image").attr({ "src": "/getimage?url=" + this.images[i] });
 			$("#lightbox-image").css('position', 'relative');
-			$("#lightbox-image").mousemove(function(e){});
+			$("#lightbox-image").mousemove(function (e) { });
 		}
 
-		$('#lightbox-zoom').html('<img src="/static/img/zoom-in.svg" style="width: 10px; height: 10px">');
+		$('#lightbox-zoom').html('<img src="/static/img/zoom-in.svg" style="width: 16px; height: 16px">');
 		this.zoom = false;
 
 
-		console.log('choosed ' +  this.images[i]);
+		console.log('choosed ' + this.images[i]);
 	},
 
-	next: function() {
+	next: function () {
 		this.set(Number(this.index) + 1);
 	},
 
-	prev: function() {
+	prev: function () {
 		this.set(Number(this.index) - 1);
 	},
 
-	stretch: function() {
+	stretch: function () {
 		var dh = window.innerHeight;
 		var dw = window.innerWidth;
 
@@ -119,21 +119,22 @@ var lightBox = {
 		}
 	},
 
-	menu: function() {
+	menu: function () {
 		if (this.zoom != true)
 			this.next();
 	},
 
-	setzoom: function(z) {
+	setzoom: function (z) {
 		if (z) {
-			$('#lightbox-zoom').html('<img src="/static/img/zoom-out.svg" style="width: 10px; height: 10px">');
+			$('#lightbox-zoom').html('<img src="/static/img/zoom-out.svg" style="width: 16px; height: 16px">');
+			$('#lightbox-zoom').attr("class", "cursor zoom-out");
 			this.zoom = true;
 			$("#lightbox-image").css("height", this.img_h + "px");
 			$("#lightbox-image").css("width", this.img_w + "px");
 			$("#lightbox-content").css("max-width", window.innerWidth + "px");
 			$("#lightbox-content").css("max-height", (window.innerHeight - 30) + "px");
 
-			$("#lightbox-image").mousemove(function(e){
+			$("#lightbox-image").mousemove(function (e) {
 				return;
 				if (e.which === 1 && lightBox.zoom == true) {
 					$("#lightbox-image").css('position', 'absolute');
@@ -174,28 +175,28 @@ var lightBox = {
 				}
 			});
 		} else {
-			$('#lightbox-zoom').html('<img src="/static/img/zoom-in.svg" style="width: 10px; height: 10px">');
+			//$('#lightbox-zoom').html('<img src="/static/img/zoom-in.svg" style="width: 10px; height: 10px">');
 			$("#lightbox-image").css('position', 'relative');
 			$("#lightbox-content").css("max-width", "100%");
 			$("#lightbox-content").css("max-height", "100%");
 			this.zoom = false;
 			this.stretch();
-			$("#lightbox-image").mousemove(function(e){
+			$("#lightbox-image").mousemove(function (e) {
 			});
 		}
 	},
 
-	artist: function() {
+	artist: function () {
 		if (this.fn_artist != null && this.imgids != null && this.index < this.imgids.length)
 			this.fn_artist(this.imgids[this.index]);
 	},
 
-	character: function() {
+	character: function () {
 		if (this.fn_character != null && this.imgids != null && this.index < this.imgids.length)
 			this.fn_character(this.imgids[this.index]);
 	},
 
-	onload: function(o) {
+	onload: function (o) {
 		$('#busy').hide();
 
 		this.img_w = o.naturalWidth;
