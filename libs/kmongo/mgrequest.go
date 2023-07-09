@@ -70,6 +70,11 @@ func (self *DbRequest) OpenSession(addr string, user string, pass string) bool {
 func (self *DbRequest) CloseSession() bool {
 	self.Failed = true
 
+	if self.client == nil {
+		log.Println("MongoDB client invalid.")
+		return false
+	}
+
 	if err := self.client.Disconnect(context.TODO()); err != nil {
 		log.Println("MongoDB error: ", err.Error())
 		return false
@@ -112,6 +117,11 @@ func (self *DbRequest) UpdateSession() bool {
 func (self *DbRequest) ValidSession() bool {
 	var err error
 
+	if self.client == nil {
+		log.Println("MongoDB client invalid.")
+		return false
+	}
+
 	if err = self.client.Database("admin").RunCommand(context.TODO(), bson.D{{"ping", 1}}).Err(); err != nil {
 		log.Println("MongoDB validity error: ", err.Error())
 		return false
@@ -125,6 +135,10 @@ func (self *DbRequest) GetValues(doc string, vals []string, keys map[string]stri
 
 	self.Failed = true
 
+	if self.client == nil {
+		log.Println("MongoDB client invalid.")
+		return nil
+	}
 	col := self.client.Database("mongo13_db").Collection(doc)
 
 	var filter bson.D
@@ -174,6 +188,11 @@ func (self *DbRequest) GetValues(doc string, vals []string, keys map[string]stri
 func (self *DbRequest) SetValues(doc string, vals map[string]string, keys map[string]string) bool {
 	log.Println("MongoDB insert collection: ", doc)
 
+	if self.client == nil {
+		log.Println("MongoDB client invalid.")
+		return false
+	}
+
 	col := self.client.Database("mongo13_db").Collection(doc)
 
 	var filter bson.D
@@ -219,6 +238,11 @@ func (self *DbRequest) SetValues(doc string, vals map[string]string, keys map[st
 func (self *DbRequest) DelValues(doc string, vals []string, keys map[string]string) bool {
 	log.Println("MongoDB delete collection: ", doc)
 
+	if self.client == nil {
+		log.Println("MongoDB client invalid.")
+		return false
+	}
+
 	col := self.client.Database("mongo13_db").Collection(doc)
 
 	var err error
@@ -245,6 +269,11 @@ func (self *DbRequest) DelValues(doc string, vals []string, keys map[string]stri
 
 func (self *DbRequest) HasValues(doc string, vals []string, keys map[string]string) bool {
 	log.Println("MongoDB check find collection: ", doc)
+
+	if self.client == nil {
+		log.Println("MongoDB client invalid.")
+		return false
+	}
 
 	col := self.client.Database("mongo13_db").Collection(doc)
 
