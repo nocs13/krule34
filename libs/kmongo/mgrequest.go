@@ -41,7 +41,7 @@ func (self *DbRequest) OpenSession(addr string, user string, pass string) bool {
 
 	self.Failed = true
 
-	url := "mongodb+srv://" + user + ":" + pass + "@" + addr
+	url := "mongodb+srv://" + user + ":" + pass + "@" + addr + ".hr2fsad.mongodb.net/?retryWrites=true&w=majority"
 
 	log.Print("Open database session: ", url)
 
