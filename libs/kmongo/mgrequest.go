@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -49,7 +50,13 @@ func (self *DbRequest) OpenSession(addr string, user string, pass string) bool {
 
 	var err error
 
-	self.client, err = mongo.Connect(context.TODO(), opts)
+	ctx, cancel := context.WithTimeout(context.Background(), 45*time.Second)
+	defer cancel()
+
+	self.client, err = mongo.Connect(ctx, opts)
+
+	//self.client, err = mongo.Connect(context.TODO(), opts)
+
 	if err != nil {
 		log.Println("MongoDB error: ", err.Error())
 		return false
