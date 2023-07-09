@@ -39,13 +39,12 @@ func (self *DbRequest) OpenSession(addr string, user string, pass string) bool {
 	self.user = user
 	self.pass = pass
 
-	self.Failed = true
-
 	url := "mongodb+srv://" + user + ":" + pass + "@" + addr + ".hr2fsad.mongodb.net/?retryWrites=true&w=majority"
 
 	log.Print("Open database session: ", url)
 
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
+
 	opts := options.Client().ApplyURI(url).SetServerAPIOptions(serverAPI)
 
 	var err error
@@ -56,20 +55,18 @@ func (self *DbRequest) OpenSession(addr string, user string, pass string) bool {
 		return false
 	}
 
+	log.Print("Open database connection pass: pinging...")
+
 	if err := self.client.Database("admin").RunCommand(context.TODO(), bson.D{{"ping", 1}}).Err(); err != nil {
 		log.Println("MongoDB error: ", err.Error())
 		self.client = nil
 		return false
 	}
 
-	self.Failed = false
-
 	return true
 }
 
 func (self *DbRequest) CloseSession() bool {
-	self.Failed = true
-
 	if self.client == nil {
 		log.Println("MongoDB client invalid.")
 		return false
@@ -85,8 +82,6 @@ func (self *DbRequest) CloseSession() bool {
 	self.pass = ""
 	self.addr = ""
 
-	self.Failed = false
-
 	return true
 }
 
@@ -95,8 +90,16 @@ func (self *DbRequest) UpdateSession() bool {
 
 	var err error
 
-	if err = self.client.Database("admin").RunCommand(context.TODO(), bson.D{{"ping", 1}}).Err(); err == nil {
-		return true
+	if self.client != nil {
+		err = self.client.Database("admin").RunCommand(context.TODO(), bson.D{{"ping", 1}}).Err()
+
+		if err == nil {
+			return true
+		}
+
+		log.Println("MongoDB update session error: ", err.Error())
+
+		self.client = nil
 	}
 
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
