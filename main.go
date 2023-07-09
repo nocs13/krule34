@@ -435,8 +435,6 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	email := getFormValue(r, "email")
 	pass := getFormValue(r, "pass")
 
-	//hash, _ := bcrypt.GenerateFromPassword([]byte(pass), 16)
-	//var k map[string]string = map[string]string{"email": email, "password": string(hash)}
 	var k map[string]string = map[string]string{"email": email}
 
 	fmt.Println("handle Login ", k)

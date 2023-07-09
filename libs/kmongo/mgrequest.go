@@ -190,7 +190,7 @@ func (self *DbRequest) SetValues(doc string, vals map[string]string, keys map[st
 	log.Println("MongoDB insert filter: ", filter)
 	//opts := options.Find().SetSort(bson.D{{}})
 	//cur, err := col.Find(context.TODO(), filter, nil) //opts) bson.D{{"name", "Bob"}}
-	if keys != nil {
+	if keys != nil && len(keys) > 0 {
 		for k, v := range keys {
 			replace = append(filter, bson.E{k, v})
 		}
@@ -198,7 +198,7 @@ func (self *DbRequest) SetValues(doc string, vals map[string]string, keys map[st
 		res, err := col.ReplaceOne(context.TODO(), replace, filter, nil)
 
 		if err != nil {
-			log.Println("MongoDB repace error: ", err.Error())
+			log.Println("MongoDB replace error: ", err.Error())
 			return false
 		}
 
