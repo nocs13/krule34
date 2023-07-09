@@ -7,4 +7,7 @@ require (
 	golang.org/x/net v0.10.0
 )
 
-require github.com/google/uuid v1.1.5
+require (
+	github.com/google/uuid v1.1.5
+	go.mongodb.org/mongo-driver v1.12.0 // indirect
+)

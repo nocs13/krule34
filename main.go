@@ -1,11 +1,13 @@
 package main
 
 import (
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"io"
 
 	"krule34/libs"
+	kmongo "krule34/libs/kmongo"
 	"log"
 	"net"
 	"net/http"
@@ -58,7 +60,8 @@ var dbuser string
 var dbpass string
 var dbaddr string
 
-var dbrequest *libs.DbRequest = nil
+// var dbrequest *libs.DbRequest = nil
+var dbrequest *kmongo.DbRequest = nil
 
 func (h *WebHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
@@ -145,6 +148,26 @@ func hostOnly(addr string) string {
 	}
 
 	return host
+}
+
+func gen_uid() (uid string) {
+
+	b := make([]byte, 10)
+
+	_, err := rand.Read(b)
+
+	if err != nil {
+		log.Println("GenUID Error: ", err)
+		return
+	}
+
+	uid = fmt.Sprintf("%X", b[0:])
+
+	return
+}
+
+func get_time() string {
+	return time.Now().Format("2006-01-02 15:04:05")
 }
 
 func handleStatic(w http.ResponseWriter, r *http.Request) {
@@ -432,6 +455,8 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	uid := v[0]
 
+	log.Println("Login user data: ", v)
+
 	if uid == "" || v[1] != "1" {
 		log.Println("Login user failed. Invalid user id in db.")
 		w.WriteHeader(http.StatusBadRequest)
@@ -450,16 +475,17 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	v = dbrequest.GetValues("db_session", []string{"sid"}, map[string]string{"uid": uid, "closed": "0", "remote": hostOnly(r.RemoteAddr)})
+	v = dbrequest.GetValues("db_sessions", []string{"sid"}, map[string]string{"uid": uid, "closed": "0", "remote": hostOnly(r.RemoteAddr)})
 
 	var sid string = ""
 
 	res := false
 
 	if v == nil || len(v) < 1 || v[0] == "" {
+		tm := time.Now().Format("2006-01-02 15:04:05")
 		sid = uuid.New().String()
-		res = dbrequest.SetValues("db_session", map[string]string{"sid": sid, "uid": uid, "closed": "0", "remote": hostOnly(r.RemoteAddr)},
-			map[string]string{})
+		res = dbrequest.SetValues("db_sessions", map[string]string{"sid": sid, "uid": uid, "closed": "0", "remote": hostOnly(r.RemoteAddr),
+			"start": tm, "finish": tm}, map[string]string{})
 	} else {
 		sid = v[0]
 		res = true
@@ -492,7 +518,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 func handleLogout(w http.ResponseWriter, r *http.Request) {
 	sid := getValue(r, "sid")
 
-	res := dbrequest.HasValues("db_session", []string{"closed"}, map[string]string{"sid": sid, "closed": "1", "remote": hostOnly(r.RemoteAddr)})
+	res := dbrequest.HasValues("db_sessions", []string{"closed"}, map[string]string{"sid": sid, "closed": "1", "remote": hostOnly(r.RemoteAddr)})
 
 	if res == true {
 		w.WriteHeader(http.StatusOK)
@@ -501,7 +527,7 @@ func handleLogout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res = dbrequest.SetValues("db_session", map[string]string{"closed": "1", "final": time.Now().Format("2006-01-02 15:04:05")},
+	res = dbrequest.SetValues("db_sessions", map[string]string{"closed": "1", "final": time.Now().Format("2006-01-02 15:04:05")},
 		map[string]string{"sid": sid, "remote": hostOnly(r.RemoteAddr)})
 
 	if res == false {
@@ -545,7 +571,26 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var k map[string]string = map[string]string{"email": email, "username": uname, "valid": "1", "password": string(hash)}
+	vid := dbrequest.GetValues("db_users", []string{"id"}, map[string]string{"email": email})
+
+	if vid == nil && dbrequest.Failed == true {
+		log.Println("Register user failed, DB error.")
+		w.WriteHeader(http.StatusBadRequest)
+		w.Header().Set("Content-Type", "application/json")
+		io.WriteString(w, "{\"Result\":\"False\"}\n")
+		return
+	}
+
+	if len(vid) > 0 && vid[0] != "" {
+		log.Println("Register user failed, user already registered.")
+		w.WriteHeader(http.StatusBadRequest)
+		w.Header().Set("Content-Type", "application/json")
+		io.WriteString(w, "{\"Result\":\"False\"}\n")
+		return
+	}
+
+	var k map[string]string = map[string]string{"id": gen_uid(), "email": email, "username": uname, "valid": "1", "password": string(hash),
+		"firstname": "", "lastname": "", "isadmin": "0", "regdate": get_time(), "host": hostOnly(r.RemoteAddr)}
 
 	log.Println("pass hash " + string(hash))
 
@@ -672,11 +717,11 @@ func handleCommand(w http.ResponseWriter, r *http.Request) {
 }
 
 func cmdSidValid(sid string, host string) bool {
-	return dbrequest.HasValues("db_session", nil, map[string]string{"sid": sid, "closed": "0", "remote": host})
+	return dbrequest.HasValues("db_sessions", nil, map[string]string{"sid": sid, "closed": "0", "remote": host})
 }
 
 func cmdUserInfo(sid string) (map[string]string, bool) {
-	vals := dbrequest.GetValues("db_session", []string{"uid"}, map[string]string{"sid": sid, "closed": "0"})
+	vals := dbrequest.GetValues("db_sessions", []string{"uid"}, map[string]string{"sid": sid, "closed": "0"})
 
 	if vals == nil {
 		return nil, false
@@ -692,7 +737,7 @@ func cmdUserInfo(sid string) (map[string]string, bool) {
 }
 
 func cmdUserFavors(sid string) (string, bool) {
-	vs := dbrequest.GetValues("db_session", []string{"uid"}, map[string]string{"sid": sid, "closed": "0"})
+	vs := dbrequest.GetValues("db_sessions", []string{"uid"}, map[string]string{"sid": sid, "closed": "0"})
 
 	if vs == nil || vs[0] == "" {
 		return "", false
@@ -720,7 +765,7 @@ func cmdUserFavors(sid string) (string, bool) {
 func cmdUserFavorAdd(sid string, favor string) bool {
 	log.Println("Add user favor: ", favor, sid)
 
-	vs := dbrequest.GetValues("db_session", []string{"uid"}, map[string]string{"sid": sid, "closed": "0"})
+	vs := dbrequest.GetValues("db_sessions", []string{"uid"}, map[string]string{"sid": sid, "closed": "0"})
 
 	if vs == nil || vs[0] == "" {
 		log.Println("Add user favor: Invalid session.")
@@ -748,7 +793,7 @@ func cmdUserFavorAdd(sid string, favor string) bool {
 func cmdUserFavorRem(sid string, favor string) bool {
 	log.Println("Remove user favor: ", sid, favor)
 
-	vs := dbrequest.GetValues("db_session", []string{"uid"}, map[string]string{"sid": sid, "closed": "0"})
+	vs := dbrequest.GetValues("db_sessions", []string{"uid"}, map[string]string{"sid": sid, "closed": "0"})
 
 	if vs == nil || vs[0] == "" {
 		log.Println("Remove user favor: Invalid session.")
@@ -775,7 +820,7 @@ func cmdUserFavorRem(sid string, favor string) bool {
 }
 
 func cmdUserImages(sid string) (string, bool) {
-	vs := dbrequest.GetValues("db_session", []string{"uid"}, map[string]string{"sid": sid, "closed": "0"})
+	vs := dbrequest.GetValues("db_sessions", []string{"uid"}, map[string]string{"sid": sid, "closed": "0"})
 
 	if vs == nil || vs[0] == "" {
 		return "", false
@@ -803,7 +848,7 @@ func cmdUserImages(sid string) (string, bool) {
 func cmdUserImageAdd(sid string, image string) bool {
 	log.Println("Add user image: ", image, sid)
 
-	vs := dbrequest.GetValues("db_session", []string{"uid"}, map[string]string{"sid": sid, "closed": "0"})
+	vs := dbrequest.GetValues("db_sessions", []string{"uid"}, map[string]string{"sid": sid, "closed": "0"})
 
 	if vs == nil || vs[0] == "" {
 		log.Println("Add user image: Invalid session.")
@@ -831,7 +876,7 @@ func cmdUserImageAdd(sid string, image string) bool {
 func cmdUserImageRem(sid string, image string) bool {
 	log.Println("Remove user image: ", sid, image)
 
-	vs := dbrequest.GetValues("db_session", []string{"uid"}, map[string]string{"sid": sid, "closed": "0"})
+	vs := dbrequest.GetValues("db_sessions", []string{"uid"}, map[string]string{"sid": sid, "closed": "0"})
 
 	if vs == nil || vs[0] == "" {
 		log.Println("Remove user image: Invalid session.")
@@ -911,13 +956,15 @@ func main() {
 	dbuser := os.Getenv("dbuser")
 	dbpass := os.Getenv("dbpass")
 	dbhost := os.Getenv("dbhost")
-	dbport, _ := strconv.Atoi(os.Getenv("dbport"))
+	//dbport, _ := strconv.Atoi(os.Getenv("dbport"))
 
 	log.Println("Using port: " + port)
 
-	dbrequest = &libs.DbRequest{}
+	//dbrequest = &libs.DbRequest{}
+	dbrequest = &kmongo.DbRequest{}
 
-	r := dbrequest.OpenSession(dbhost, int32(dbport), dbuser, dbpass)
+	//r := dbrequest.OpenSession(dbhost, int32(dbport), dbuser, dbpass)
+	r := dbrequest.OpenSession(dbhost, dbuser, dbpass)
 
 	if r != true {
 		log.Println("Unable open database session.")

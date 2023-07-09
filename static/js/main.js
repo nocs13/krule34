@@ -836,8 +836,8 @@ function showLogin() {
     <form id="form_login" onsubmit="onLogin();" autocomplete="on">
       <!--<br><input id="inp_log_email" class="form-control ds-input" type="text" placeholder="email" autocomplete="on"/>
       <br><input id="inp_log_pass" class="form-control ds-input" type="password" placeholder="password" autocomplete="on"/>-->
-      <br><input id="inp_log_email" class="form-control ds-input" type="text" placeholder="email" value="" autocomplete="on"/>
-      <br><input id="inp_log_pass" class="form-control ds-input" type="password" placeholder="password" value="" autocomplete="on"/>
+      <br><input id="inp_log_email" class="form-control ds-input" type="text" placeholder="email" value="user@mail.com" autocomplete="on"/>
+      <br><input id="inp_log_pass" class="form-control ds-input" type="password" placeholder="password" value="1234567" autocomplete="on"/>
       <br>
       <table> <tr>
       <td> <input type="submit" id="btn_log_submit" class="btn btn-primary" value="Login"></input> </td>
@@ -984,12 +984,12 @@ function doLogout() {
 function showRegister() {
   var con = `
   <div id="div_register" class="alert alert-info" style="visibility: visible; position: absolute;">
-    <form id="form_register">
-      <br><input id="inp_reg_email" class="form-control ds-input" type="text" placeholder="email" value=""/>
-      <br><input id="inp_reg_uname" class="form-control ds-input" type="text" placeholder="username" value=""/>
-      <br><input id="inp_reg_pass" class="form-control ds-input" type="password" placeholder="password" value=""/>
-      <br><input id="inp_reg_cpass" class="form-control ds-input" type="password" placeholder="password" value=""/>
-      <br><button  id="btn_register" class="btn btn-primary">Register</button>
+    <form id="form_register" onsubmit="false;" autocomplete="on">
+      <br><input id="inp_reg_email" class="form-control ds-input" type="text" placeholder="email" value="user@mail.com"/>
+      <br><input id="inp_reg_uname" class="form-control ds-input" type="text" placeholder="username" value="user_a"/>
+      <br><input id="inp_reg_pass" class="form-control ds-input" type="password" placeholder="password" value="1234567"/>
+      <br><input id="inp_reg_cpass" class="form-control ds-input" type="password" placeholder="password" value="1234567"/>
+      <br><input type="submit" id="btn_register" class="btn btn-primary" value="Register"></input>
     </form>
   </div>
   `;
@@ -1015,6 +1015,17 @@ function showRegister() {
     var email = $("#inp_reg_email").val();
     var uname = $("#inp_reg_uname").val();
     var pass = $("#inp_reg_pass").val();
+    var cpass = $("#inp_reg_cpass").val();
+
+    if (!isEmail(email)) {
+      alert('Wrong email format.');
+      return;
+    }
+
+    if (pass != cpass) {
+      alert('Passwords not match.');
+      return;
+    }
 
     console.log("email: ", email);
     console.log("uname: ", uname);
