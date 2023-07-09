@@ -836,8 +836,8 @@ function showLogin() {
     <form id="form_login" onsubmit="onLogin();" autocomplete="on">
       <!--<br><input id="inp_log_email" class="form-control ds-input" type="text" placeholder="email" autocomplete="on"/>
       <br><input id="inp_log_pass" class="form-control ds-input" type="password" placeholder="password" autocomplete="on"/>-->
-      <br><input id="inp_log_email" class="form-control ds-input" type="text" placeholder="email" value="user@mail.com" autocomplete="on"/>
-      <br><input id="inp_log_pass" class="form-control ds-input" type="password" placeholder="password" value="1234567" autocomplete="on"/>
+      <br><input id="inp_log_email" class="form-control ds-input" type="text" placeholder="email" value="" autocomplete="on"/>
+      <br><input id="inp_log_pass" class="form-control ds-input" type="password" placeholder="password" value="" autocomplete="on"/>
       <br>
       <table> <tr>
       <td> <input type="submit" id="btn_log_submit" class="btn btn-primary" value="Login"></input> </td>
@@ -985,10 +985,10 @@ function showRegister() {
   var con = `
   <div id="div_register" class="alert alert-info" style="visibility: visible; position: absolute;">
     <form id="form_register" onsubmit="false;" autocomplete="on">
-      <br><input id="inp_reg_email" class="form-control ds-input" type="text" placeholder="email" value="user@mail.com"/>
-      <br><input id="inp_reg_uname" class="form-control ds-input" type="text" placeholder="username" value="user_a"/>
-      <br><input id="inp_reg_pass" class="form-control ds-input" type="password" placeholder="password" value="1234567"/>
-      <br><input id="inp_reg_cpass" class="form-control ds-input" type="password" placeholder="password" value="1234567"/>
+      <br><input id="inp_reg_email" class="form-control ds-input" type="text" placeholder="email" value=""/>
+      <br><input id="inp_reg_uname" class="form-control ds-input" type="text" placeholder="username" value=""/>
+      <br><input id="inp_reg_pass" class="form-control ds-input" type="password" placeholder="password" value=""/>
+      <br><input id="inp_reg_cpass" class="form-control ds-input" type="password" placeholder="password" value=""/>
       <br><input type="submit" id="btn_register" class="btn btn-primary" value="Register"></input>
     </form>
   </div>
