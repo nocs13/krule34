@@ -939,6 +939,7 @@ function doLogin(email, pass) {
 
         doListFavors(UserInfo);
         doListImages(UserInfo);
+        showMessage('Success', 'Login finished.');
       } catch (e) {
         console.log(e)
         showMessage('Error', 'Login failed.');
@@ -1044,6 +1045,7 @@ function doRegister(email, uname, pass) {
         let res = JSON.parse(data);
         if (res.Result == true) {
           console.log('Registration success.');
+          showMessage('Registration', 'Registration finished.');
         }
       } catch (e) {
         console.log('Registration failed. ' + data);

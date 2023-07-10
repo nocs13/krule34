@@ -221,17 +221,22 @@ func (self *DbRequest) SetValues(doc string, vals map[string]string, keys map[st
 	//cur, err := col.Find(context.TODO(), filter, nil) //opts) bson.D{{"name", "Bob"}}
 	if keys != nil && len(keys) > 0 {
 		for k, v := range keys {
-			replace = append(filter, bson.E{k, v})
+			replace = append(replace, bson.E{k, v})
 		}
 
-		res, err := col.ReplaceOne(context.TODO(), replace, filter, nil)
+		update := bson.D{{"$set", filter}}
+
+		log.Println("MongoDB replace: ", replace)
+
+		//res, err := col.ReplaceOne(context.TODO(), replace, filter, nil)
+		res, err := col.UpdateOne(context.TODO(), replace, update, nil)
 
 		if err != nil {
 			log.Println("MongoDB replace error: ", err.Error())
 			return false
 		}
 
-		log.Println("MongoDB repace id: ", res.MatchedCount)
+		log.Println("MongoDB replace count: ", res.MatchedCount)
 	} else {
 		res, err := col.InsertOne(context.TODO(), filter, nil)
 		if err != nil {

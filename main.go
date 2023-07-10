@@ -507,10 +507,6 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	json += "\"}"
 	io.WriteString(w, json+"\n")
 	fmt.Println("Login result: ", json)
-	//buf := new(bytes.Buffer)
-	//rw := io.MultiWriter(buf, w)
-	//io.WriteString(rw, json+"\n")
-	//fmt.Printf("dump: %q\n", buf)
 }
 
 func handleLogout(w http.ResponseWriter, r *http.Request) {
@@ -521,7 +517,7 @@ func handleLogout(w http.ResponseWriter, r *http.Request) {
 	if res == true {
 		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "application/json")
-		io.WriteString(w, "{\"Result\" : \"True\"}\n")
+		io.WriteString(w, "{\"Result\" : true}\n")
 		return
 	}
 
@@ -531,24 +527,24 @@ func handleLogout(w http.ResponseWriter, r *http.Request) {
 	if res == false {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Header().Set("Content-Type", "application/json")
-		io.WriteString(w, "{\"Result\" : \"False\"}\n")
+		io.WriteString(w, "{\"Result\" : false}\n")
 		return
 	}
 
-	json := "{\"Result\" : \""
+	json := "{\"Result\" : "
 
 	if res != true {
 		log.Println("Logout user failed.")
 		w.WriteHeader(http.StatusBadRequest)
 		w.Header().Set("Content-Type", "application/json")
-		json += "False"
+		json += "false"
 	} else {
 		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "application/json")
-		json += "True"
+		json += "true"
 	}
 
-	json += "\"}"
+	json += "}"
 	io.WriteString(w, json+"\n")
 }
 
@@ -596,19 +592,19 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("register result " + strconv.FormatBool(res))
 
-	json := "{\"Result\" : \""
+	json := "{\"Result\" : "
 
 	if res != true {
 		log.Println("Register user failed.")
 		w.WriteHeader(http.StatusBadRequest)
-		json += "False"
+		json += "false"
 	} else {
 		w.WriteHeader(http.StatusOK)
-		json += "True"
+		json += "true"
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json += "\"}"
+	json += "}"
 	io.WriteString(w, json+"\n")
 }
 
