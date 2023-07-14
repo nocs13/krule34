@@ -50,7 +50,7 @@ func (self *DbRequest) OpenSession(addr string, user string, pass string) bool {
 
 	var err error
 
-	ctx, cancel := context.WithTimeout(context.Background(), 45*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
 	self.client, err = mongo.Connect(ctx, opts)

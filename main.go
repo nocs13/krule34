@@ -150,6 +150,24 @@ func hostOnly(addr string) string {
 	return host
 }
 
+func getRealIP(r *http.Request) string {
+	IPAddress := r.Header.Get("X-Real-IP")
+
+	if IPAddress == "" {
+		IPAddress = r.Header.Get("X-Forwarder-For")
+	}
+
+	if IPAddress == "" {
+		IPAddress = r.RemoteAddr
+	}
+
+	return IPAddress
+}
+
+func getHostIP(r *http.Request) string {
+	return hostOnly(getRealIP(r))
+}
+
 func gen_uid() (uid string) {
 
 	b := make([]byte, 10)
@@ -473,7 +491,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	v = dbrequest.GetValues("db_sessions", []string{"sid"}, map[string]string{"uid": uid, "closed": "0", "remote": hostOnly(r.RemoteAddr)})
+	v = dbrequest.GetValues("db_sessions", []string{"sid"}, map[string]string{"uid": uid, "closed": "0", "remote": getHostIP(r)})
 
 	var sid string = ""
 
@@ -482,7 +500,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	if v == nil || len(v) < 1 || v[0] == "" {
 		tm := time.Now().Format("2006-01-02 15:04:05")
 		sid = uuid.New().String()
-		res = dbrequest.SetValues("db_sessions", map[string]string{"sid": sid, "uid": uid, "closed": "0", "remote": hostOnly(r.RemoteAddr),
+		res = dbrequest.SetValues("db_sessions", map[string]string{"sid": sid, "uid": uid, "closed": "0", "remote": getHostIP(r),
 			"start": tm, "finish": tm}, map[string]string{})
 	} else {
 		sid = v[0]
@@ -512,7 +530,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 func handleLogout(w http.ResponseWriter, r *http.Request) {
 	sid := getValue(r, "sid")
 
-	res := dbrequest.HasValues("db_sessions", []string{"closed"}, map[string]string{"sid": sid, "closed": "1", "remote": hostOnly(r.RemoteAddr)})
+	res := dbrequest.HasValues("db_sessions", []string{"closed"}, map[string]string{"sid": sid, "closed": "1", "remote": getHostIP(r)})
 
 	if res == true {
 		w.WriteHeader(http.StatusOK)
@@ -522,7 +540,7 @@ func handleLogout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	res = dbrequest.SetValues("db_sessions", map[string]string{"closed": "1", "final": time.Now().Format("2006-01-02 15:04:05")},
-		map[string]string{"sid": sid, "remote": hostOnly(r.RemoteAddr)})
+		map[string]string{"sid": sid, "remote": getHostIP(r)})
 
 	if res == false {
 		w.WriteHeader(http.StatusBadRequest)
@@ -584,7 +602,7 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var k map[string]string = map[string]string{"id": gen_uid(), "email": email, "username": uname, "valid": "1", "password": string(hash),
-		"firstname": "", "lastname": "", "isadmin": "0", "regdate": get_time(), "host": hostOnly(r.RemoteAddr)}
+		"firstname": "", "lastname": "", "isadmin": "0", "regdate": get_time(), "host": getHostIP(r)}
 
 	log.Println("pass hash " + string(hash))
 
@@ -623,7 +641,7 @@ func handleCommand(w http.ResponseWriter, r *http.Request) {
 
 	switch cmd {
 	case "sidvalid":
-		res = cmdSidValid(sid, hostOnly(r.RemoteAddr))
+		res = cmdSidValid(sid, getHostIP(r))
 		if res {
 			result = "Result"
 			content = "true"
