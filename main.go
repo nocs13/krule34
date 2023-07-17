@@ -539,7 +539,7 @@ func handleLogout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res = dbrequest.SetValues("db_sessions", map[string]string{"closed": "1", "final": time.Now().Format("2006-01-02 15:04:05")},
+	res = dbrequest.SetValues("db_sessions", map[string]string{"closed": "1", "finish": time.Now().Format("2006-01-02 15:04:05")},
 		map[string]string{"sid": sid, "remote": getHostIP(r)})
 
 	if res == false {

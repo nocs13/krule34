@@ -1672,3 +1672,56 @@ function doViewImage(id, image) {
     }
   });
 }
+
+function checkAgeRestriction(fn) {
+  let a = 'WARNING this site is for adults only!';
+  let b = 'I am 18 years old or older ENTER';
+  let title = 'WARNING Site is for adults only!';
+  let content = 'I am 18 years old or older ENTER';
+
+  if ((localStorage.getItem("k-i-am-18-over") != null) &&
+      (localStorage.getItem("k-i-am-18-over") == "Agree")) {
+    return;
+  }
+
+
+  let cont = `<div id="k_age_dialog_message">
+              </div>`;
+
+  $('body').append(cont);
+  $("#k_age_dialog_message").html("<p>" + title + "<br>" + content + "</p>");
+  $("#k_age_dialog_message").dialog({
+    autoOpen: true,
+    modal: true,
+    title: title,
+    closeOnEscape: false,
+    close: function () {}, //{ $(this).dialog('close'); $("#k_age_dialog_message").remove();},
+    open : function(event, ui){
+      $(".ui-widget-overlay").css({
+          background:"rgb(50, 50, 50)",
+          opacity: "100",
+      });
+      $(".ui-dialog-titlebar-close").css({
+        display: "none"
+      });
+    },
+    beforeClose: function(event, ui) {
+    },
+    buttons: {
+      Yes: function ()
+      {
+        localStorage.setItem("k-i-am-18-over", "Agree");
+        $(this).dialog("close");
+        $("#k_age_dialog_message").remove();
+      },
+      No: function ()
+      {
+        window.location.href = "https://google.com";
+        $(this).dialog("close");
+        $("#k_age_dialog_message").remove();
+      }
+    }
+  });
+
+  $("#k_age_dialog_message").dialog("open");
+}
