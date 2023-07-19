@@ -8,6 +8,7 @@ require (
 )
 
 require (
-	github.com/google/uuid v1.1.5
-	go.mongodb.org/mongo-driver v1.12.0 // indirect
+	github.com/google/uuid v1.3.0
+	gitlab.com/ggvaberi/kdbttp v0.1.0
+	go.mongodb.org/mongo-driver v1.12.0
 )

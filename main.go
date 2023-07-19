@@ -7,7 +7,6 @@ import (
 	"io"
 
 	"krule34/libs"
-	kmongo "krule34/libs/kmongo"
 	"log"
 	"net"
 	"net/http"
@@ -18,6 +17,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	kdbttp "gitlab.com/ggvaberi/kdbttp/lib"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -61,7 +61,9 @@ var dbpass string
 var dbaddr string
 
 // var dbrequest *libs.DbRequest = nil
-var dbrequest *kmongo.DbRequest = nil
+//var dbrequest *kmongo.DbRequest = nil
+
+var dbrequest *kdbttp.DbRequest = nil
 
 func (h *WebHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
@@ -585,7 +587,7 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 
 	vid := dbrequest.GetValues("db_users", []string{"id"}, map[string]string{"email": email})
 
-	if vid == nil && dbrequest.Failed == true {
+	if vid == nil {
 		log.Println("Register user failed, DB error.")
 		w.WriteHeader(http.StatusBadRequest)
 		w.Header().Set("Content-Type", "application/json")
@@ -968,15 +970,21 @@ func main() {
 	dbuser := os.Getenv("dbuser")
 	dbpass := os.Getenv("dbpass")
 	dbhost := os.Getenv("dbhost")
-	//dbport, _ := strconv.Atoi(os.Getenv("dbport"))
+	dbport, _ := strconv.Atoi(os.Getenv("dbport"))
 
 	log.Println("Using port: " + port)
+	log.Println("Using host: " + dbhost)
+	log.Println("Using user: " + dbuser)
+	log.Println("Using pass: " + dbpass)
 
 	//dbrequest = &libs.DbRequest{}
-	dbrequest = &kmongo.DbRequest{}
+	//dbrequest = &kmongo.DbRequest{}
+	dbrequest = &kdbttp.DbRequest{}
 
 	//r := dbrequest.OpenSession(dbhost, int32(dbport), dbuser, dbpass)
-	r := dbrequest.OpenSession(dbhost, dbuser, dbpass)
+	//r := dbrequest.OpenSession(dbhost, dbuser, dbpass)
+
+	r := dbrequest.OpenSession(dbhost, int32(dbport), dbuser, dbpass)
 
 	if r != true {
 		log.Println("Unable open database session.")
