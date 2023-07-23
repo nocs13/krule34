@@ -1,5 +1,6 @@
 var page = 0;
 var thpp = 42; // thumbs per page for it may be 42
+var images_per_page = 12;
 
 var items = null;
 var count = 0;
@@ -137,7 +138,7 @@ function showImgInfo(arts, char, tags) {
 
   var date = new Date();
 
-  var d = '<div id="divImgInfo" class="dropdown-menu" aria-labelledby="dropdownMenuLink" birth="' + date.getTime() + '">';
+  var d = '<div id="divImgInfo" class="dropdown-menu" style="z-index: 1100; cursor: pointer;" aria-labelledby="dropdownMenuLink" birth="' + date.getTime() + '">';
 
   for (i in as) {
     if (as[i].length > 0)
@@ -622,7 +623,6 @@ function onInfo(id) {
 
   let item = null;
 
-
   for (var i = 0; i < items.length; i++) {
     if (items[i].id == id) {
       item = items[i];
@@ -836,8 +836,8 @@ function showLogin() {
     <form id="form_login" onsubmit="onLogin();" autocomplete="on">
       <!--<br><input id="inp_log_email" class="form-control ds-input" type="text" placeholder="email" autocomplete="on"/>
       <br><input id="inp_log_pass" class="form-control ds-input" type="password" placeholder="password" autocomplete="on"/>-->
-      <br><input id="inp_log_email" class="form-control ds-input" type="text" placeholder="email" value="" autocomplete="on"/>
-      <br><input id="inp_log_pass" class="form-control ds-input" type="password" placeholder="password" value="" autocomplete="on"/>
+      <br><input id="inp_log_email" class="form-control ds-input" type="text" placeholder="email" value="user@mail.com" autocomplete="on"/>
+      <br><input id="inp_log_pass" class="form-control ds-input" type="password" placeholder="password" value="1234567" autocomplete="on"/>
       <br>
       <table> <tr>
       <td> <input type="submit" id="btn_log_submit" class="btn btn-primary" value="Login"></input> </td>
@@ -870,24 +870,6 @@ function showLogin() {
     $("#div_login").css({ left: (ww - lw) });
   }
 
-  /*
-  $('#btn_login').click(function () {
-    var email = $("#inp_log_email").val();
-    var pass =  $("#inp_log_pass").val();
-
-    console.log("email: ", email);
-
-    if (!isEmail(email))
-      alert("Invalid email format.");
-
-    if (pass.length < 4)
-      alert("Small password.");
-
-    $('#div_login').remove();
-
-    doLogin(email, pass);
-  });
-  */
   $('#btn_register').click(function () {
     $('#div_login').remove();
     showRegister();
@@ -1146,46 +1128,11 @@ function showProfile() {
 
     $('#d_pr_cont').html(cont);
 
-    let body = $("#tb_fav_images").find('tbody');
-    let ipr = 3;
-    let j = 1;
-    let hbody = '';
-
-    for (i in UserInfo.images) {
-      let v = UserInfo.images[i];
-      let r = '';
-
-      if (j == 1)
-        r += `<tr> `;
-
-      let ivideo = false;
-
-      if (v.image.indexOf(".mp4") > 0 || v.image.indexOf(".webm") > 0) {
-        ivideo = true;
-      }
-
-      let url = v.image;
-
-      if (ivideo)
-        url = v.sample;
-
-      r += `<td mid='${v.id}' iurl='${url}'>
-              <div style='position: relative;'>
-                <image sid='${v.id}' class='img-drag-remove' draggable="true" ondragstart="onImgDragDel(event)" src='${v.thumb}' width='48px'></image>
-              </div>
-          </td>`;
-
-      if (j == 3 || ((i + 1) == UserInfo.images.length)) {
-        r += ` </tr>`;
-        j = 1;
-      } else {
-        j++;
-      }
-
-      hbody += r;
+    if (UserInfo.images_page < 0) {
+      onFavorImagesPageNext();
+    } else {
+      onFavorImagesPage(UserInfo.images_page);
     }
-
-    body.html(hbody);
     $("#tb_fav_images").on("click", "td", function () {
       let mid = $(this).attr("mid");
       let url = $(this).attr("iurl");
@@ -1196,13 +1143,24 @@ function showProfile() {
 
       //doViewImage(mid, url);
       let index = -1;
+      let start = UserInfo.images_page * images_per_page;
       lightBox.new();
 
-      for (i in UserInfo.images) {
-        if (UserInfo.images[i].id == mid) index = i;
-        lightBox.add(UserInfo.images[i].image, UserInfo.images[i].id);
+      for (let i = 0; i < images_per_page; i++) {
+        if ((start + i) >= UserInfo.images.length)
+          break;
+
+        if (UserInfo.images[start + i].id == '-1')
+          continue;
+
+        if (UserInfo.images[start + i].id == mid)
+          index = i;
+
+        lightBox.add(UserInfo.images[start + i].image, UserInfo.images[start + i].id);
       }
+
       lightBox.set(index);
+      $('#div_profile').remove();
     });
   });
 
@@ -1248,12 +1206,14 @@ function onImgDragDel(evt) {
         v = UserInfo.images[i];
         if (v.id == id) {
           index = i;
+          UserInfo.images[i].id = '-1';
           break;
         }
       }
 
       if (index != -1) {
-        UserInfo.images.splice(index, 1);
+        //UserInfo.images.splice(index, 1);
+        $(event.target).attr('sid', '-1');
         doRemImage(id);
         $('#div_profile').remove();
       }
@@ -1328,8 +1288,20 @@ function doSelFavor(data) {
 }
 
 function doAddFavor() {
-  let k = $("#key").val()
+  let k = $("#key").val();
   console.log("Adding user favor : " + k);
+
+  if (UserInfo != null && UserInfo.favors != null) {
+    for (i in UserInfo.favors) {
+      if (UserInfo.favors[i] == k) {
+        console.log("Adding user favor : " + k + " already in list.");
+        $('#div_profile').remove();
+
+        return;
+      }
+    }
+  }
+
   $.post("/command", { 'cmd': 'userfavoradd', 'sid': localStorage.getItem("sid"), 'favor': k }, function (data) {
   })
     .done(function (data) {
@@ -1355,6 +1327,24 @@ function doAddFavor() {
 function doRemFavor() {
   try {
     let fav = $('#sel_list_favor').val();
+
+    if (UserInfo != null && UserInfo.favors != null) {
+      let exist = false;
+
+      for (i in UserInfo.favors) {
+        if (UserInfo.favors[i] == k) {
+          exist = true;
+          break;
+        }
+      }
+
+      if (exist != true) {
+        console.log("Removing user favor : " + k + " already removed from list.");
+        $('#div_profile').remove();
+
+        return;
+      }
+    }
 
     $.post("/command", { 'cmd': 'userfavorrem', 'sid': localStorage.getItem("sid"), 'favor': fav }, function (data) {
     })
@@ -1390,8 +1380,23 @@ function doListImages() {
 
         if (UserInfo.images == null) {
           UserInfo.images = new Array();
+          UserInfo.images_page = 0;
         }
-        doGetImageData(res.Images);
+
+        let ida = res.Images.split(",");
+
+        for (i in ida) {
+          let v = {
+            id: ida[i],
+            sample: '',
+            thumb: '',
+            image: ''
+          };
+          UserInfo.images.push(v);
+        }
+        UserInfo.images_page = -1;
+
+        //doGetImageData(res.Images, 0);
       } catch (e) {
         console.log('Get user images failed. ' + e);
       }
@@ -1459,13 +1464,16 @@ function doGetImageData(ids) {
         if (res.Images != null) {
           let ida = ids.split(",");
 
-          for (i in res.Images) {
+          for (let i = 0; i < res.Images.length; i++) {
             let v = {
-              id: ida[i],
-              sample: res.Images[i].sample,
-              thumb: res.Images[i].thumb,
-              image: res.Images[i].url
+              id : ida[i],
+              sample : res.Images[i].sample,
+              thumb : res.Images[i].thumb,
+              image : res.Images[i].url,
             };
+            //UserInfo.images[start + i].sample = res.Images[i].sample;
+            //UserInfo.images[start + i].thumb = res.Images[i].thumb;
+            //UserInfo.images[start + i].image = res.Images[i].url;
             UserInfo.images.push(v);
           }
         }
@@ -1589,6 +1597,55 @@ function k_menuTags() {
   onInfo(imgSlide.imgid);
 }
 
+function showImageTags(id) {
+  $('#busy').show();
+
+  let char = null;
+  let arts = null;
+  let tags = null;
+
+  let item = null;
+
+  $.get("/getcharacter", { id: id }, function (data) {
+    $('#busy').hide();
+    char = data;
+  })
+    .done(function () {
+      $.get("/getartist", { id: id }, function (data) {
+        arts = data;
+      })
+        .done(function () {
+          $.get("/info", { id: id }, function (data) {
+            try {
+              let jn = JSON.parse(data);
+              tags = jn.tags;
+            } catch (e) {
+              $('#busy').hide();
+              console.log("partce info error: " + e.error());
+            }
+          })
+            .done(function () {
+              $('#busy').hide();
+              showImgInfo(arts, char, tags);
+              if ($('#divImgInfo').length) {
+                let pos = $('#lightbox-tags').offset();
+                $('#divImgInfo').offset(pos);
+              }
+            })
+            .fail(function () {
+              $('#busy').hide();
+            })
+        })
+        .fail(function () {
+          $('#busy').hide();
+        })
+    })
+    .fail(function () {
+      $('#busy').hide();
+    })
+}
+
+
 function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max));
 }
@@ -1599,6 +1656,168 @@ function getPagesMinMax() {
   v.max = parseInt(count / thpp, 10);
 
   return v;
+}
+
+function onFavorImagesPageFirst() {
+  onFavorImagesPageIndex(0);
+}
+
+function onFavorImagesPageLast() {
+  let max_pages = (UserInfo.images.length / images_per_page);
+
+  max_pages = parseInt(max_pages);
+
+  onFavorImagesPageIndex(max_pages);
+}
+
+function onFavorImagesPagePrev() {
+  onFavorImagesPageIndex(UserInfo.images_page - 1);
+}
+
+function onFavorImagesPageNext() {
+  onFavorImagesPageIndex(UserInfo.images_page + 1);
+}
+
+function onFavorImagesPageIndex(page) {
+  let max_pages = (UserInfo.images.length / images_per_page);
+
+  max_pages = parseInt(max_pages);
+
+  if (page < 0 || page > max_pages) {
+    return;
+  }
+
+  let start = images_per_page * page;
+
+  let cids = '';
+
+  for (let i = start; i < (start + images_per_page); i++) {
+    if (i >= UserInfo.images.length)
+      break;
+
+      cids += UserInfo.images[i].id + ',';
+  }
+
+  if (UserInfo.images[start].image != '') {
+    onFavorImagesPage(page);
+    return;
+  }
+
+  if (cids.slice(-1) == ',') {
+    cids = cids.slice(0, -1);
+  }
+
+  $.post("/command", { 'cmd': 'userimagedata', 'sid': localStorage.getItem("sid"), 'images': cids }, function (data) {
+  })
+    .done(function (data) {
+      try {
+        console.log("Get user image data: " + data);
+        let jsbody = data.replace("\n", "")
+        let res = JSON.parse(jsbody);
+        if (res.Images != null) {
+          let ida = cids.split(",");
+          let start = page * images_per_page;
+
+          for (let i = 0; i < res.Images.length; i++) {
+            let v = UserInfo.images[start + i];
+            UserInfo.images[start + i].sample = res.Images[i].sample;
+            UserInfo.images[start + i].thumb = res.Images[i].thumb;
+            UserInfo.images[start + i].image = res.Images[i].url;
+          }
+        }
+        onFavorImagesPage(page);
+      } catch (e) {
+        console.log('Get user image data failed: ' + e);
+      }
+    })
+    .fail(function (data) {
+      console.log('Get user image data failed.');
+    })
+}
+
+function onFavorImagesPage(page) {
+  let body = $("#tb_fav_images").find('tbody');
+  let ipr = 3;
+  let j = 1;
+  let hbody = '';
+
+  if (UserInfo.images == null || UserInfo.images.length < 1) {
+    $('#div_profile').remove();
+    return;
+  }
+
+  let max_pages = (UserInfo.images.length / images_per_page);
+
+  max_pages = parseInt(max_pages);
+
+  if ((page < 0) || (page > max_pages)) {
+    return;
+  }
+
+  body.html("");
+
+  let start = images_per_page * page;
+
+  for (let i = start; i < (start + images_per_page); i++) {
+    if (i >= UserInfo.images.length)
+      break;
+
+    let v = UserInfo.images[i];
+    let r = '';
+
+    if (v.id == '-1') {
+      continue;
+    }
+
+    if (j == 1)
+      r += `<tr> `;
+
+    let ivideo = false;
+
+    if (v.image.indexOf(".mp4") > 0 || v.image.indexOf(".webm") > 0) {
+      ivideo = true;
+    }
+
+    let url = v.image;
+
+    if (ivideo)
+      url = v.sample;
+
+    r += `<td mid='${v.id}' iurl='${url}'>
+            <div style='position: relative;'>
+              <image sid='${v.id}' class='img-drag-remove' draggable="true" ondragstart="onImgDragDel(event)" src='${v.thumb}' width='48px'></image>
+            </div>
+        </td>`;
+
+    if (j == 3 || ((i + 1) == UserInfo.images.length)) {
+      r += ` </tr>`;
+      j = 1;
+    } else {
+      j++;
+    }
+
+    hbody += r;
+  }
+
+  if (UserInfo.images.length > images_per_page) {
+    hbody += (`
+        <tr>
+          <td style='text-align: left;'>
+          <button type="button" class="btn btn-outline-primary btn-sm" onclick="onFavorImagesPageFirst()"> << </button>
+          <button type="button" class="btn btn-outline-primary btn-sm" onclick="onFavorImagesPagePrev()"> < </button>
+          </td>
+          <td style='text-align: center;'>${page}</td>
+          <td style='text-align: right;'>
+            <button type="button" class="btn btn-outline-primary btn-sm" onclick="onFavorImagesPageNext()"> > </button>
+            <button type="button" class="btn btn-outline-primary btn-sm" onclick="onFavorImagesPageLast()"> >> </button>
+          </td>
+        </tr>
+    `);
+  }
+
+  UserInfo.images_page = page;
+
+  body.html(hbody);
 }
 
 function showMessage(title, content) {
@@ -1614,7 +1833,7 @@ function showMessage(title, content) {
 }
 
 function showSpinner(id, on) {
-  let o = $('#'+id);
+  let o = $('#' + id);
 
   if (o == null) return;
 
@@ -1624,7 +1843,7 @@ function showSpinner(id, on) {
   if (on) {
     let par = o.parent();
     par.append(`<div id="divSpinner" class="spinner-border text-primary"></div>`);
-    let spos = { x: pos .left + res.width / 2 - 10, y: pos.top + res.height / 2 - 10 };
+    let spos = { x: pos.left + res.width / 2 - 10, y: pos.top + res.height / 2 - 10 };
     $('#divSpinner').css({ top: spos.y + 'px', left: spos.x + 'px', position: 'absolute' });
   } else {
     let par = o.parent();
@@ -1632,7 +1851,7 @@ function showSpinner(id, on) {
 
     if (spr == null) spr = $('#divSpinner');
 
-    if (spr != null ) spr.remove();
+    if (spr != null) spr.remove();
   }
 }
 
@@ -1680,7 +1899,7 @@ function checkAgeRestriction(fn) {
   let content = 'I am 18 years old or older ENTER';
 
   if ((localStorage.getItem("k-i-am-18-over") != null) &&
-      (localStorage.getItem("k-i-am-18-over") == "Agree")) {
+    (localStorage.getItem("k-i-am-18-over") == "Agree")) {
     return;
   }
 
@@ -1695,28 +1914,26 @@ function checkAgeRestriction(fn) {
     modal: true,
     title: title,
     closeOnEscape: false,
-    close: function () {}, //{ $(this).dialog('close'); $("#k_age_dialog_message").remove();},
-    open : function(event, ui){
+    close: function () { },
+    open: function (event, ui) {
       $(".ui-widget-overlay").css({
-          background:"rgb(50, 50, 50)",
-          opacity: "100",
+        background: "rgb(50, 50, 50)",
+        opacity: "10",
       });
       $(".ui-dialog-titlebar-close").css({
         display: "none"
       });
     },
-    beforeClose: function(event, ui) {
+    beforeClose: function (event, ui) {
     },
     buttons: {
-      Yes: function ()
-      {
+      Yes: function () {
         localStorage.setItem("k-i-am-18-over", "Agree");
         $(this).dialog("close");
         $("#k_age_dialog_message").remove();
+        window.location.href = "/";
       },
-      No: function ()
-      {
-        window.location.href = "https://google.com";
+      No: function () {
         $(this).dialog("close");
         $("#k_age_dialog_message").remove();
       }

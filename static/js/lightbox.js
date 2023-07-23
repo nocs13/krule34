@@ -6,12 +6,16 @@ var lightBox = {
 		this.zoom = false;
 		this.img_w = 0;
 		this.img_h = 0;
+		this.fn_tags = null;
 		this.fn_artist = null;
 		this.fn_character = null;
 
 		let sl = '<div id="div_lightbox" class="modal" style="display: block;">';
-		sl += ' <span class="close cursor" onclick="lightBox.close()">&times;</span>';
-		sl += ' <span id="lightbox-zoom" class="zoom-in cursor" onclick="lightBox.onzoom()" style="width:32px;"></span>';
+		sl += ' <table width="100%"> <tbody> <tr> ';
+		sl += ' <td> <span id="lightbox-zoom" class="zoom-in cursor" onclick="lightBox.onzoom()" style="width:32px;"></span> </td>';
+		sl += ' <td style="text-align: center;"> <span id="lightbox-tags" class="cursor" onclick="lightBox.ontags()" style="width:32px;">&#9733;</span> </td>';
+		sl += ' <td> <span class="close cursor" onclick="lightBox.close()">&times;</span> </td>';
+		sl += ' </tr> </tbody> </table> ';
 
 		if (typeof amenu !== 'undefined' && amenu == true) {
 			sl += ' <span class="artist cursor" onclick="lightBox.artist()">A</span>';
@@ -58,11 +62,11 @@ var lightBox = {
 	},
 
 	set: function (i) {
-
-		if ((i > -1) && (i < this.images.length))
-			this.index = i;
-		else
-			return;
+		if (i < 0) {
+			i = this.images.length - 1;
+		} else if (i >= this.images.length) {
+			i = 0;
+		}
 
 		var src = this.images[i];
 		var id = this.imgids[i];
@@ -72,9 +76,9 @@ var lightBox = {
 			s += '<video class="bord" style="width:100%" preload="auto" controls loop';
 			s += ' id="' + id + '"';
 			s += '>';
-			s += '  <source src="/getvideo?url=' + src + '" type="video/webm">';
+			s += '  <source src="/getvideobyid?id=' + id + '" type="video/webm">';
 			let d1 = src.replace(".webm", ".mp4")
-			s += '  <source src="/getvideo?url=' + d1 + '" type="video/mp4">';
+			s += '  <source src="/getvideobyid?id=' + id + '" type="video/mp4">';
 			s += '</video>';
 			$("#lightbox-content").html(s);
 		} else {
@@ -94,6 +98,7 @@ var lightBox = {
 		$('#lightbox-zoom').html('<img src="/static/img/zoom-in.svg" style="width: 16px; height: 16px">');
 		this.zoom = false;
 
+		this.index = i;
 
 		console.log('choosed ' + this.images[i]);
 	},
@@ -207,5 +212,10 @@ var lightBox = {
 
 	onzoom: function () {
 		this.setzoom(!this.zoom);
+	},
+
+	ontags: function () {
+		//this.fn_tags(this.imgids[this.index]);
+		showImageTags(this.imgids[this.index]);
 	}
 };

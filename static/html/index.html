@@ -164,6 +164,13 @@
       browser = 'firefox';
     }
 
+    // Check age restriction.
+
+    if ((localStorage.getItem("k-i-am-18-over") == null) ||
+      (localStorage.getItem("k-i-am-18-over") != "Agree")) {
+      window.location.href = "/age";
+    }
+
     $(window).on("orientationchange", function (event) {
       onOrientationChange(screen.orientation.type);
     });
@@ -388,8 +395,6 @@
         }
       }
 
-      checkAgeRestriction();
-
       var res = checkArtist();
 
       if (!res) {
@@ -401,7 +406,7 @@
           "thighs", "thigh_strap", "thigh_sex", "thick_thighs", "thighhighs", "knee_highs",
           "lingerie", "thong", "panties_down", "panties ", "bra", "high_heels", "pantyhose"];
         var base_tag = base_tags[getRandomInt(base_tags.length)];
-        //base_tag = 'nonude';
+        base_tag = 'nonude';
         //base_tag = 'mixplin';
         $('#key').val(base_tag);
         onSearch();

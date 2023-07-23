@@ -17,7 +17,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	kdbttp "gitlab.com/ggvaberi/kdbttp/lib"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -60,10 +59,7 @@ var dbuser string
 var dbpass string
 var dbaddr string
 
-// var dbrequest *libs.DbRequest = nil
-//var dbrequest *kmongo.DbRequest = nil
-
-var dbrequest *kdbttp.DbRequest = nil
+var dbrequest *libs.DbRequest = nil
 
 func (h *WebHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
@@ -224,6 +220,16 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, t.Content)
 }
 
+func handleAge(w http.ResponseWriter, r *http.Request) {
+	log.Println("run handler hello " + r.URL.Path)
+
+	t := libs.NewPage()
+
+	t.Init("age.html")
+
+	io.WriteString(w, t.Content)
+}
+
 func handleFavicon(w http.ResponseWriter, r *http.Request) {
 	log.Println("run handler favicon " + r.URL.Path)
 
@@ -275,6 +281,20 @@ func handleTag(w http.ResponseWriter, r *http.Request) {
 	log.Println("run handler tag " + tag)
 
 	var content = libs.Search(tag, "")
+
+	//str := libs.ContentToXML(content)
+
+	io.WriteString(w, content)
+}
+
+func handleInfo(w http.ResponseWriter, r *http.Request) {
+	log.Println("run handler tag " + r.URL.Path)
+
+	var id = getValue(r, "id")
+
+	log.Println("run handler info " + id)
+
+	var content = libs.SearchImageInfo(id)
 
 	//str := libs.ContentToXML(content)
 
@@ -427,6 +447,68 @@ func handleGetVideo(w http.ResponseWriter, r *http.Request) {
 
 		io.Copy(w, ri.Body)
 	*/
+}
+
+func handleGetVideoById(w http.ResponseWriter, r *http.Request) {
+	log.Println("run handler get video.")
+
+	var id = getValue(r, "id")
+
+	log.Println("video id is " + id)
+
+	v := libs.SearchImage(id)
+
+	var jn map[string]string
+
+	err := json.Unmarshal([]byte(v), &jn)
+
+	if err != nil {
+		log.Println("video id unmarsha error " + err.Error())
+
+		return
+	}
+
+	url := jn["url"]
+
+	log.Println("video id url is " + url)
+
+	ri := libs.GetVideo(url)
+
+	if ri == nil {
+		log.Println("Unable handle get video " + r.URL.Path)
+
+		return
+	}
+
+	//http.Redirect(w, r, url, http.StatusFound)
+	//return
+	farr := strings.Split(url, "/")
+
+	fname := farr[len(farr)-1]
+
+	var contentType string = ""
+
+	if strings.HasSuffix(url, ".mp4") {
+		contentType = "video/mp4"
+	} else if strings.HasSuffix(url, ".webm") {
+		contentType = "video/webm"
+	}
+
+	contentSize := strconv.FormatInt(ri.ContentLength, 10)
+	s64, _ := strconv.ParseInt(contentSize, 10, 32)
+	s64--
+
+	w.Header().Set("Content-Type", contentType)
+	w.Header().Add("Accept-Ranges", "bytes")
+	w.Header().Add("Content-Length", contentSize)
+	w.Header().Add("Content-Disposition", "inline; filename="+fname+"")
+
+	//requestedBytes := r.Header.Get("Range")
+	//w.Header().Add("Content-Range", "bytes "+requestedBytes[6:len(requestedBytes)]+
+	//	s32+"/"+contentSize)
+	w.Header().Add("Content-Range", "bytes 0 "+contentSize+"/"+contentSize)
+
+	io.Copy(w, ri.Body)
 }
 
 func handleGetThumbnail(w http.ResponseWriter, r *http.Request) {
@@ -977,12 +1059,7 @@ func main() {
 	log.Println("Using user: " + dbuser)
 	log.Println("Using pass: " + dbpass)
 
-	//dbrequest = &libs.DbRequest{}
-	//dbrequest = &kmongo.DbRequest{}
-	dbrequest = &kdbttp.DbRequest{}
-
-	//r := dbrequest.OpenSession(dbhost, int32(dbport), dbuser, dbpass)
-	//r := dbrequest.OpenSession(dbhost, dbuser, dbpass)
+	dbrequest = &libs.DbRequest{}
 
 	r := dbrequest.OpenSession(dbhost, int32(dbport), dbuser, dbpass)
 
@@ -995,12 +1072,15 @@ func main() {
 	var h = new(WebHandler)
 
 	h.Add("/", handleIndex)
+	h.Add("/age", handleAge)
 	h.Add("/tag", handleTag)
+	h.Add("/info", handleInfo)
 	h.Add("/page", handlePage)
 	h.Add("/search", handleSearch)
 	h.Add("/getimage", handleGetImage)
 	h.Add("/getvideo", handleGetVideo)
 	h.Add("/getartist", handleGetArtist)
+	h.Add("/getvideobyid", handleGetVideoById)
 	h.Add("/getcharacter", handleGetCharacter)
 	h.Add("/getautocomplete", handleGetAutocomplete)
 
