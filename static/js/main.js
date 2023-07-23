@@ -836,8 +836,8 @@ function showLogin() {
     <form id="form_login" onsubmit="onLogin();" autocomplete="on">
       <!--<br><input id="inp_log_email" class="form-control ds-input" type="text" placeholder="email" autocomplete="on"/>
       <br><input id="inp_log_pass" class="form-control ds-input" type="password" placeholder="password" autocomplete="on"/>-->
-      <br><input id="inp_log_email" class="form-control ds-input" type="text" placeholder="email" value="user@mail.com" autocomplete="on"/>
-      <br><input id="inp_log_pass" class="form-control ds-input" type="password" placeholder="password" value="1234567" autocomplete="on"/>
+      <br><input id="inp_log_email" class="form-control ds-input" type="text" placeholder="email" value="" autocomplete="on"/>
+      <br><input id="inp_log_pass" class="form-control ds-input" type="password" placeholder="password" value="" autocomplete="on"/>
       <br>
       <table> <tr>
       <td> <input type="submit" id="btn_log_submit" class="btn btn-primary" value="Login"></input> </td>
@@ -1803,13 +1803,13 @@ function onFavorImagesPage(page) {
     hbody += (`
         <tr>
           <td style='text-align: left;'>
-          <button type="button" class="btn btn-outline-primary btn-sm" onclick="onFavorImagesPageFirst()"> << </button>
+          <button type="button" class="btn btn-outline-info btn-sm" onclick="onFavorImagesPageFirst()"> << </button>
           <button type="button" class="btn btn-outline-primary btn-sm" onclick="onFavorImagesPagePrev()"> < </button>
           </td>
           <td style='text-align: center;'>${page}</td>
           <td style='text-align: right;'>
             <button type="button" class="btn btn-outline-primary btn-sm" onclick="onFavorImagesPageNext()"> > </button>
-            <button type="button" class="btn btn-outline-primary btn-sm" onclick="onFavorImagesPageLast()"> >> </button>
+            <button type="button" class="btn btn-outline-info btn-sm" onclick="onFavorImagesPageLast()"> >> </button>
           </td>
         </tr>
     `);
