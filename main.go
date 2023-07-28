@@ -1027,18 +1027,24 @@ func cmdUserImageData(sid string, image string) (string, bool) {
 }
 
 var dbMonitor bool = true
+var delay time.Duration = 1 * time.Minute
 
 func dbmonitor() {
 	log.Println("Start db session monitoring", dbMonitor)
 
 	for dbMonitor == true {
-		if dbrequest != nil && dbrequest.ValidSession() != true {
-			dbrequest.UpdateSession()
+		if dbrequest.ValidSession() != true {
+			if dbrequest.UpdateSession() != true {
+				delay = 1 * time.Minute
+			} else {
+				delay = 3 * time.Minute
+			}
+		} else {
+			delay = 3 * time.Minute
 		}
 
-		log.Println("Ping database...")
-		time.Sleep(5 * time.Minute)
-		//time.Sleep(10 * time.Second)
+		log.Println("Ping database..., delay is ", delay)
+		time.Sleep(delay)
 	}
 }
 
