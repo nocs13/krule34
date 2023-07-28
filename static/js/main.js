@@ -54,8 +54,8 @@ function showImgMenu(id) {
   var d = '<div id="divImgMenu" class="dropdown-menu" aria-labelledby="dropdownMenuLink" birth="' + date.getTime() + '">';
   d += '<a  id="aImgArtist" class="dropdown-item">Artist</a>';
   d += '<a  id="aImgCharacter" class="dropdown-item">Character</a>';
-  d += '<a  id="aImgInfo" class="dropdown-item">Tags</a>';
   d += '<a  id="aImgView" class="dropdown-item">View</a>';
+  d += '<a  id="aImgInfo" class="dropdown-item">Tags</a>';
 
   if (localStorage.getItem("sid") != null && localStorage.getItem("sid") != "" &&
     UserInfo != null && UserInfo.hasOwnProperty("sid")) {

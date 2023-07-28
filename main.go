@@ -1071,9 +1071,9 @@ func main() {
 
 	if r != true {
 		log.Println("Unable open database session.")
-	} else {
-		go dbmonitor()
 	}
+
+	go dbmonitor()
 
 	var h = new(WebHandler)
 
