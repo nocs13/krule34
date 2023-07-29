@@ -54,14 +54,14 @@ function showImgMenu(id) {
   var d = '<div id="divImgMenu" class="dropdown-menu" aria-labelledby="dropdownMenuLink" birth="' + date.getTime() + '">';
   d += '<a  id="aImgArtist" class="dropdown-item">Artist</a>';
   d += '<a  id="aImgCharacter" class="dropdown-item">Character</a>';
-  d += '<a  id="aImgView" class="dropdown-item">View</a>';
-  d += '<a  id="aImgInfo" class="dropdown-item">Tags</a>';
 
   if (localStorage.getItem("sid") != null && localStorage.getItem("sid") != "" &&
     UserInfo != null && UserInfo.hasOwnProperty("sid")) {
     d += '<a  id="aImgFavor" class="dropdown-item">Favor</a>';
   }
 
+  d += '<a  id="aImgView" class="dropdown-item">View</a>';
+  d += '<a  id="aImgInfo" class="dropdown-item">Tags</a>';
   d += '<a  id="aImgCansel" class="dropdown-item">Cansel</a>';
   d += '</div>';
 
@@ -1577,6 +1577,9 @@ function k_menuView() {
   if (imgSlide.imgid === undefined || imgSlide.imgid == "")
     return;
 
+  if (UserInfo == nil)
+    return;
+
   onView(imgSlide.imgid);
 }
 
@@ -1837,21 +1840,22 @@ function showSpinner(id, on) {
 
   if (o == null) return;
 
+  let par = o.parent();
   let pos = o.offset();
   let res = { width: o.width(), height: o.height() };
 
   if (on) {
-    let par = o.parent();
+    o.css('visibility', 'hidden');
     par.append(`<div id="divSpinner" class="spinner-border text-primary"></div>`);
     let spos = { x: pos.left + res.width / 2 - 10, y: pos.top + res.height / 2 - 10 };
     $('#divSpinner').css({ top: spos.y + 'px', left: spos.x + 'px', position: 'absolute' });
   } else {
-    let par = o.parent();
     let spr = par.children('#divSpinner');
 
     if (spr == null) spr = $('#divSpinner');
 
     if (spr != null) spr.remove();
+    o.css('visibility', 'visible');
   }
 }
 
