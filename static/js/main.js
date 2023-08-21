@@ -1409,6 +1409,18 @@ function doListImages() {
 function doAddImage(id) {
   console.log("Adding user image : " + id);
 
+  if (UserInfo.images != null) {
+    for (i in UserInfo.images) {
+      let v = UserInfo.images[i];
+
+      if (v.id == id) {
+        console.log("Image : " + id + " already in list.");
+
+        return false;
+      }
+    }
+  }
+
   $.post("/command", { 'cmd': 'userimageadd', 'sid': localStorage.getItem("sid"), 'image': id }, function (data) {
   })
     .done(function (data) {
