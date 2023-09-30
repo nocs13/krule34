@@ -117,7 +117,7 @@
           <div id="k_menu_drop" class="dropdown-menu">
             <a class="dropdown-item" href="javascript:k_menuArtist()">Artist</a>
             <a class="dropdown-item" href="javascript:k_menuCharacter()">Character</a>
-            <a class="dropdown-item" href="javascript:k_menuFavor()">Favorite</a>
+            <a id='k_menu_drop_favorite' class="dropdown-item" href="javascript:k_menuFavor()">Favorite</a>
             <a class="dropdown-item" href="javascript:k_menuView()">View</a>
             <a class="dropdown-item" href="javascript:k_menuTags()">Tags</a>
           </div>
@@ -521,6 +521,8 @@
 
       is_swipe = false;
     });
+
+    $('#k_menu_drop_favorite').hide();
 
     if (localStorage.getItem("sid") != null && localStorage.getItem("sid") != "") {
       doSidValid(localStorage.getItem("sid"));

@@ -1516,12 +1516,15 @@ function doSidValid(sid) {
 
           doListFavors();
           doListImages();
+
+          $('#k_menu_drop_favorite').show();
         }
       })
       .fail(function (data) {
         console.log('Sid: ' + sid + 'is invalid.');
         UserInfo = null;
         localStorage.removeItem("sid")
+
       })
   } catch (e) {
     console.log('Sid: ' + sid + 'is invalid.');
