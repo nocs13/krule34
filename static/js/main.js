@@ -769,7 +769,7 @@ function onThumb(id) {
 }
 
 function onAutocompete(id) {
-  $.get("/getautocomplete", { id: id }, function (data) {
+  $.get("/getautocomplete", { 'id': id }, function (data) {
     if (data != "") {
       var items = JSON.parse(data);
       $('#keyauto').empty();
@@ -779,9 +779,9 @@ function onAutocompete(id) {
         return;
 
       for (i in items) {
-        if (items[i].label[0] == '\\')
+        if (items[i].name == '\\')
           continue;
-        $('#keyauto').append('<div style="display: flex; justify-content: space-between;"><a class="dropdown-item" href="#">' + items[i].label + '</a> <button class="btn btn-outline-primary btn-sm"">&#187</button></div>');
+        $('#keyauto').append('<div style="display: flex; justify-content: space-between;"><a class="dropdown-item" href="#">' + items[i].name + '</a> <button class="btn btn-outline-primary btn-sm"">&#187</button></div>');
         //tags.push(items[i].label);
       }
 
@@ -1961,3 +1961,20 @@ function checkAgeRestriction(fn) {
 
   $("#k_age_dialog_message").dialog("open");
 }
+
+function saveContactInfo(name ,mail, text) {
+  $.post("/command", { 'cmd': 'contactus', 'name': name, 'mail': mail, 'text': text }, function (data) {
+  })
+    .done(function (data) {
+      try {
+        console.log("Get user contact result: " + data);
+        let jsbody = data.replace("\n", "")
+        let res = JSON.parse(jsbody);
+      } catch (e) {
+        console.log('Get user contact result failed: ' + e);
+      }
+    })
+    .fail(function (data) {
+      console.log('Get user contact result failed.');
+    })
+  }

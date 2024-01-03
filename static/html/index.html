@@ -42,14 +42,21 @@
 <body>
   <div id="k_header" class="jumbotron text-center" style="height: 1px; padding-top: 1px; padding-bottom: 60px;">
     <div class="row">
-      <div class="col-" style="width: 50%;">
+      <div class="col-" style="width: 20%;">
         <span class="float-left">
           <button id="btn_krule34" class="btn btn-primary" type="button" stype="text-align: left;">
             Krule34
           </button>
         </span>
       </div>
-      <div class="col-" style="width: 50%;">
+      <div class="col-" style="width: 60%;">
+        <span class="float-center">
+          <button id="btn_contact" class="btn btn-outline-secondary btn-sm" type="button" stype="text-align: center;">
+            contact
+          </button>
+        </span>
+      </div>
+      <div class="col-" style="width: 20%;">
         <span class="float-right">
           <button id="btn_profile" class="btn btn-secondary" type="button" stype="text-align: right;">
             Profile
@@ -148,8 +155,6 @@
   <div id="busy" class="busy">
     <img src="/static/img/loading.gif" width="150px" height="150px" style="left: 50%; top: 50%; position: fixed;">
   </div>
-
-  <!--<div id="kdialog_message"></div>-->
 
   <div id="info">
     Adult art and images. 3D and 2D xxx paint art or modeling art.
@@ -336,6 +341,9 @@
     });
     $('#btn_krule34').on("click", function () {
       window.open(window.location.origin, '_blank');
+    });
+    $('#btn_contact').on("click", function () {
+      window.open("/contactus", '_blank');
     });
     $('#mode_gallery').on("change", function () {
       var k = $('#key').val();

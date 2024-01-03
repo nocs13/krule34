@@ -710,6 +710,18 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, json+"\n")
 }
 
+func handleContactUs(w http.ResponseWriter, r *http.Request) {
+	log.Println("run handler hello " + r.URL.Path)
+
+	t := libs.NewPage()
+
+	t.Init("contact.html")
+
+	io.WriteString(w, t.Content)
+}
+
+var contactTime time.Time = time.Now()
+
 func handleCommand(w http.ResponseWriter, r *http.Request) {
 	cmd := getFormValue(r, "cmd")
 	sid := getFormValue(r, "sid")
@@ -792,6 +804,21 @@ func handleCommand(w http.ResponseWriter, r *http.Request) {
 		if ok {
 			result = "Images"
 			content = "[" + m + "]"
+			res = true
+		}
+	case "contactus":
+		diff := time.Now().Sub(contactTime)
+
+		if diff.Seconds() < 5 {
+			return
+		}
+
+		contactTime = time.Now()
+
+		ok := cmdUserContactUs(getFormValue(r, "name"), getFormValue(r, "mail"), getFormValue(r, "text"))
+		if ok {
+			result = "Result"
+			content = "True"
 			res = true
 		}
 	default:
@@ -1026,6 +1053,22 @@ func cmdUserImageData(sid string, image string) (string, bool) {
 	return res, true
 }
 
+func cmdUserContactUs(name, mail, text string) bool {
+	var contact string
+
+	contact = "Name: " + name + "\n"
+	contact += "Email: " + mail + "\n"
+	contact += "Text: " + text
+	rs := dbrequest.SetValues("db_datas", map[string]string{"key": "contact", "value": contact, "uid": "-1"}, nil)
+
+	if !rs {
+		log.Println("Add contact: Unable add contact.")
+		return false
+	}
+
+	return true
+}
+
 var dbMonitor bool = true
 var delay time.Duration = 1 * time.Minute
 
@@ -1094,6 +1137,7 @@ func main() {
 	h.Add("/login", handleLogin)
 	h.Add("/logout", handleLogout)
 	h.Add("/register", handleRegister)
+	h.Add("/contactus", handleContactUs)
 	h.Add("/command", handleCommand)
 
 	h.Add("/sitemap.xml", handleSitemap)

@@ -711,26 +711,32 @@ func GetCharacter(id string) string {
 }
 
 func GetAutocomplete(id string) string {
-	url := "https://rule34.xxx/autocomplete.php?q=" + id
+	//url := "https://rule34.xxx/autocomplete.php?q=" + id
+	url := "https://rule34.us/index.php?r=autocomplete&term=" + id + "&limit=10"
 
-	client := &http.Client{}
-	req, _ := http.NewRequest("GET", url, nil)
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36")
+	/*
+		client := &http.Client{}
+		req, _ := http.NewRequest("GET", url, nil)
+		req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36")
 
-	res, err := client.Do(req)
+		res, err := client.Do(req)
+	*/
+
+	res, err := http.Get(url)
 
 	if err != nil || res == nil {
-		log.Println("Failed GET request.")
+		log.Println("GetAutocomplete: Failed GET request.")
 
 		return ""
 	}
 
 	defer res.Body.Close()
 
-	responseData, err := ioutil.ReadAll(res.Body)
+	//responseData, err := ioutil.ReadAll(res.Body)
+	responseData, err := io.ReadAll(res.Body)
 
 	if err != nil {
-		log.Println("Read body data error:" + err.Error())
+		log.Println("GetAutocomplete: Read body data error:" + err.Error())
 
 		return ""
 	}
