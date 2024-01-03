@@ -73,6 +73,10 @@ func (h *WebHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		log.Println("Run web  " + r.URL.Path[0:8])
 	}
 
+	clientIP := getHostIP(r)
+
+	log.Println("Request income from:  " + clientIP)
+
 	if len(url) > len("/static/") && url[0:8] == "/static/" {
 		log.Println("Handle static")
 		handleStatic(w, r)
@@ -156,8 +160,14 @@ func getRealIP(r *http.Request) string {
 	}
 
 	if IPAddress == "" {
+		IPAddress = r.Header.Get("CF-Connecting-IP")
+	}
+
+	if IPAddress == "" {
 		IPAddress = r.RemoteAddr
 	}
+
+	log.Println("getRealIP: ", IPAddress)
 
 	return IPAddress
 }
