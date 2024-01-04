@@ -153,6 +153,10 @@ func hostOnly(addr string) string {
 	log.Println("host: ", host, " port: ", port)
 
 	if err != nil {
+		if strings.Contains(err.Error(), "missing port in address") == true {
+			return addr
+		}
+
 		log.Println("SplitHostPort error: ", err.Error())
 		return "127.0.0.1"
 	}
