@@ -1970,11 +1970,19 @@ function saveContactInfo(name ,mail, text) {
         console.log("Get user contact result: " + data);
         let jsbody = data.replace("\n", "")
         let res = JSON.parse(jsbody);
+        if (res.Result == true) {
+          alert("Text sent successfully.");
+          window.close();
+        }
       } catch (e) {
         console.log('Get user contact result failed: ' + e);
+        alert("Text sent failed. Try later...");
+        window.close();
       }
     })
     .fail(function (data) {
       console.log('Get user contact result failed.');
+      alert("Text send request failed. Try later...");
+      window.close();
     })
   }

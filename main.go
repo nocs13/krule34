@@ -141,11 +141,19 @@ func getFormValue(r *http.Request, key string) string {
 func hostOnly(addr string) string {
 	log.Println("hostOnly: ", addr)
 
+	if addr == "::1" {
+		return "127.0.0.1"
+	}
+
 	var host string = ""
+	var port string
 
-	host, _, err := net.SplitHostPort(addr)
+	host, port, err := net.SplitHostPort(addr)
 
-	if err != nil || host == "::1" {
+	log.Println("host: ", host, " port: ", port)
+
+	if err != nil {
+		log.Println("SplitHostPort error: ", err.Error())
 		return "127.0.0.1"
 	}
 
@@ -828,7 +836,7 @@ func handleCommand(w http.ResponseWriter, r *http.Request) {
 		ok := cmdUserContactUs(getFormValue(r, "name"), getFormValue(r, "mail"), getFormValue(r, "text"))
 		if ok {
 			result = "Result"
-			content = "True"
+			content = "true"
 			res = true
 		}
 	default:
