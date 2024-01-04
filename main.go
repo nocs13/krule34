@@ -154,6 +154,8 @@ func hostOnly(addr string) string {
 
 	if err != nil {
 		if strings.Contains(err.Error(), "missing port in address") == true {
+			log.Println("SplitHostPort: port absent.")
+
 			return addr
 		}
 
