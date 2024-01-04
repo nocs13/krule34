@@ -714,15 +714,15 @@ func GetAutocomplete(id string) string {
 	//url := "https://rule34.xxx/autocomplete.php?q=" + id
 	url := "https://rule34.us/index.php?r=autocomplete&term=" + id + "&limit=10"
 
-	/*
-		client := &http.Client{}
-		req, _ := http.NewRequest("GET", url, nil)
-		req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36")
+	log.Println("GetAutocomplete: Formed url is ", url)
 
-		res, err := client.Do(req)
-	*/
+	client := &http.Client{}
+	req, _ := http.NewRequest("POST", url, nil)
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36")
 
-	res, err := http.Get(url)
+	res, err := client.Do(req)
+
+	//res, err := http.Get(url)
 
 	if err != nil || res == nil {
 		log.Println("GetAutocomplete: Failed GET request.")
