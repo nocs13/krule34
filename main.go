@@ -234,6 +234,12 @@ func handleSitemap(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, data)
 }
 
+func handleRobots(w http.ResponseWriter, r *http.Request) {
+	data := libs.ReadFile("robots.txt")
+
+	io.WriteString(w, data)
+}
+
 func handleIndex(w http.ResponseWriter, r *http.Request) {
 	log.Println("run handler hello " + r.URL.Path)
 
@@ -1164,6 +1170,7 @@ func main() {
 	h.Add("/contactus", handleContactUs)
 	h.Add("/command", handleCommand)
 
+	h.Add("/robots.txt", handleRobots)
 	h.Add("/sitemap.xml", handleSitemap)
 	h.Add("/BingSiteAuth.xml", handleBingSiteAuth)
 	h.Add("/googleb295dd6d4113b434.html", handleGoogleSiteAuth)
