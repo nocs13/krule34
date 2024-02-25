@@ -1,8 +1,7 @@
 package libs
 
-import "fmt"
-
 //ContentToXML ...
+/*
 func ContentToXML(c *Content) string {
 	var res string
 
@@ -36,3 +35,4 @@ func ContentToXML(c *Content) string {
 
 	return res
 }
+*/
