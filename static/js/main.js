@@ -27,7 +27,7 @@ function resetPages() {
 
   $('#pages').empty();
   $('#pagesMax').text(0);
-  $('#pages').attr({ "max": 0, "min": 0 });
+  $('#pages').attr({ "max": 1, "min": 0 });
 }
 
 function hideImgMenu() {
@@ -128,13 +128,13 @@ function showImgInfo(arts, char, tags) {
   var ts = null;
 
   if (arts)
-    as = JSON.parse(arts).artists.split(",");
+    as = arts;
 
   if (char)
-    cs = JSON.parse(char).characters.split(",");
+    cs = char;
 
   if (tags)
-    ts = tags.split(" ");
+    ts = tags;
 
   var date = new Date();
 
@@ -386,6 +386,10 @@ function parseJSON(data) {
   offset = parseInt(ops.offset, 10);
 
   var maxPages = parseInt(count / thpp, 10);
+  var curPage = parseInt(offset / thpp, 10);
+
+  //if ((count % maxPages) > 0) 
+  maxPages++;
 
   if (maxPages > 1000)
     maxPages = 1000;
@@ -393,6 +397,7 @@ function parseJSON(data) {
   $('#pagesMax').text(maxPages);
 
   $('#pages').attr({ "max": maxPages, "min": 0 });
+  $('#pages').val(curPage);
 
   if (items.length > 0) {
     var imode = sessionStorage.getItem('image_list_mode');
@@ -636,25 +641,12 @@ function onInfo(id) {
     return;
   }
 
-  $.get("/getcharacter", { id: id }, function (data) {
-    $('#busy').hide();
-
-    char = data;
+  $.get("/gettags", { id: id }, function (data) {
   })
-    .done(function () {
-      $.get("/getartist", { id: id }, function (data) {
-        arts = data;
-      })
-        .done(function () {
-          if (char == null && arts == null) {
-
-          }
-          $('#busy').hide();
-          showImgInfo(arts, char, item.tags);
-        })
-        .fail(function () {
-          $('#busy').hide();
-        })
+    .done(function (data) {
+      $('#busy').hide();
+      var tags = JSON.parse(data);
+      showImgInfo(tags.artists, tags.characters, tags.tags);
     })
     .fail(function () {
       $('#busy').hide();

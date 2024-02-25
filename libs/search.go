@@ -1,7 +1,6 @@
 package libs
 
 import (
-	"container/list"
 	"encoding/xml"
 	"fmt"
 	"io"
@@ -16,14 +15,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-// Content is ...
-type Content struct {
-	ids    *list.List
-	tags   *list.List
-	images *list.List
-	thumbs *list.List
-	pages  *list.List
-	artist *list.List
+type R34XXX struct {
 }
 
 //search by id
@@ -70,17 +62,12 @@ func IsTokenAttr(tok *html.Token, tag string, key string, val string) bool {
 		return false
 	}
 
-	//log.Println("IsTokenAttr: tk is " + tok.Data)
-
 	if tok.Data != tag {
 		return false
 	}
 
 	for _, a := range tok.Attr {
-		//log.Println("IsTokenArrt: Current attribute is " + a.Key + "/" + a.Val)
-
 		if a.Key == key && a.Val == val {
-			//log.Println("IsTokenArrt: Found XXXXXX")
 			return true
 		}
 	}
@@ -174,7 +161,7 @@ func IsVideo(uri string) bool {
 	return true
 }
 
-func convertThumb(src string, anim bool) string {
+func (self R34XXX) convertThumb(src string, anim bool) string {
 	var r string
 
 	r = ""
@@ -260,7 +247,7 @@ func convertThumb(src string, anim bool) string {
 	return r
 }
 
-func parseImage(url string) string {
+func (self R34XXX) parseImage(url string) string {
 	var r string
 
 	log.Println("Parsing rul: " + url)
@@ -318,7 +305,8 @@ wloop:
 
 			if IsTokenAttr(&tn, "img", "id", "image") == true {
 				r = GetTokenAttr(&tn, "img", "src")
-			} else if avideo && IsTokenAttr(&tn, "source", "type", "video/webm") {
+			} else if avideo && (IsTokenAttr(&tn, "source", "type", "video/webm") ||
+				IsTokenAttr(&tn, "source", "type", "video/mp4")) {
 				s := GetTokenAttr(&tn, "source", "src")
 
 				r = s
@@ -335,22 +323,21 @@ wloop:
 	return r
 }
 
-func parseImageUS(url string) string {
+func (self R34XXX) GetTags(id string) string {
 	var r string
 
-	log.Println("Parsing url: " + url)
+	log.Println("Parsing post id: " + id)
 
-	if url == "" {
-		log.Println("Wrong url.")
+	if id == "" {
+		log.Println("Wrong post id.")
 
 		return ""
 	}
+	url := "https://rule34.xxx/index.php?page=post&s=view&id=" + id
 
 	client := &http.Client{}
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36")
-	//req.AddCookie(&http.Cookie{Name: "resize-original", Value: "1"})
-	//req.AddCookie(&http.Cookie{Name: "resize-notification", Value: "1"})
 
 	res, err := client.Do(req)
 
@@ -364,79 +351,68 @@ func parseImageUS(url string) string {
 
 	tok := html.NewTokenizer(res.Body)
 
-	var divPushContent bool
+	var atag = false
+	var ctag = false
+	var gtag = false
 
-	divPushContent = false
+	var hreftag = false
 
-	//var xst string
-
-	//xst = ""
-
-	//wloop:
-	count := 0
-	avideo := false
+	var tags []string
+	var artists []string
+	var characters []string
 
 	for {
 		stat := tok.Next()
 
 		tn := tok.Token()
 
-		count++
-
-		if tn.Data == "img" {
-			ss := GetTokenAttr(&tn, "img", "src")
-			log.Println("Actual image sourceis: " + ss)
-		}
-
 		if stat == html.ErrorToken {
-			log.Println("Tokenizer error " + fmt.Sprintf("%v", tok.Err()))
-			divPushContent = false
 			break
 		} else if stat == html.StartTagToken {
-			if tn.Data == "img" {
-				ss := GetTokenAttr(&tn, "img", "src")
-				log.Println("Img is open id " + fmt.Sprintf("%v", count))
+			if IsTokenAttr(&tn, "li", "class", "tag-type-artist tag") {
+				atag = true
+				log.Println("Open artist tag")
+			} else if IsTokenAttr(&tn, "li", "class", "tag-type-character tag") {
+				ctag = true
+				log.Println("Open character tag")
+			} else if IsTokenAttr(&tn, "li", "class", "tag-type-general tag") {
+				gtag = true
+				log.Println("Open general tag")
+			} else if tn.Data == "a" && (atag || ctag || gtag) {
+				href := GetTokenAttr(&tn, "a", "href")
 
-				if divPushContent == true && r == "" {
-					r = ss
-
-					break
+				if strings.Contains(href, "&tags=") {
+					hreftag = true
+				} else {
+					hreftag = false
 				}
-			} else if tn.Data == "video" {
-				avideo = true
-			} else if tn.Data == "source" && avideo == true && divPushContent == true {
-				ss := GetTokenAttr(&tn, "source", "src")
-
-				if strings.Contains(ss, ".webm") {
-					r = ss
-				}
-			}
-
-			if IsToken(&tn, "div", "content_push") {
-				xst := GetTokenAttr(&tn, "div", "class")
-				log.Println("Open div class is: " + xst)
-
-				divPushContent = true
-				log.Println("Push content set.")
 			}
 		} else if stat == html.EndTagToken {
-			if tn.Data == "img" {
-				log.Println("Img is close id " + fmt.Sprintf("%v", count))
-			} else if tn.Data == "video" {
-				avideo = false
-			}
-
-			if IsToken(&tn, "div", "content_push") {
-				divPushContent = false
-				log.Println("Push content unset.")
+			if tn.Data == "li" && atag {
+				atag = false
+				log.Println("Close artist tag")
+			} else if tn.Data == "li" && ctag {
+				ctag = false
+				log.Println("Close character tag")
+			} else if tn.Data == "li" && gtag {
+				gtag = false
+				log.Println("Close general tag")
+			} else if tn.Data == "a" {
+				hreftag = false
 			}
 		} else if stat == html.SelfClosingTagToken {
-			if tn.Data == "source" && avideo == true && divPushContent == true {
-				ss := GetTokenAttr(&tn, "source", "src")
+		} else if stat == html.TextToken {
+			log.Println("Text tag is: ", tn.Data)
+			if !hreftag || tn.Data == "?" || tn.Data == "\n" {
+				continue
+			}
 
-				if strings.Contains(ss, ".webm") {
-					r = ss
-				}
+			if atag {
+				artists = append(artists, tn.Data)
+			} else if ctag {
+				characters = append(characters, tn.Data)
+			} else if gtag {
+				tags = append(tags, tn.Data)
 			}
 		}
 	}
@@ -445,18 +421,47 @@ func parseImageUS(url string) string {
 		log.Println("Parse page error: " + fmt.Sprintf("%v", err))
 	}
 
-	log.Println("Parsing result is: " + r)
+	r = "{\"artists\":["
 
-	//return r
-	if strings.Index(r, "https://video.rule34.us/") != -1 {
-		return strings.Replace(r, "https://video.rule34.us/", "/video/", -1)
+	if len(artists) > 0 {
+		for _, s := range artists {
+			r += "\"" + s + "\","
+		}
+
+		r = r[:len(r)-1]
 	}
 
-	return strings.Replace(r, "https://img2.rule34.us", "", -1)
+	r += "],"
+	r += "\"characters\":["
+
+	if len(characters) > 0 {
+		for _, s := range characters {
+			r += "\"" + s + "\","
+		}
+
+		r = r[:len(r)-1]
+	}
+
+	r += "],"
+	r += "\"tags\":["
+
+	if len(tags) > 0 {
+		for _, s := range tags {
+			r += "\"" + s + "\","
+		}
+
+		r = r[:len(r)-1]
+	}
+
+	r += "]"
+	r += "}"
+
+	log.Println("Parsing result is: " + r)
+
+	return r
 }
 
-// GetArtistUS ...
-func GetArtist(id string) string {
+func (self R34XXX) GetArtist(id string) string {
 	var r string
 
 	log.Println("Parsing post id: " + id)
@@ -466,54 +471,7 @@ func GetArtist(id string) string {
 
 		return ""
 	}
-	/*
-		var posts XPosts
 
-		url := "https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&limit=42&json=0&id=" + id
-
-		client := &http.Client{}
-		req, _ := http.NewRequest("GET", url, nil)
-		req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36")
-
-		res, err := client.Do(req)
-
-		//res, err := client.Get("https://www.google.com/search?q=" + s)
-
-		if err != nil || res == nil {
-			log.Println("Search failed. Id: " + id)
-		}
-
-		defer res.Body.Close()
-
-		responseData, err := ioutil.ReadAll(res.Body)
-
-		if err != nil {
-			log.Println("Read body data error:" + err.Error())
-
-			return ""
-		}
-
-		final := string(responseData)
-
-		log.Println(final)
-
-		err = xml.Unmarshal([]byte(final), &posts)
-
-		if err != nil {
-			log.Println("Parse error " + err.Error())
-
-			return ""
-		}
-
-		fmt.Printf("Count : %+v \n", posts.Count)
-		fmt.Printf("Offset : %+v \n", posts.Offset)
-
-		defer res.Body.Close()
-
-		if posts.Count < 1 {
-			return ""
-		}
-	*/
 	url := "https://rule34.xxx/index.php?page=post&s=view&id=" + id
 
 	client := &http.Client{}
@@ -547,7 +505,7 @@ func GetArtist(id string) string {
 			if IsTokenAttr(&tn, "li", "class", "tag-type-artist tag") {
 				atag = true
 				log.Println("Open artist tag")
-			} else if tn.Data == "a" && atag == true {
+			} else if tn.Data == "a" && atag {
 				href := GetTokenAttr(&tn, "a", "href")
 
 				if !strings.Contains(href, "&tags=") {
@@ -608,8 +566,7 @@ func GetArtist(id string) string {
 	return r
 }
 
-// GetCharacter ...
-func GetCharacter(id string) string {
+func (self R34XXX) GetCharacter(id string) string {
 	var r string
 
 	log.Println("Parsing post id: " + id)
@@ -654,7 +611,7 @@ func GetCharacter(id string) string {
 		} else if stat == html.StartTagToken {
 			if IsTokenAttr(&tn, "li", "class", "tag-type-character tag") {
 				atag = true
-			} else if tn.Data == "a" && atag == true {
+			} else if tn.Data == "a" && atag {
 				href := GetTokenAttr(&tn, "a", "href")
 
 				if strings.Contains(href, "page=wiki") {
@@ -710,45 +667,8 @@ func GetCharacter(id string) string {
 	return r
 }
 
-func GetAutocomplete(id string) string {
+func (self R34XXX) GetAutocomplete(id string) string {
 	url := "https://rule34.xxx/autocomplete.php?q=" + id
-
-	log.Println("GetAutocomplete: Formed url is ", url)
-
-	client := &http.Client{}
-	req, _ := http.NewRequest("POST", url, nil)
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36")
-
-	res, err := client.Do(req)
-
-	//res, err := http.Get(url)
-
-	if err != nil || res == nil {
-		log.Println("GetAutocomplete: Failed GET request.")
-
-		return ""
-	}
-
-	defer res.Body.Close()
-
-	//responseData, err := ioutil.ReadAll(res.Body)
-	responseData, err := io.ReadAll(res.Body)
-
-	if err != nil {
-		log.Println("GetAutocomplete: Read body data error:" + err.Error())
-
-		return ""
-	}
-
-	final := string(responseData)
-
-	log.Println("Autocomplete: " + final)
-
-	return final
-}
-
-func GetAutocompleteUS(id string) string {
-	url := "https://rule34.us/index.php?r=autocomplete&term=" + id + "&limit=10"
 
 	log.Println("GetAutocomplete: Formed url is ", url)
 
@@ -835,26 +755,32 @@ type XPosts struct {
 	Posts   []XPost  `xml:"post"`
 }
 
-// Search is ...
-func Search(key string, pid string) string {
+func (self R34XXX) Search(key string, pid string) string {
 	var r string
 
-	//var nodes []JsNode
-	var posts XPosts
+	icount := 0
+	ioffset := 0
 
-	ss := "https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&limit=42&json=0&tags=" + key
+	//var nodes []JsNode
+	//var posts XPosts
+
+	//ss := "https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&limit=42&json=0&tags=" + key
+	ss := "https://rule34.xxx/index.php?page=post&s=list&tags=" + key
 
 	if pid != "" {
+		ioffset, _ = strconv.Atoi(pid)
+		ioffset *= 42
+		pid = strconv.Itoa(ioffset)
 		ss += "&pid=" + pid
 	}
+
+	log.Println("Search url: " + ss)
 
 	client := &http.Client{}
 	req, _ := http.NewRequest("GET", ss, nil)
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36")
 
 	res, err := client.Do(req)
-
-	//res, err := client.Get("https://www.google.com/search?q=" + s)
 
 	if err != nil || res == nil {
 		log.Println("Search failed. Tag: " + key)
@@ -862,91 +788,229 @@ func Search(key string, pid string) string {
 
 	defer res.Body.Close()
 
-	responseData, err := io.ReadAll(res.Body)
+	/*
+		responseData, err := io.ReadAll(res.Body)
 
-	if err != nil {
-		log.Println("Read body data error:" + err.Error())
+		if err != nil {
+			log.Println("Read body data error:" + err.Error())
+		}
+
+		log.Println("Read body result: " + string(responseData))
+
+		final := string(responseData)
+
+		//log.Println(final)
+
+		err = xml.Unmarshal([]byte(final), &posts)
+
+		//err = json.Unmarshal([]byte(final), &nodes)
+
+		if err != nil {
+			log.Println("Parse error " + err.Error())
+		}
+
+		fmt.Printf("Count : %+v \n", posts.Count)
+		fmt.Printf("Offset : %+v \n", posts.Offset)
+
+		//log.Println("Elements count is " + string(len(nodes)))
+
+		r = "["
+		//xxx_row := 1
+		for _, n := range posts.Posts {
+			t := n.Tags
+
+			if string(t[0:1]) == "\\" {
+				continue
+			}
+
+			//log.Println("Tags " + strconv.Itoa(xxx_row) + " " + t)
+			//fmt.Printf("%x.\n", t)
+			//xxx_row++
+
+			if IsPrintable(t) == false {
+				fmt.Printf("Non printable should correct.\n")
+				t = strings.Map(func(r rune) rune {
+					if unicode.IsPrint(r) {
+						return r
+					}
+					return -1
+				}, t)
+			}
+
+			//log.Println("Element " + n.Hash)
+			r += "{"
+			r += `"id":`
+			r += `"` + strconv.Itoa(n.Id) + `",`
+
+			//t = strings.Replace(t, `\||/`, "", -1)
+			t = strings.Replace(t, "\\", "\\\\", -1)
+			t = strings.Replace(t, "\n", "", -1)
+			t = strings.Replace(t, "\"", " ", -1)
+
+			r += `"tags":`
+			r += `"` + t + `",`
+
+			r += `"thumb":`
+			r += `"` + n.Preview_url + `",`
+
+			r += `"image":`
+			r += `"` + n.Sample_url + `"`
+
+			r += "},\n"
+		}
+
+		//if len(r) > 1 {
+		//	r = r[:len(r)-1]
+		//}
+
+		r += "{" + `"count":"` + strconv.Itoa(posts.Count) + `", "offset":"` + strconv.Itoa(posts.Offset) + `"}`
+
+		r += "]"
+
+		//log.Println("JSON: " + r)
+	*/
+
+	type EL struct {
+		id    string
+		tags  string
+		image string
+		thumb string
 	}
 
-	log.Println("Read body result: " + string(responseData))
+	var elems []EL
 
-	final := string(responseData)
+	tok := html.NewTokenizer(res.Body)
 
-	//log.Println(final)
+	var ttype string
 
-	err = xml.Unmarshal([]byte(final), &posts)
+	var alink bool
 
-	//err = json.Unmarshal([]byte(final), &nodes)
+	ttype = ""
+	alink = false
 
-	if err != nil {
-		log.Println("Parse error " + err.Error())
+	log.Println("Start search procedure...")
+
+wloop:
+	for {
+		stat := tok.Next()
+
+		switch {
+		case stat == html.ErrorToken:
+			log.Println("Tokenizer error.")
+			break wloop
+		case stat == html.StartTagToken:
+			tn := tok.Token()
+
+			if IsTokenAttr(&tn, "li", "class", "tag-type-metadata") || IsTokenAttr(&tn, "li", "class", "tag-type-general") {
+				log.Println("Token for tag.")
+				ttype = "tag"
+			} else if IsTokenAttr(&tn, "li", "class", "tag-type-artist") {
+				log.Println("Token for thumb.")
+				ttype = "artist"
+			} else if IsToken(&tn, "span", "thumb") {
+				log.Println("Token for thumb.")
+				ttype = "thumb"
+				el := EL{}
+				el.id = fmt.Sprintf("%v", GetTokenAttr(&tn, "span", "id")[1:])
+				elems = append(elems, el)
+
+			} else if IsToken(&tn, "div", "image-list") {
+				log.Println("Token for images list.")
+				ttype = "images"
+			} else if IsToken(&tn, "div", "pagination") {
+				log.Println("Token for pagination.")
+				ttype = "pagination"
+			}
+
+			if tn.Data == "a" {
+				log.Println("Token for A.")
+
+				if ttype == "thumb" {
+					alink = true
+					imgHref := "https://rule34.xxx" + GetTokenAttr(&tn, "a", "href")
+					//thumbs = append(thumbs, thumbHref)
+					elems[len(elems)-1].image = fmt.Sprintf("%v", imgHref)
+				} else if ttype == "pagination" {
+					alink = true
+
+					alt := GetTokenAttr(&tn, "a", "alt")
+
+					if alt != "last page" {
+						continue
+					}
+
+					href := GetTokenAttr(&tn, "a", "href")
+
+					if href != "" {
+						re := regexp.MustCompile(`pid=(.+)$`)
+						mc := fmt.Sprintf("%v", re.FindString(href))
+						mc = strings.Replace(mc, "pid=", "", 1)
+
+						icount, err = strconv.Atoi(mc)
+
+						if err != nil {
+							icount = 0
+						}
+					}
+				}
+			}
+		case stat == html.EndTagToken:
+			tn := tok.Token()
+
+			if tn.Data == "li" || tn.Data == "span" || tn.Data == "div" {
+				ttype = ""
+			}
+
+			if tn.Data == "a" {
+				log.Println("Token a closing.")
+				alink = false
+			}
+		case stat == html.SelfClosingTagToken:
+			tn := tok.Token()
+
+			log.Println("Token tag is: " + tn.Data)
+			if IsToken(&tn, "img", "preview") && alink == true {
+				log.Println("Token for image preview.")
+
+				elems[len(elems)-1].tags = GetTokenAttr(&tn, "img", "title")
+				elems[len(elems)-1].thumb = GetTokenAttr(&tn, "img", "src")
+
+				elems[len(elems)-1].image = self.parseImage("https://rule34.xxx/index.php?page=post&s=view&id=" + elems[len(elems)-1].id)
+			}
+		}
 	}
 
-	fmt.Printf("Count : %+v \n", posts.Count)
-	fmt.Printf("Offset : %+v \n", posts.Offset)
-
-	//log.Println("Elements count is " + string(len(nodes)))
+	log.Println("End search procedure...")
 
 	r = "["
-	//xxx_row := 1
-	for _, n := range posts.Posts {
-		t := n.Tags
 
-		if string(t[0:1]) == "\\" {
-			continue
-		}
-
-		//log.Println("Tags " + strconv.Itoa(xxx_row) + " " + t)
-		//fmt.Printf("%x.\n", t)
-		//xxx_row++
-
-		if IsPrintable(t) == false {
-			fmt.Printf("Non printable should correct.\n")
-			t = strings.Map(func(r rune) rune {
-				if unicode.IsPrint(r) {
-					return r
-				}
-				return -1
-			}, t)
-		}
-
-		//log.Println("Element " + n.Hash)
+	for _, e := range elems {
 		r += "{"
 		r += `"id":`
-		r += `"` + strconv.Itoa(n.Id) + `",`
-
-		//t = strings.Replace(t, `\||/`, "", -1)
-		t = strings.Replace(t, "\\", "\\\\", -1)
-		t = strings.Replace(t, "\n", "", -1)
-		t = strings.Replace(t, "\"", " ", -1)
+		r += `"` + e.id + `",`
 
 		r += `"tags":`
-		r += `"` + t + `",`
+		r += `"` + e.tags + `",`
 
 		r += `"thumb":`
-		r += `"` + n.Preview_url + `",`
+		r += `"` + e.thumb + `",`
 
 		r += `"image":`
-		r += `"` + n.Sample_url + `"`
+		r += `"` + e.image + `"`
 
 		r += "},\n"
 	}
 
-	//if len(r) > 1 {
-	//	r = r[:len(r)-1]
-	//}
-
-	r += "{" + `"count":"` + strconv.Itoa(posts.Count) + `", "offset":"` + strconv.Itoa(posts.Offset) + `"}`
-
+	if icount < ioffset {
+		icount = ioffset
+	}
+	r += "{" + `"count":"` + strconv.Itoa(icount) + `", "offset":"` + strconv.Itoa(ioffset) + `"}`
 	r += "]"
 
-	//log.Println("JSON: " + r)
-
 	return r
 }
 
-// Search is ...
-func SearchImage(id string) string {
+func (self R34XXX) SearchImage(id string) string {
 	var r string
 
 	var posts XPosts
@@ -1001,10 +1065,8 @@ func SearchImage(id string) string {
 	return r
 }
 
-func SearchImageInfo(id string) string {
+func (self R34XXX) SearchImageInfo(id string) string {
 	var r string
-
-	var posts XPosts
 
 	ss := "https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&limit=42&json=0&id=" + id
 
@@ -1022,44 +1084,46 @@ func SearchImageInfo(id string) string {
 
 	defer res.Body.Close()
 
-	responseData, err := ioutil.ReadAll(res.Body)
+	/*
 
-	if err != nil {
-		log.Println("Read body data error:" + err.Error())
-	}
+		responseData, err := io.ReadAll(res.Body)
 
-	final := string(responseData)
+		if err != nil {
+			log.Println("Read body data error:" + err.Error())
+		}
 
-	err = xml.Unmarshal([]byte(final), &posts)
+		final := string(responseData)
 
-	if err != nil {
-		log.Println("Parse error " + err.Error())
-	} else {
-		log.Println("Parse post ", posts.Posts[0])
-	}
+		err = xml.Unmarshal([]byte(final), &posts)
 
-	fmt.Printf("Count : %+v \n", posts.Count)
-	fmt.Printf("Offset : %+v \n", posts.Offset)
+		if err != nil {
+			log.Println("Parse error " + err.Error())
+		} else {
+			log.Println("Parse post ", posts.Posts[0])
+		}
 
-	r = "{"
+		fmt.Printf("Count : %+v \n", posts.Count)
+		fmt.Printf("Offset : %+v \n", posts.Offset)
 
-	if posts.Count > 0 {
-		post := posts.Posts[0]
+		r = "{"
 
-		r += "\"url\" : \"" + post.File_url + "\""
-		r += ", \"thumb\" : \"" + post.Preview_url + "\""
-		r += ", \"sample\" : \"" + post.Sample_url + "\""
-		r += ", \"tags\" : \"" + post.Tags + "\""
-	}
+		if posts.Count > 0 {
+			post := posts.Posts[0]
 
-	r += "}"
+			r += "\"url\" : \"" + post.File_url + "\""
+			r += ", \"thumb\" : \"" + post.Preview_url + "\""
+			r += ", \"sample\" : \"" + post.Sample_url + "\""
+			r += ", \"tags\" : \"" + post.Tags + "\""
+		}
+
+		r += "}"
+
+	*/
 
 	return r
 }
 
-// GetImage is ...
-// func GetImage(uri string) io.Reader {
-func GetImage(uri string) *http.Response {
+func (self R34XXX) GetImage(uri string) *http.Response {
 	response, err := http.Get(uri)
 
 	log.Println("GetImage: " + uri)
@@ -1079,9 +1143,7 @@ func GetImage(uri string) *http.Response {
 	return response
 }
 
-// GetVideo is ...
-// func GetVideo(uri string) io.Reader {
-func GetVideo(uri string) *http.Response {
+func (self R34XXX) GetVideo(uri string) *http.Response {
 	response, err := http.Get(uri)
 
 	log.Println("GetVideo: " + uri)
@@ -1099,32 +1161,4 @@ func GetVideo(uri string) *http.Response {
 	}
 
 	return response
-}
-
-// GetVideoUS is ...
-func GetVideoUS(uri string) io.Reader {
-	if strings.Index(uri, "/video/") == -1 {
-		log.Println("Invalid video url: " + uri)
-
-		return nil
-	}
-
-	//url := "https://img2.rule34.us" + uri
-	url := strings.Replace(uri, "/video/", "https://video.rule34.us/", -1)
-
-	response, err := http.Get(url)
-
-	if err != nil {
-		log.Println("Cannot get video from url: " + url)
-
-		return nil
-	}
-
-	if response.StatusCode != 200 {
-		log.Println("Received non 200 response code")
-
-		return nil
-	}
-
-	return response.Body
 }

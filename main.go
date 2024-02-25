@@ -61,6 +61,10 @@ var dbaddr string
 
 var dbrequest *libs.DbRequest = nil
 
+var r34 libs.R34XXX = libs.R34XXX{}
+
+//var r34 libs.R34US = libs.R34US{}
+
 func (h *WebHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	//h.mu.Lock()
@@ -87,8 +91,9 @@ func (h *WebHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		log.Println("Handle artist")
 		handleCharacter(w, r)
 	} else if len(url) >= len("/k34tag/") && url[0:8] == "/k34tag/" {
-		log.Println("Handle artist")
-		handleCharacter(w, r)
+		log.Println("Handle tags")
+		//handleCharacter(w, r)
+		handleTag(w, r)
 	} else if len(url) > len("/images/") && url[0:8] == "/images/" {
 		log.Println("Handle images")
 		handleGetImage(w, r)
@@ -275,7 +280,7 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("run handler search " + key)
 
-	var content = libs.Search(key, "")
+	var content = r34.Search(key, "")
 
 	if content == "" {
 		return
@@ -296,9 +301,7 @@ func handlePage(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("run handler search " + tag + " " + pid)
 
-	var content = libs.Search(tag, pid)
-
-	//str := libs.ContentToXML(content)
+	var content = r34.Search(tag, pid)
 
 	io.WriteString(w, content)
 }
@@ -310,9 +313,7 @@ func handleTag(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("run handler tag " + tag)
 
-	var content = libs.Search(tag, "")
-
-	//str := libs.ContentToXML(content)
+	var content = r34.Search(tag, "")
 
 	io.WriteString(w, content)
 }
@@ -324,9 +325,7 @@ func handleInfo(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("run handler info " + id)
 
-	var content = libs.SearchImageInfo(id)
-
-	//str := libs.ContentToXML(content)
+	var content = r34.SearchImageInfo(id)
 
 	io.WriteString(w, content)
 }
@@ -342,7 +341,7 @@ func handleGetArtist(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("run handler getartist " + id)
 
-	str := libs.GetArtist(id)
+	str := r34.GetArtist(id)
 
 	io.WriteString(w, str)
 }
@@ -358,11 +357,23 @@ func handleGetCharacter(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("run handler getcharacter " + id)
 
-	str := libs.GetCharacter(id)
+	str := r34.GetCharacter(id)
 
-	if str == "" {
-		str = "<empty></empty>"
+	io.WriteString(w, str)
+}
+
+func handleGetTags(w http.ResponseWriter, r *http.Request) {
+	log.Println("run handler get character " + r.URL.Path)
+
+	var id = getValue(r, "id")
+
+	if id == "" {
+		id = "none"
 	}
+
+	log.Println("run handler getcharacter " + id)
+
+	str := r34.GetTags(id)
 
 	io.WriteString(w, str)
 }
@@ -392,7 +403,7 @@ func handleGetImage(w http.ResponseWriter, r *http.Request) {
 
 	var url = getValue(r, "url")
 
-	ri := libs.GetImage(url)
+	ri := r34.GetImage(url)
 
 	if ri == nil {
 		log.Println("while handle get image " + r.URL.Path)
@@ -436,7 +447,7 @@ func handleGetVideo(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("video url is " + url)
 
-	ri := libs.GetVideo(url)
+	ri := r34.GetVideo(url)
 
 	if ri == nil {
 		log.Println("while handle get video " + r.URL.Path)
@@ -486,7 +497,7 @@ func handleGetVideoById(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("video id is " + id)
 
-	v := libs.SearchImage(id)
+	v := r34.SearchImage(id)
 
 	var jn map[string]string
 
@@ -502,7 +513,7 @@ func handleGetVideoById(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("video id url is " + url)
 
-	ri := libs.GetVideo(url)
+	ri := r34.GetVideo(url)
 
 	if ri == nil {
 		log.Println("Unable handle get video " + r.URL.Path)
@@ -558,7 +569,7 @@ func handleGetAutocomplete(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("run handler get autocomplete " + id)
 
-	str := libs.GetAutocomplete(id)
+	str := r34.GetAutocomplete(id)
 
 	io.WriteString(w, str)
 }
@@ -1065,7 +1076,7 @@ func cmdUserImageData(sid string, image string) (string, bool) {
 	vs := strings.Split(image, ",")
 
 	if vs == nil || len(vs) < 1 {
-		v := libs.SearchImage(image)
+		v := r34.SearchImage(image)
 
 		return v, true
 	}
@@ -1073,7 +1084,7 @@ func cmdUserImageData(sid string, image string) (string, bool) {
 	var res string
 
 	for i, v := range vs {
-		res += libs.SearchImage(v)
+		res += r34.SearchImage(v)
 
 		if i != len(vs)-1 {
 			res += ", "
@@ -1142,7 +1153,7 @@ func main() {
 
 	r := dbrequest.OpenSession(dbhost, int32(dbport), dbuser, dbpass)
 
-	if r != true {
+	if !r {
 		log.Println("Unable open database session.")
 	}
 
@@ -1156,6 +1167,7 @@ func main() {
 	h.Add("/info", handleInfo)
 	h.Add("/page", handlePage)
 	h.Add("/search", handleSearch)
+	h.Add("/gettags", handleGetTags)
 	h.Add("/getimage", handleGetImage)
 	h.Add("/getvideo", handleGetVideo)
 	h.Add("/getartist", handleGetArtist)
