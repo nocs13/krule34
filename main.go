@@ -61,9 +61,9 @@ var dbaddr string
 
 var dbrequest *libs.DbRequest = nil
 
-var r34 libs.R34XXX = libs.R34XXX{}
+//var r34 libs.R34XXX = libs.R34XXX{}
 
-//var r34 libs.R34US = libs.R34US{}
+var r34 libs.R34US = libs.R34US{}
 
 func (h *WebHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
@@ -72,10 +72,6 @@ func (h *WebHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Println("Run web handler " + r.URL.Path)
 
 	var url = r.URL.Path
-
-	if len(url) > 7 {
-		log.Println("Run web  " + r.URL.Path[0:8])
-	}
 
 	clientIP := getHostIP(r)
 
@@ -403,6 +399,8 @@ func handleGetImage(w http.ResponseWriter, r *http.Request) {
 
 	var url = getValue(r, "url")
 
+	log.Println("getImage url is: " + url)
+
 	ri := r34.GetImage(url)
 
 	if ri == nil {
@@ -455,39 +453,37 @@ func handleGetVideo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, url, http.StatusFound)
+	//http.Redirect(w, r, url, http.StatusFound)
 
-	return
+	//return
 
-	/*
-		farr := strings.Split(url, "/")
+	farr := strings.Split(url, "/")
 
-		fname := farr[len(farr)-1]
+	fname := farr[len(farr)-1]
 
-		var contentType string = ""
+	var contentType string = ""
 
-		if strings.HasSuffix(url, ".mp4") {
-			contentType = "video/mp4"
-		} else if strings.HasSuffix(url, ".webm") {
-			contentType = "video/webm"
-		}
+	if strings.HasSuffix(url, ".mp4") {
+		contentType = "video/mp4"
+	} else if strings.HasSuffix(url, ".webm") {
+		contentType = "video/webm"
+	}
 
-		contentSize := strconv.FormatInt(ri.ContentLength, 10)
-		s64, _ := strconv.ParseInt(contentSize, 10, 32)
-		s64--
+	contentSize := strconv.FormatInt(ri.ContentLength, 10)
+	s64, _ := strconv.ParseInt(contentSize, 10, 32)
+	s64--
 
-		w.Header().Set("Content-Type", contentType)
-		w.Header().Add("Accept-Ranges", "bytes")
-		w.Header().Add("Content-Length", contentSize)
-		w.Header().Add("Content-Disposition", "inline; filename="+fname+"")
+	w.Header().Set("Content-Type", contentType)
+	w.Header().Add("Accept-Ranges", "bytes")
+	w.Header().Add("Content-Length", contentSize)
+	w.Header().Add("Content-Disposition", "inline; filename="+fname+"")
 
-		//requestedBytes := r.Header.Get("Range")
-		//w.Header().Add("Content-Range", "bytes "+requestedBytes[6:len(requestedBytes)]+
-		//	s32+"/"+contentSize)
-		w.Header().Add("Content-Range", "bytes 0 "+contentSize+"/"+contentSize)
+	//requestedBytes := r.Header.Get("Range")
+	//w.Header().Add("Content-Range", "bytes "+requestedBytes[6:len(requestedBytes)]+
+	//	s32+"/"+contentSize)
+	w.Header().Add("Content-Range", "bytes 0 "+contentSize+"/"+contentSize)
 
-		io.Copy(w, ri.Body)
-	*/
+	io.Copy(w, ri.Body)
 }
 
 func handleGetVideoById(w http.ResponseWriter, r *http.Request) {

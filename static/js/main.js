@@ -291,7 +291,7 @@ function showImageGallery(images, thumbs, ids) {
   let d = "";
 
   for (i in items) {
-    imgSlide.add(items[i].thumb, items[i].id, items[i].image);
+    imgSlide.add('/getimage?url=' + items[i].thumb, items[i].id, '/getimage?url=' + items[i].image);
   }
 
   imgSlide.set(items[0].image, items[0].id);
